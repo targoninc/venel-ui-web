@@ -11,5 +11,9 @@ export const routes = [
     {
         path: 'chat',
         title: 'Chat'
+    },
+    {
+        path: "uitest",
+        title: "UI Test"
     }
 ];

@@ -1,0 +1,14 @@
+.flex, .flex-v {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--gap-h);
+}
+
+.flex-v {
+    flex-direction: column;
+    gap: var(--gap-v);
+}
+
+.padded {
+    padding: var(--gap-h);
+}

@@ -30,6 +30,10 @@ export class Page {
         "login": {
             path: "login",
             component: "LoginComponent"
+        },
+        "uitest": {
+            path: "uitest",
+            component: "UiTestComponent"
         }
     };
 }
