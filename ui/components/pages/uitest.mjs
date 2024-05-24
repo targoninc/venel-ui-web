@@ -56,22 +56,9 @@ export class UiTestComponent {
                         console.log(e.target.value);
                     })
                     .build(),
-                create("select")
-                    .children(
-                        create("option")
-                            .text("Option 1")
-                            .build(),
-                        create("option")
-                            .text("Option 2")
-                            .build(),
-                        create("option")
-                            .text("Option 3")
-                            .build(),
-                    )
-                    .onchange((e) => {
-                        console.log(e.target.value);
-                    })
-                    .build(),
+                CommonTemplates.select(["Option 1", "Option 2", "Option 3"], (e) => {
+                    console.log(e.target.value);
+                })
             ).build();
     }
 }

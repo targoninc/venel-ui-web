@@ -97,5 +97,5 @@ button:hover {
 }
 
 .material-symbols-outlined {
-    font-size: var(--font-size-base);
+    font-size: var(--font-size-base) !important;
 }

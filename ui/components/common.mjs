@@ -15,4 +15,20 @@ export class CommonTemplates {
                     .build(),
             ).build();
     }
+
+    static select(options, onchange) {
+        return create("div")
+            .classes("select")
+            .children(
+                create("select")
+                    .onchange(onchange)
+                    .children(
+                        ...options.map(option => {
+                            return create("option")
+                                .text(option)
+                                .build();
+                        })
+                    ).build()
+            ).build();
+    }
 }
