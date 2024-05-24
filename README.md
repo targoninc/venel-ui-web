@@ -1,5 +1,17 @@
 # How to run
 
+This guide assumes you have Node.js and npm installed and running on your machine.
+
+```bash
+npm install
+```
+
+```bash
+npm run start
+```
+
+# How to deploy
+
 This guide assumes you have Docker and Docker Compose installed and running on your machine.
 
 ## Windows
