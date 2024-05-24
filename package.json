@@ -1,0 +1,11 @@
+{
+  "name": "venel-ui-web",
+  "version": "1.0.0",
+  "description": "This guide assumes you have Docker and Docker Compose installed and running on your machine.",
+  "main": "main.mjs",
+  "scripts": {
+    "start": "node main.mjs"
+  },
+  "author": "",
+  "license": "ISC"
+}
