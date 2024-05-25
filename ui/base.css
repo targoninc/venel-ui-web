@@ -9,6 +9,7 @@
     --blue: #16bac5ff;
     --green: #6a994eff;
     --red: #bc4749ff;
+    --purple: #6a4c93ff;
     --font-size-base: 18px;
     --gap-h: 5px;
     --gap-v: 10px;
@@ -92,7 +93,7 @@ span {
 
 button, input, textarea, select {
     background-color: var(--bg);
-    border: var(--input-border-width) solid var(--bg-3);
+    border: var(--input-border-width) solid var(--bg-4);
     border-radius: var(--input-border-radius);
     color: var(--text);
     font-family: 'Roboto', sans-serif;
@@ -104,6 +105,25 @@ button, input, textarea, select {
 button.positive, input.positive, textarea.positive, select.positive {
     border-color: var(--positive);
     color: var(--positive);
+}
+
+a {
+    color: var(--text);
+    text-decoration: none;
+    font-size: 0.8em;
+}
+
+a .material-symbols-outlined {
+    font-size: 0.9em !important;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+label {
+    color: var(--text-2);
+    font-size: 0.8em;
 }
 
 button {

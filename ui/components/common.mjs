@@ -98,7 +98,7 @@ export class CommonTemplates {
 
     static input(type, id, label, placeholder, value, onchange, required = true, autocomplete = "off", onkeydown = () => {}) {
         return create("div")
-            .classes("flex-v", "card")
+            .classes("flex-v", "small-gap")
             .children(
                 create("label")
                     .for(id)
@@ -128,11 +128,26 @@ export class CommonTemplates {
             .build();
     }
 
-    static pageLink(text, onclick, classes = []) {
-        return create("button")
-            .classes("page-link", ...classes)
-            .onclick(onclick)
-            .text(text)
-            .build();
+    static pageLink(text, target, classes = []) {
+        return create("a")
+            .href(target)
+            .target("_blank")
+            .onclick((e) => {
+                const isExternal = target.startsWith("http");
+                const middleClick = e.button === 1;
+                if (!isExternal && !middleClick) {
+                    e.preventDefault();
+                    window.router.navigate(target);
+                } else {
+                    window.open(e.target.href, "_blank");
+                }
+            })
+            .classes("page-link", "flex", "align-center", ...classes)
+            .children(
+                create("span")
+                    .text(text)
+                    .build(),
+                CommonTemplates.icon("open_in_new")
+            ).build();
     }
 }

@@ -25,6 +25,10 @@
     gap: 0;
 }
 
+.small-gap {
+    gap: var(--gap-h);
+}
+
 .bold {
     font-weight: bold;
 }
@@ -106,18 +110,28 @@
 .instance {
     padding: var(--gap-h) var(--gap-v);
     border-radius: var(--input-border-radius);
-    border: var(--input-border-width) solid var(--bg-3);
+    border: var(--input-border-width) solid var(--bg-4);
     background: var(--blue);
     color: var(--bg);
+    font-size: 0.8em;
 }
 
 .align-center {
     align-items: center;
 }
 
-.card {
-    padding: var(--gap-v);
+.card, .main-card {
+    padding: calc(var(--gap-v) * 2);
     background: var(--bg-2);
     border-radius: var(--input-border-radius);
-    border: var(--input-border-width) solid var(--bg-3);
+    border: var(--input-border-width) solid var(--bg-4);
+}
+
+.main-card {
+    width: min(100%, 500px);
+    justify-content: space-between;
+}
+
+.space-between {
+    justify-content: space-between;
 }

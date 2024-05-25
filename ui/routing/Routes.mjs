@@ -9,6 +9,10 @@ export const routes = [
         title: 'Login'
     },
     {
+        path: 'register',
+        title: 'Register'
+    },
+    {
         path: 'chat',
         title: 'Chat'
     },

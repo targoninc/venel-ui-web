@@ -3,11 +3,11 @@ import {LayoutTemplates} from "../layout.mjs";
 import {CommonTemplates} from "../common.mjs";
 import {Api} from "../../api/Api.mjs";
 
-export class LoginComponent {
+export class RegisterComponent {
     static render() {
         return LayoutTemplates.pageFull(
             LayoutTemplates.centeredContent(
-                LoginComponent.content()
+                RegisterComponent.content()
             )
         );
     }
@@ -17,6 +17,8 @@ export class LoginComponent {
         const usernameError = signal(null);
         const password = signal("");
         const passwordError = signal(null);
+        const password2 = signal("");
+        const password2Error = signal(null);
         const validate = () => {
             if (username.value.length === 0) {
                 usernameError.value = "Username cannot be empty.";
@@ -28,9 +30,17 @@ export class LoginComponent {
             } else {
                 passwordError.value = null;
             }
+            if (password2.value.length === 0) {
+                password2Error.value = "Password cannot be empty.";
+            } else if (password.value !== password2.value) {
+                password2Error.value = "Passwords do not match.";
+            } else {
+                password2Error.value = null;
+            }
         }
         username.subscribe(validate);
         password.subscribe(validate);
+        password2.subscribe(validate);
         const loading = signal(false);
 
         return create("div")
@@ -43,7 +53,7 @@ export class LoginComponent {
                             .classes("flex-v")
                             .children(
                                 create("h1")
-                                    .text("Login")
+                                    .text("Register")
                                     .build(),
                                 create("div")
                                     .classes("flex", "align-center")
@@ -70,22 +80,29 @@ export class LoginComponent {
                                     password.value = e.target.value;
                                 }, true, "current-password", (e) => {
                                     password.value = e.target.value;
-                                    document.getElementById("login").click();
+                                    document.getElementById("password2").focus();
                                 }),
                                 ifjs(passwordError, CommonTemplates.error(passwordError)),
-                                CommonTemplates.buttonWithSpinner("login", "Login", "login", () => {
+                                CommonTemplates.input("password", "password2", "Password", "Password", password2, (e) => {
+                                    password2.value = e.target.value;
+                                }, true, "new-password", (e) => {
+                                    password2.value = e.target.value;
+                                    document.getElementById("register").click();
+                                }),
+                                ifjs(password2Error, CommonTemplates.error(password2Error)),
+                                CommonTemplates.buttonWithSpinner("person_add", "Register", "register", () => {
                                     validate();
-                                    if (usernameError.value || passwordError.value) {
+                                    if (usernameError.value || passwordError.value || password2Error.value) {
                                         return;
                                     }
 
                                     loading.value = true;
-                                    Api.authorize(username.value, password.value).then((res) => {
+                                    Api.register(username.value, password.value).then((res) => {
                                         loading.value = false;
-                                        console.log("Login: " + res.status);
+                                        console.log("Register: " + res.status);
                                     }).catch(() => {
                                         loading.value = false;
-                                        console.log("Login failed");
+                                        console.log("Register failed");
                                     });
                                 }, loading, ["positive"]),
                             ).build(),
@@ -93,8 +110,7 @@ export class LoginComponent {
                 create("div")
                     .classes("flex-v")
                     .children(
-                        CommonTemplates.pageLink("Register", "register"),
-                        CommonTemplates.pageLink("Forgot password", "forgot-password"),
+                        CommonTemplates.pageLink("Login", "login"),
                     ).build(),
             ).build();
     }
