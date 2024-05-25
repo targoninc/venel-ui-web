@@ -1,4 +1,4 @@
-import {store} from "https://fjs.targoninc.com/f.js";
+import {signal, store} from "https://fjs.targoninc.com/f.js";
 
 export class Store {
     static clear() {
@@ -29,8 +29,8 @@ export class Store {
             default: 0,
         },
         messages: {
-            type: "object",
-            default: {},
+            type: "signal<array>",
+            default: signal([]),
         },
         selectedMessageId: {
             type: "number",

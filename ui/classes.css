@@ -29,7 +29,7 @@
     flex-grow: 1;
 }
 
-.panes, .panes.v {
+.panes, .panes-v {
     gap: 0;
 }
 
@@ -186,8 +186,16 @@
 }
 
 .chat-content {
+    height: 100%;
+}
+
+.chat-input {
     padding: var(--gap-v);
-    height: calc(100% - 2 * var(--gap-v));
+}
+
+.chat-messages {
+    padding: var(--gap-v);
+    flex-grow: 1;
 }
 
 .chat-messages {

@@ -47,6 +47,22 @@
     }
 }
 
+.background {
+    background-color: var(--bg);
+}
+
+.background-2 {
+    background-color: var(--bg-2);
+}
+
+.background-3 {
+    background-color: var(--bg-3);
+}
+
+.background-4 {
+    background-color: var(--bg-4);
+}
+
 html, body {
     height: 100dvh;
     width: 100vw;

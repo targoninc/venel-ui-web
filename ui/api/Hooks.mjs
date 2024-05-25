@@ -21,4 +21,23 @@ export class Hooks {
             }
         });
     }
+
+    static runActiveChannel(channel) {
+        if (!channel) {
+            return;
+        }
+
+        if (!store().get('messages')) {
+            store().set('messages', signal({}));
+        }
+
+        Api.getMessages(channel, 0).then((res) => {
+            if (res.status === 200) {
+                store().setSignalValue('messages', res.data);
+            } else {
+                toast("Failed to fetch messages", "negative");
+                store().setSignalValue('messages', {});
+            }
+        });
+    }
 }

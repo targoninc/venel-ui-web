@@ -55,8 +55,8 @@ export class Api extends ApiBase {
     static async createDirect(targetUserId = null) {
         return await this.post("/api/channels/createDirect", {targetUserId});
     }
-    static async getMessages(offset = null) {
-        return await this.get("/api/channels/getMessages", {offset});
+    static async getMessages(channelId = null, offset = null) {
+        return await this.get("/api/channels/getMessages", {channelId, offset});
     }
     static async getChannels() {
         return await this.get("/api/channels/getChannels", {});
