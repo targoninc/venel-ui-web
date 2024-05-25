@@ -1,7 +1,8 @@
 :root {
     --black: #040403ff;
-    --black-2: #171712;
-    --black-3: #23231a;
+    --black-2: #10100e;
+    --black-3: #171712;
+    --black-4: #23231a;
     --white: #efe9e7ff;
     --white-2: #e7ddda;
     --white-3: #ded2ce;
@@ -25,6 +26,7 @@
         --text: var(--black);
         --text-2: var(--black-2);
         --text-3: var(--black-3);
+        --text-4: var(--black-4);
         --primary: var(--blue);
         --positive: var(--green);
         --negative: var(--red);
@@ -36,6 +38,7 @@
         --bg: var(--black);
         --bg-2: var(--black-2);
         --bg-3: var(--black-3);
+        --bg-4: var(--black-4);
         --text: var(--white);
         --text-2: var(--white-2);
         --text-3: var(--white-3);
@@ -43,6 +46,13 @@
         --positive: var(--green);
         --negative: var(--red);
     }
+}
+
+html, body {
+    height: 100dvh;
+    width: 100vw;
+    margin: 0;
+    padding: 0;
 }
 
 body {
@@ -81,7 +91,7 @@ span {
 }
 
 button, input, textarea, select {
-    background-color: var(--bg-2);
+    background-color: var(--bg);
     border: var(--input-border-width) solid var(--bg-3);
     border-radius: var(--input-border-radius);
     color: var(--text);
@@ -89,6 +99,11 @@ button, input, textarea, select {
     font-size: var(--font-size-base);
     margin: 0;
     padding: var(--input-padding-v) var(--input-padding-h);
+}
+
+button.positive, input.positive, textarea.positive, select.positive {
+    border-color: var(--positive);
+    color: var(--positive);
 }
 
 button {
