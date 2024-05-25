@@ -99,6 +99,7 @@ export class LoginComponent {
                                         } else {
                                             actionError.value = null;
                                             toast("Login successful", "positive");
+                                            window.router.navigate("chat");
                                         }
                                     });
                                 }, loading, ["positive"]),

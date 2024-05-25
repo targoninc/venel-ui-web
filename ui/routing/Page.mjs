@@ -45,6 +45,10 @@ export class Page {
             path: "register",
             component: "RegisterComponent"
         },
+        "logout": {
+            path: "logout",
+            component: "LogoutComponent"
+        },
         "uitest": {
             path: "uitest",
             component: "UiTestComponent"

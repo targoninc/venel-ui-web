@@ -98,11 +98,16 @@ button, input, textarea, select {
     font-size: var(--font-size-base);
     margin: 0;
     padding: var(--input-padding-v) var(--input-padding-h);
+    height: max-content;
 }
 
 button.positive, input.positive, textarea.positive, select.positive {
     border: var(--input-border-width) solid var(--green);
     color: var(--green);
+}
+
+button.double, input.double, textarea.double, select.double {
+    padding: var(--input-padding-v) calc(var(--input-padding-h) * 2);
 }
 
 a {

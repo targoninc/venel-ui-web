@@ -28,6 +28,10 @@ export class Store {
             type: "number",
             default: 0,
         },
+        messages: {
+            type: "object",
+            default: {},
+        },
         selectedMessageId: {
             type: "number",
             default: 0,

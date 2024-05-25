@@ -158,4 +158,23 @@ export class CommonTemplates {
                     .build()
             ).build();
     }
+
+    static textArea(value, id, label, placeholder, classes = [], subClasses = []) {
+        return create("div")
+            .classes("flex-v", "small-gap", ...classes)
+            .children(
+                create("label")
+                    .for(id)
+                    .text(label)
+                    .build(),
+                create("textarea")
+                    .id(id)
+                    .classes(...subClasses)
+                    .placeholder(placeholder)
+                    .oninput((e) => {
+                        value.value = e.target.value;
+                    })
+                    .build()
+            ).build();
+    }
 }

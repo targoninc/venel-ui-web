@@ -2,8 +2,16 @@
     height: 100%;
 }
 
+.full-height-v {
+    height: auto;
+}
+
 .full-width {
     width: 100%;
+}
+
+.full-width-h {
+    width: auto;
 }
 
 .flex, .flex-v, .panes, .panes-v {
@@ -15,6 +23,10 @@
 .flex-v, .panes-v {
     flex-direction: column;
     gap: var(--gap-v);
+}
+
+.flex-grow {
+    flex-grow: 1;
 }
 
 .panes, .panes.v {
@@ -152,4 +164,36 @@
 
 .space-between {
     justify-content: space-between;
+}
+
+.channel {
+    padding: var(--gap-h) var(--gap-v);
+    width: calc(100% - 2 * var(--gap-v));
+    background: var(--bg);
+    border-radius: var(--input-border-radius);
+    border-bottom: var(--input-border-width) solid var(--bg-4);
+    color: var(--text);
+    font-size: 1.2em;
+    cursor: pointer;
+}
+
+.channel.active {
+    background: var(--bg-2);
+}
+
+.text-small {
+    font-size: 0.8em;
+}
+
+.chat-content {
+    padding: var(--gap-v);
+    height: calc(100% - 2 * var(--gap-v));
+}
+
+.chat-messages {
+    overflow-y: auto;
+}
+
+.rounded-max {
+    border-radius: 9999px;
 }

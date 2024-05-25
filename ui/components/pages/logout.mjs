@@ -1,0 +1,24 @@
+import {create} from "https://fjs.targoninc.com/f.js";
+import {LayoutTemplates} from "../layout.mjs";
+import {Api} from "../../api/Api.mjs";
+import {toast} from "../../actions.mjs";
+
+export class LogoutComponent {
+    static render() {
+        Api.logout().then((res) => {
+            if (res.status === 200) {
+                window.router.navigate('login');
+            } else {
+                toast("Failed to log out", "negative");
+            }
+        });
+
+        return LayoutTemplates.pageFull(
+            LayoutTemplates.centeredContent(
+                create("span")
+                    .text("Logging out...")
+                    .build()
+            )
+        );
+    }
+}

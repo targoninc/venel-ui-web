@@ -1,6 +1,9 @@
 import {ApiBase} from "./ApiBase.mjs";
 
 export class Api extends ApiBase {
+    static async logout() {
+        return await this.post("/api/auth/logout", {});
+    }
     static async authorize(username = null, password = null) {
         return await this.post("/api/auth/authorize", {username, password});
     }
