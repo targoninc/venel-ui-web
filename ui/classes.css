@@ -6,15 +6,25 @@
     width: 100%;
 }
 
-.flex, .flex-v {
+.flex, .flex-v, .panes, .panes-v {
     display: flex;
     flex-wrap: wrap;
     gap: var(--gap-h);
 }
 
-.flex-v {
+.flex-v, .panes-v {
     flex-direction: column;
     gap: var(--gap-v);
+}
+
+.panes, .panes.v {
+    gap: 0;
+}
+
+.pane {
+    border: var(--input-border-width) solid var(--bg-4);
+    --width: 50%;
+    width: calc(var(--width) - 2 * var(--input-border-width));
 }
 
 .padded {

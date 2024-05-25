@@ -22,4 +22,13 @@ export class LayoutTemplates {
             .children(content)
             .build();
     }
+
+    static pane(content, defaultWidth = "50%", minWidth = "300px") {
+        return create("div")
+            .classes("pane")
+            .styles("--width", defaultWidth)
+            .styles("min-width", minWidth)
+            .children(content)
+            .build();
+    }
 }

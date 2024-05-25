@@ -14,11 +14,13 @@ export const routes = [
     },
     {
         path: 'logout',
-        title: 'Logout'
+        title: 'Logout',
+        noUser: 'login'
     },
     {
         path: 'chat',
-        title: 'Chat'
+        title: 'Chat',
+        noUser: 'login'
     },
     {
         path: "uitest",

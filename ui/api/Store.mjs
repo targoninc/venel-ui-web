@@ -24,15 +24,11 @@ export class Store {
             type: "object",
             default: null,
         },
-        currentPage: {
-            type: "string",
-            default: "login",
-        },
         currentChannelId: {
             type: "number",
             default: 0,
         },
-        currentMessageId: {
+        selectedMessageId: {
             type: "number",
             default: 0,
         },

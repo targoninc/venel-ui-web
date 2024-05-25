@@ -1,16 +1,16 @@
 import {create, FjsObservable, ifjs} from "https://fjs.targoninc.com/f.js";
 
 export class CommonTemplates {
-    static icon(icon, tag = "span") {
+    static icon(icon, classes = [], tag = "span") {
         if ((icon.constructor === String && icon.includes(".")) || (icon.constructor === FjsObservable && icon.value.includes("."))) {
             return create("img")
-                .classes("icon")
+                .classes("icon", ...classes)
                 .src(icon)
                 .build();
         }
 
         return create(tag)
-            .classes("material-symbols-outlined")
+            .classes("material-symbols-outlined", ...classes)
             .text(icon)
             .build();
     }
@@ -78,10 +78,7 @@ export class CommonTemplates {
             .classes("flex")
             .onclick(onclick)
             .children(
-                create("img")
-                    .classes("round", "icon", "doublesize")
-                    .src(image)
-                    .build(),
+                CommonTemplates.icon(image, ["round", "doublesize"]),
                 create("div")
                     .classes("flex-v", "no-gap")
                     .children(
