@@ -13,8 +13,7 @@ export class UiTestComponent {
             .children(
                 UiTestComponent.headingsAndText(),
                 UiTestComponent.interactables(),
-            )
-            .build();
+            ).build();
     }
 
     static headingsAndText() {

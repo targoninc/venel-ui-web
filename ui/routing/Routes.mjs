@@ -13,6 +13,10 @@ export const routes = [
         title: 'Register'
     },
     {
+        path: 'logout',
+        title: 'Logout'
+    },
+    {
         path: 'chat',
         title: 'Chat'
     },

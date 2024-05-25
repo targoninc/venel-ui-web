@@ -8,9 +8,14 @@ Store.create();
 
 window.router = new Router(routes, async (route, params) => {
     console.log(`Route changed to ${route.path}`);
-    document.title = `botanika - ${route.title}`;
+    document.title = `Venel - ${route.title}`;
 
-    const user = await Api.getUser();
-    Store.set('user', user);
+    await Api.getUser().then((res) => {
+        if (res.status === 200) {
+            Store.set('user', res.data);
+        } else {
+            Store.set('user', null);
+        }
+    });
     Page.load(route.path, params, window.router);
 });

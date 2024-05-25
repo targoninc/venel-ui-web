@@ -2,6 +2,7 @@ import {create, ifjs, signal} from "https://fjs.targoninc.com/f.js";
 import {LayoutTemplates} from "../layout.mjs";
 import {CommonTemplates} from "../common.mjs";
 import {Api} from "../../api/Api.mjs";
+import {toast} from "../../actions.mjs";
 
 export class RegisterComponent {
     static render() {
@@ -99,7 +100,11 @@ export class RegisterComponent {
                                     loading.value = true;
                                     Api.register(username.value, password.value).then((res) => {
                                         loading.value = false;
-                                        console.log("Register: " + res.status);
+                                        if (res.status === 200) {
+                                            toast("Registration successful", "positive");
+                                        } else {
+                                            toast("Registration failed", "negative");
+                                        }
                                     }).catch(() => {
                                         loading.value = false;
                                         console.log("Register failed");

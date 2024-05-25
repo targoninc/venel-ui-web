@@ -2,6 +2,8 @@ import {create, ifjs, signal} from "https://fjs.targoninc.com/f.js";
 import {LayoutTemplates} from "../layout.mjs";
 import {CommonTemplates} from "../common.mjs";
 import {Api} from "../../api/Api.mjs";
+import {Store} from "../../api/Store.mjs";
+import {toast} from "../../actions.mjs";
 
 export class LoginComponent {
     static render() {
@@ -13,6 +15,7 @@ export class LoginComponent {
     }
 
     static content() {
+        const user = Store.get('user');
         const username = signal("");
         const usernameError = signal(null);
         const password = signal("");
@@ -31,6 +34,7 @@ export class LoginComponent {
         }
         username.subscribe(validate);
         password.subscribe(validate);
+        const actionError = signal(null);
         const loading = signal(false);
 
         return create("div")
@@ -56,6 +60,13 @@ export class LoginComponent {
                                             .text(window.location.hostname)
                                             .build()
                                     ).build(),
+                                ifjs(user, create("div")
+                                    .classes("flex-v")
+                                    .children(
+                                        CommonTemplates.warning("You are already logged in. Logging in will log you out and switch you to the new user."),
+                                        CommonTemplates.pageLink("Go to chat", "chat", ["positive"]),
+                                        CommonTemplates.pageLink("Logout", "logout", ["negative"])
+                                    ).build())
                             ).build(),
                         create("div")
                             .classes("flex-v")
@@ -82,20 +93,24 @@ export class LoginComponent {
                                     loading.value = true;
                                     Api.authorize(username.value, password.value).then((res) => {
                                         loading.value = false;
-                                        console.log("Login: " + res.status);
-                                    }).catch(() => {
-                                        loading.value = false;
-                                        console.log("Login failed");
+                                        if (res.status !== 200) {
+                                            actionError.value = res.data.error;
+                                            toast("Login failed", "negative");
+                                        } else {
+                                            actionError.value = null;
+                                            toast("Login successful", "positive");
+                                        }
                                     });
                                 }, loading, ["positive"]),
+                                ifjs(actionError, CommonTemplates.error(actionError)),
                             ).build(),
                     ).build(),
-                create("div")
+                ifjs(user, create("div")
                     .classes("flex-v")
                     .children(
                         CommonTemplates.pageLink("Register", "register"),
                         CommonTemplates.pageLink("Forgot password", "forgot-password"),
-                    ).build(),
+                    ).build(), true)
             ).build();
     }
 }

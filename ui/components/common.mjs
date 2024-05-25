@@ -122,18 +122,18 @@ export class CommonTemplates {
     }
 
     static error(message) {
-        return create("p")
+        return create("span")
             .classes("error")
             .text(message)
             .build();
     }
 
     static pageLink(text, target, classes = []) {
+        const isExternal = target.startsWith("http");
         return create("a")
             .href(target)
             .target("_blank")
             .onclick((e) => {
-                const isExternal = target.startsWith("http");
                 const middleClick = e.button === 1;
                 if (!isExternal && !middleClick) {
                     e.preventDefault();
@@ -147,7 +147,18 @@ export class CommonTemplates {
                 create("span")
                     .text(text)
                     .build(),
-                CommonTemplates.icon("open_in_new")
+                CommonTemplates.icon(isExternal ? "open_in_new" : "arrow_forward")
+            ).build();
+    }
+
+    static warning(text) {
+        return create("div")
+            .classes("warning", "flex")
+            .children(
+                CommonTemplates.icon("warning"),
+                create("span")
+                    .text(text)
+                    .build()
             ).build();
     }
 }

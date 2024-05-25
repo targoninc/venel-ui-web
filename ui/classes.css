@@ -53,6 +53,14 @@
 
 .error {
     color: var(--red);
+    max-width: 200px;
+    font-size: 0.8em;
+}
+
+.warning {
+    color: var(--yellow);
+    max-width: 200px;
+    font-size: 0.8em;
 }
 
 .centered-content {

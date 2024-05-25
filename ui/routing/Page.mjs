@@ -1,8 +1,18 @@
+import {create} from "https://fjs.targoninc.com/f.js";
+
 export class Page {
     static container = document.body;
+    static get toasts() {
+        return document.getElementById("toasts");
+    }
 
     static empty() {
         Page.container.innerHTML = "";
+        Page.initialize();
+    }
+
+    static initialize() {
+        Page.container.appendChild(create("div").id("toasts").build());
     }
 
     static load(page, params, router) {

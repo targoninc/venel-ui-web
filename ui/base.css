@@ -9,6 +9,7 @@
     --blue: #16bac5ff;
     --green: #6a994eff;
     --red: #bc4749ff;
+    --yellow: #f0c929ff;
     --purple: #6a4c93ff;
     --font-size-base: 18px;
     --gap-h: 5px;
@@ -28,9 +29,9 @@
         --text-2: var(--black-2);
         --text-3: var(--black-3);
         --text-4: var(--black-4);
-        --primary: var(--blue);
-        --positive: var(--green);
-        --negative: var(--red);
+        --yellow: #bf871d;
+        --green: #478422;
+        --blue: #387be3;
     }
 }
 
@@ -43,9 +44,6 @@
         --text: var(--white);
         --text-2: var(--white-2);
         --text-3: var(--white-3);
-        --primary: var(--blue);
-        --positive: var(--green);
-        --negative: var(--red);
     }
 }
 
@@ -103,8 +101,8 @@ button, input, textarea, select {
 }
 
 button.positive, input.positive, textarea.positive, select.positive {
-    border-color: var(--positive);
-    color: var(--positive);
+    border: var(--input-border-width) solid var(--green);
+    color: var(--green);
 }
 
 a {
@@ -137,4 +135,36 @@ button:hover {
 
 .material-symbols-outlined {
     font-size: var(--font-size-base) !important;
+}
+
+#toasts {
+    position: fixed;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-v);
+    padding: var(--gap-v);
+    z-index: 999;
+}
+
+.toast {
+    background: var(--bg-4);
+    border: 1px solid var(--bg-3);
+    border-radius: var(--input-border-radius);
+    padding: var(--gap-h) var(--gap-v);
+    display: flex;
+    gap: var(--gap-h);
+    align-self: end;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.08);
+    max-width: max-content;
+}
+
+.toast.negative {
+    border-color: var(--red);
+}
+
+.toast.positive {
+    border-color: var(--green);
 }
