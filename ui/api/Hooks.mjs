@@ -33,7 +33,7 @@ export class Hooks {
 
         Api.getMessages(channel, 0).then((res) => {
             if (res.status === 200) {
-                store().setSignalValue('messages', res.data);
+                store().setSignalValue('messages', res.data.reverse());
             } else {
                 toast("Failed to fetch messages", "negative");
                 store().setSignalValue('messages', {});

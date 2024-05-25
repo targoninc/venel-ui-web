@@ -205,3 +205,15 @@
 .rounded-max {
     border-radius: 9999px;
 }
+
+.message-content {
+    padding-left: 1em;
+}
+
+.message-timestamp {
+    display: none;
+}
+
+.chat-message:hover .message-timestamp {
+    display: block;
+}

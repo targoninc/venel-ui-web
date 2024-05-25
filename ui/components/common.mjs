@@ -86,9 +86,9 @@ export class CommonTemplates {
                             .classes("bold")
                             .text(name)
                             .build(),
-                        create("span")
+                        ifjs(text, create("span")
                             .text(text)
-                            .build(),
+                            .build()),
                     ).build(),
             ).build();
     }

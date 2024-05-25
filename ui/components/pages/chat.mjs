@@ -5,6 +5,7 @@ import {CommonTemplates} from "../common.mjs";
 import {Api} from "../../api/Api.mjs";
 import {toast} from "../../actions.mjs";
 import {Hooks} from "../../api/Hooks.mjs";
+import {Time} from "../../tooling/Time.mjs";
 
 export class ChatComponent {
     static render() {
@@ -59,7 +60,7 @@ export class ChatComponent {
                     .children(
                         signalMap(messages, create("div")
                                 .classes("chat-messages", "flex-v", "flex-grow"),
-                            message => ChatComponent.message(message)),
+                            message => ChatComponent.message(message, messages)),
                         create("div")
                             .classes("background-2", "chat-input", "flex", "align-center")
                             .children(
@@ -125,17 +126,42 @@ export class ChatComponent {
             ).build();
     }
 
-    static message(message) {
+    static message(message, messages) {
+        const messageIndex = messages.value.indexOf(message);
+        const previousMessage = messages.value[messageIndex - 1];
+        let shouldDisplaySender = true;
+        if (previousMessage && previousMessage.sender.id === message.sender.id) {
+            shouldDisplaySender = false;
+        }
+        const edited = message.createdAt !== message.updatedAt;
+        const timestamp = new Date(message.createdAt).getTime();
+        const offset = new Date().getTimezoneOffset() * 60000;
+        const localTimestamp = timestamp + offset;
+
         return create("div")
-            .classes("chat-message", "flex")
+            .classes("chat-message", "flex-v")
             .children(
-                create("span")
-                    .classes("bold")
-                    .text(message.sender.displayname ?? message.sender.username)
-                    .build(),
-                create("span")
-                    .text(message.text)
-                    .build(),
+                ifjs(shouldDisplaySender, create("div")
+                    .classes("flex", "align-center")
+                    .children(
+                        CommonTemplates.userInList("face_5", message.sender.displayname ?? message.sender.username, null, () => {})
+                    ).build()),
+                create("div")
+                    .classes("flex", "space-between", "full-width")
+                    .children(
+                        ifjs(edited, create("span")
+                            .classes("message-content")
+                            .text(message.text)
+                            .build()),
+                        create("span")
+                            .classes("message-content")
+                            .text(message.text)
+                            .build(),
+                        create("span")
+                            .classes("message-timestamp", "text-small")
+                            .text(Time.ago(localTimestamp))
+                            .build(),
+                    ).build()
             ).build();
     }
 }
