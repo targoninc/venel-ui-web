@@ -31,4 +31,27 @@ export class CommonTemplates {
                     ).build()
             ).build();
     }
+
+    static userInList(image, name, text, onclick) {
+        return create("button")
+            .classes("flex")
+            .onclick(onclick)
+            .children(
+                create("img")
+                    .classes("round", "icon", "doublesize")
+                    .src(image)
+                    .build(),
+                create("div")
+                    .classes("flex-v", "no-gap")
+                    .children(
+                        create("span")
+                            .classes("bold")
+                            .text(name)
+                            .build(),
+                        create("span")
+                            .text(text)
+                            .build(),
+                    ).build(),
+            ).build();
+    }
 }

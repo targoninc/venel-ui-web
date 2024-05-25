@@ -12,3 +12,29 @@
 .padded {
     padding: var(--gap-h);
 }
+
+.no-gap {
+    gap: 0;
+}
+
+.bold {
+    font-weight: bold;
+}
+
+.round {
+    border-radius: 50%;
+}
+
+.icon {
+    width: 1em;
+    height: 1em;
+}
+
+.icon.doublesize {
+    width: calc(2em + var(--gap-v));
+    height: calc(2em + var(--gap-v));
+}
+
+.highlight {
+    background-color: var(--bg-3);
+}

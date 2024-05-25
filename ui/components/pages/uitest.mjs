@@ -58,7 +58,10 @@ export class UiTestComponent {
                     .build(),
                 CommonTemplates.select(["Option 1", "Option 2", "Option 3"], (e) => {
                     console.log(e.target.value);
-                })
+                }),
+                CommonTemplates.userInList("", "User", "User description", () => {
+                    console.log("User clicked");
+                }),
             ).build();
     }
 }

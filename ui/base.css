@@ -76,6 +76,10 @@ h4 {
     font-size: 1.5rem;
 }
 
+span {
+    text-align: start;
+}
+
 button, input, textarea, select {
     background-color: var(--bg-2);
     border: var(--input-border-width) solid var(--bg-3);
