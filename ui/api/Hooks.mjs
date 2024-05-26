@@ -1,6 +1,7 @@
 import {Api} from "./Api.mjs";
 import {toast} from "../actions.mjs";
 import {signal, store} from "https://fjs.targoninc.com/f.js";
+import {Live} from "../live/Live.mjs";
 
 export class Hooks {
     static runUser(user) {
@@ -20,6 +21,8 @@ export class Hooks {
                 store().setSignalValue('channels', []);
             }
         });
+
+        Live.startIfNotRunning();
     }
 
     static runActiveChannel(channel) {
@@ -27,17 +30,39 @@ export class Hooks {
             return;
         }
 
-        if (!store().get('messages')) {
-            store().set('messages', signal({}));
-        }
-
         Api.getMessages(channel, 0).then((res) => {
             if (res.status === 200) {
-                store().setSignalValue('messages', res.data.reverse());
+                setMessages(channel, res.data);
             } else {
                 toast("Failed to fetch messages", "negative");
-                store().setSignalValue('messages', {});
+                setMessages(channel, []);
             }
         });
+    }
+}
+
+export function setMessages(channel, messages) {
+    if (!store().get('messages')) {
+        store().set('messages', signal({}));
+    }
+
+    const ex = store().get('messages').value;
+    setChannel(ex, channel);
+    store().setSignalValue('messages', {...ex, [channel]: messages});
+}
+
+export function addMessage(channel, message) {
+    if (!store().get('messages')) {
+        store().set('messages', signal({}));
+    }
+
+    const ex = store().get('messages').value;
+    setChannel(ex, channel);
+    store().setSignalValue('messages', {...ex, [channel]: [message, ...ex[channel]]});
+}
+
+export function setChannel(ex, channel) {
+    if (!ex[channel]) {
+        ex[channel] = [];
     }
 }

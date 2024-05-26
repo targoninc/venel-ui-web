@@ -50,12 +50,14 @@ export class ApiBase {
         try {
             return {
                 status: res.status,
-                data: JSON.parse(text)
+                data: JSON.parse(text),
+                headers: res.headers
             };
         } catch (e) {
             return {
                 status: res.status,
-                data: text
+                data: text,
+                headers: res.headers
             };
         }
     }

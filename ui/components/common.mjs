@@ -171,6 +171,7 @@ export class CommonTemplates {
                     .id(id)
                     .classes(...subClasses)
                     .placeholder(placeholder)
+                    .value(value)
                     .oninput((e) => {
                         value.value = e.target.value;
                     })

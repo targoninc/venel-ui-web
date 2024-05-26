@@ -61,4 +61,7 @@ export class Api extends ApiBase {
     static async getChannels() {
         return await this.get("/api/channels/getChannels", {});
     }
+    static async getConnectionSid() {
+        return await this.get("/api/auth/getConnectionSid", {});
+    }
 }

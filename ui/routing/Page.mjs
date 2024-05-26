@@ -3,7 +3,13 @@ import {create} from "https://fjs.targoninc.com/f.js";
 export class Page {
     static container = document.body;
     static get toasts() {
-        return document.getElementById("toasts");
+        const toasts = document.getElementById("toasts");
+        if (!toasts) {
+            Page.initialize();
+            return Page.toasts;
+        } else {
+            return toasts;
+        }
     }
 
     static empty() {
@@ -36,6 +42,10 @@ export class Page {
         "chat": {
             path: "chat",
             component: "ChatComponent"
+        },
+        "home": {
+            path: "home",
+            component: "HomeComponent"
         },
         "login": {
             path: "login",

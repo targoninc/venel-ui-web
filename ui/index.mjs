@@ -4,6 +4,7 @@ import {Page} from "./routing/Page.mjs";
 import {Api} from "./api/Api.mjs";
 import {Store} from "./api/Store.mjs";
 import {Hooks} from "./api/Hooks.mjs";
+import {Live} from "./live/Live.mjs";
 
 Store.create();
 
@@ -21,6 +22,7 @@ window.router = new Router(routes, async (route, params) => {
             window.router.navigate(route.noUser);
             return;
         }
+        Live.stop();
     }
     Page.load(route.path, params, window.router);
 });

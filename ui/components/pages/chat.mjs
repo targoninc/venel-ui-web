@@ -4,8 +4,9 @@ import {Store} from "../../api/Store.mjs";
 import {CommonTemplates} from "../common.mjs";
 import {Api} from "../../api/Api.mjs";
 import {toast} from "../../actions.mjs";
-import {Hooks} from "../../api/Hooks.mjs";
+import {addMessage, Hooks} from "../../api/Hooks.mjs";
 import {Time} from "../../tooling/Time.mjs";
+import {Live} from "../../live/Live.mjs";
 
 export class ChatComponent {
     static render() {
@@ -48,9 +49,15 @@ export class ChatComponent {
             , channel => ChatComponent.channel(channel, activeChannel));
     }
 
-    static chat(activeChannel, messages) {
+    static chat(activeChannel, allMessages) {
         const sending = signal(false);
         const messageText = signal("");
+        const messages = computedSignal(allMessages, (messages) => {
+            const out = messages[activeChannel.value] || [];
+            return out.sort((a, b) => {
+                return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+            });
+        });
 
         return create("div")
             .classes("flex-v", "full-height")
@@ -76,7 +83,16 @@ export class ChatComponent {
 
     static sendButton(sending, messages, activeChannel, messageText) {
         return CommonTemplates.buttonWithSpinner("send", "Send", "send", () => {
+            if (!messageText.value || messageText.value.trim() === "" || sending.value) {
+                return;
+            }
+
             sending.value = true;
+            Live.send({
+                type: "message",
+                channelId: activeChannel.value,
+                text: messageText.value,
+            });
             Api.sendMessage(activeChannel.value, messageText.value).then((res) => {
                 sending.value = false;
                 if (res.status !== 200) {
@@ -84,7 +100,7 @@ export class ChatComponent {
                     return;
                 }
 
-                messages.value.push(res.data);
+                addMessage(activeChannel.value, res.data);
                 messageText.value = "";
             });
         }, sending, ["rounded-max", "double"]);
