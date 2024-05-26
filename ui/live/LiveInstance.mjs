@@ -14,7 +14,7 @@ export class LiveInstance {
     async getConnectSid() {
         const res = await Api.getConnectionSid();
         if (res.status === 200) {
-            return res.data;
+            return res.data.connectSid;
         }
 
         return null;
@@ -27,7 +27,7 @@ export class LiveInstance {
             toast("Could not connect to live server. You have to refresh the page to get any updates.");
             return;
         }
-        this.server = new WebSocket(`wss://127.0.0.1:8912?cid=${connectSid}`); // TODO: Replace with actual server address
+        this.server = new WebSocket(encodeURI(`ws://127.0.0.1:8912?cid=${connectSid}`)); // TODO: Replace with actual server address
         this.server.onopen = () => {
             this.onStart();
         };
@@ -47,8 +47,7 @@ export class LiveInstance {
     }
 
     handleMessage(data) {
-        console.log(data);
-        addMessage(data.message.channelId, data.message);
+        addMessage(data.channelId, data);
     }
 
     stop() {
@@ -56,6 +55,6 @@ export class LiveInstance {
     }
 
     send(data) {
-        this.server.send(data);
+        this.server.send(JSON.stringify(data));
     }
 }
