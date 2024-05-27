@@ -2,6 +2,12 @@
 
 This guide assumes you have Node.js and npm installed and running on your machine.
 
+## Environment variables
+
+```apacheconf
+API_URL=http://localhost:3000
+```
+
 ```bash
 npm install
 ```
