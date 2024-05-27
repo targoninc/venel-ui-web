@@ -3,10 +3,18 @@ export class ApiBase {
         'Content-Type': 'application/json'
     };
     static get apiBaseUrl() {
-        if (window.location.hostname === "localhost") {
-            return "http://localhost:3000";
+        const apiUrl = sessionStorage.getItem("apiUrl");
+        if (apiUrl) {
+            return apiUrl;
         } else {
-            return "https://api." + window.location.hostname;
+            fetch("/apiurl", {
+                method: 'GET',
+                headers: this.usualHeaders,
+            }).then(async (res) => {
+                const res2 = await this.basicResponseHandling(res);
+                sessionStorage.setItem("apiUrl", res2.data);
+                window.location.reload();
+            });
         }
     };
 

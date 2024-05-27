@@ -11,6 +11,10 @@ const __dirname = path.dirname(__filename);
 const app = express();
 app.use(express.static(path.join(__dirname, "ui")));
 
+app.get('/apiurl', (req, res) => {
+    res.send(process.env.API_URL ?? 'http://localhost:3000');
+});
+
 app.get('*', (req, res) => {
     res.sendFile(__dirname + '/ui/index.html');
 });
