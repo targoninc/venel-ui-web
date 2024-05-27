@@ -61,6 +61,16 @@ export function addMessage(channel, message) {
     store().setSignalValue('messages', {...ex, [channel]: [message, ...ex[channel]]});
 }
 
+export function removeMessage(channel, messageId) {
+    if (!store().get('messages')) {
+        store().set('messages', signal({}));
+    }
+
+    const ex = store().get('messages').value;
+    setChannel(ex, channel);
+    store().setSignalValue('messages', {...ex, [channel]: ex[channel].filter((message) => message.id !== messageId)});
+}
+
 export function setChannel(ex, channel) {
     if (!ex[channel]) {
         ex[channel] = [];

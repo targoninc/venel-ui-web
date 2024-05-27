@@ -206,7 +206,7 @@
     border-radius: 9999px;
 }
 
-.message-content {
+.message-text {
     padding-left: 1em;
 }
 
@@ -216,4 +216,26 @@
 
 .chat-message:hover .message-timestamp {
     display: block;
+}
+
+.message-note {
+    font-style: italic;
+    color: var(--text-3);
+    font-size: 0.8em;
+    padding-left: 1.2em;
+}
+
+.message-content {
+    position: relative;
+}
+
+.message-menu {
+    position: absolute;
+    right: 0;
+    top: 0;
+    padding: 0.5em;
+    background: var(--bg-2);
+    border-radius: var(--input-border-radius);
+    border: var(--input-border-width) solid var(--bg-4);
+    z-index: 999;
 }

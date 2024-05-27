@@ -4,7 +4,7 @@ import {Store} from "../../api/Store.mjs";
 import {CommonTemplates} from "../common.mjs";
 import {Api} from "../../api/Api.mjs";
 import {toast} from "../../actions.mjs";
-import {addMessage, Hooks} from "../../api/Hooks.mjs";
+import {addMessage, Hooks, removeMessage} from "../../api/Hooks.mjs";
 import {Time} from "../../tooling/Time.mjs";
 import {Live} from "../../live/Live.mjs";
 
@@ -93,16 +93,8 @@ export class ChatComponent {
                 channelId: activeChannel.value,
                 text: messageText.value,
             });
-            Api.sendMessage(activeChannel.value, messageText.value).then((res) => {
-                sending.value = false;
-                if (res.status !== 200) {
-                    toast("Failed to send message", "negative");
-                    return;
-                }
-
-                addMessage(activeChannel.value, res.data);
-                messageText.value = "";
-            });
+            sending.value = false;
+            messageText.value = "";
         }, sending, ["rounded-max", "double"]);
     }
 
@@ -153,6 +145,7 @@ export class ChatComponent {
         const timestamp = new Date(message.createdAt).getTime();
         const offset = new Date().getTimezoneOffset() * 60000;
         const localTimestamp = timestamp + offset;
+        const menuShown = signal(false);
 
         return create("div")
             .classes("chat-message", "flex-v")
@@ -163,21 +156,50 @@ export class ChatComponent {
                         CommonTemplates.userInList("face_5", message.sender.displayname ?? message.sender.username, null, () => {})
                     ).build()),
                 create("div")
-                    .classes("flex", "space-between", "full-width")
+                    .classes("message-content", "flex", "space-between", "full-width")
+                    .oncontextmenu((e) => {
+                        e.preventDefault();
+                        menuShown.value = true;
+                        document.addEventListener("click", () => {
+                            menuShown.value = false;
+                        });
+                    })
                     .children(
-                        ifjs(edited, create("span")
-                            .classes("message-content")
-                            .text(message.text)
-                            .build()),
-                        create("span")
-                            .classes("message-content")
-                            .text(message.text)
-                            .build(),
+                        ifjs(menuShown, ChatComponent.messageMenu(message)),
+                        create("div")
+                            .classes("flex-v", "no-gap")
+                            .children(
+                                ifjs(edited, create("span")
+                                    .classes("message-note")
+                                    .text("edited")
+                                    .build()),
+                                create("span")
+                                    .classes("message-text")
+                                    .text(message.text)
+                                    .build(),
+                            ).build(),
                         create("span")
                             .classes("message-timestamp", "text-small")
                             .text(Time.ago(localTimestamp))
                             .build(),
                     ).build()
+            ).build();
+    }
+
+    static messageMenu(message) {
+        return create("div")
+            .classes("message-menu", "flex-v")
+            .children(
+                CommonTemplates.buttonWithIcon("edit", "Edit", () => {
+                    // TODO: Implement edit message
+                }),
+                CommonTemplates.buttonWithIcon("delete", "Delete", () => {
+                    Live.send({
+                        type: "removeMessage",
+                        messageId: message.id,
+                    });
+                    removeMessage(message.channelId, message.id);
+                }),
             ).build();
     }
 }
