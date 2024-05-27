@@ -35,7 +35,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: .
-          file: DOCKERFILE
+          file: Dockerfile
           push: false
           tags: ${{ secrets.REGISTRY_HOST }}/${{ steps.reponame.outputs.value }}:latest, ${{ secrets.REGISTRY_HOST }}/${{ steps.reponame.outputs.value }}:${{ github.run_number }}
 
@@ -43,6 +43,6 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: .
-          file: DOCKERFILE
+          file: Dockerfile
           push: true
           tags: ${{ secrets.REGISTRY_HOST }}/${{ steps.reponame.outputs.value }}:latest, ${{ secrets.REGISTRY_HOST }}/${{ steps.reponame.outputs.value }}:${{ github.run_number }}
