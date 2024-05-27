@@ -46,7 +46,13 @@ export class ChatComponent {
         return signalMap(channels,
             create("div")
                 .classes("flex-v")
-            , channel => ChatComponent.channel(channel, activeChannel));
+            , channel => {
+                if (channel.type === "gr") {
+                    return ChatComponent.groupChannel(channel, activeChannel);
+                } else {
+                    return ChatComponent.dmChannel(channel, activeChannel);
+                }
+            });
     }
 
     static chat(activeChannel, allMessages) {
@@ -124,12 +130,9 @@ export class ChatComponent {
             ).build();
     }
 
-    static channel(channel, activeChannel) {
+    static groupChannel(channel, activeChannel) {
         const activeClass = computedSignal(activeChannel, (id) => id === channel.id ? "active" : "_");
-        const channelTypes = {
-            "dm": "Direct message",
-            "group": "Group",
-        };
+        const editing = signal(false);
 
         return create("div")
             .classes("channel", "flex-v", "full-width", activeClass)
@@ -137,12 +140,22 @@ export class ChatComponent {
                 activeChannel.value = channel.id;
             })
             .children(
-                create("span")
+                ifjs(editing, create("input")
+                    .type("text")
+                    .value(channel.name)
+                    .onchange((e) => {
+                        Live.send({
+                            type: "updateChannel",
+                            channelId: channel.id,
+                            name: e.target.value,
+                        });
+                    }).build()),
+                ifjs(editing, create("span")
                     .text(channel.name)
-                    .build(),
+                    .build(), true),
                 create("span")
                     .classes("text-small")
-                    .text(channelTypes[channel.type] || "Channel")
+                    .text("Group")
                     .build(),
             ).build();
     }
@@ -213,6 +226,25 @@ export class ChatComponent {
                     });
                     removeMessage(message.channelId, message.id);
                 }),
+            ).build();
+    }
+
+    static dmChannel(channel, activeChannel) {
+        const activeClass = computedSignal(activeChannel, (id) => id === channel.id ? "active" : "_");
+
+        return create("div")
+            .classes("channel", "flex-v", "full-width", activeClass)
+            .onclick(() => {
+                activeChannel.value = channel.id;
+            })
+            .children(
+                create("span")
+                    .text(channel.name)
+                    .build(),
+                create("span")
+                    .classes("text-small")
+                    .text("DM")
+                    .build(),
             ).build();
     }
 }

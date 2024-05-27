@@ -239,3 +239,7 @@
     border: var(--input-border-width) solid var(--bg-4);
     z-index: 999;
 }
+
+.message-content:hover {
+    background: var(--bg-2);
+}
