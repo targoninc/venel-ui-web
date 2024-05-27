@@ -27,7 +27,13 @@ export class LiveInstance {
             toast("Could not connect to live server. You have to refresh the page to get any updates.");
             return;
         }
-        this.server = new WebSocket(encodeURI(`ws://127.0.0.1:8912?cid=${connectSid}`)); // TODO: Replace with actual server address
+        const res = await Api.url();
+        if (res.status !== 200) {
+            console.error("Failed to get live server URL");
+            toast("Could not connect to live server. You have to refresh the page to get any updates.");
+            return;
+        }
+        this.server = new WebSocket(encodeURI(`${res.data}?cid=${connectSid}`));
         this.server.onopen = () => {
             this.onStart();
         };

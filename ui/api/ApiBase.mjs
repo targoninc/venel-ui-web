@@ -2,7 +2,13 @@ export class ApiBase {
     static usualHeaders = {
         'Content-Type': 'application/json'
     };
-    static apiBaseUrl = "http://localhost:3000";
+    static get apiBaseUrl() {
+        if (window.location.hostname === "localhost") {
+            return "http://localhost:3000";
+        } else {
+            return "https://api." + window.location.hostname;
+        }
+    };
 
     static async post(url, body = {}, sendCredentials = true) {
         const res = await fetch(this.apiBaseUrl + url, {

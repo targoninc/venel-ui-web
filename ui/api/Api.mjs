@@ -64,4 +64,7 @@ export class Api extends ApiBase {
     static async getConnectionSid() {
         return await this.get("/api/auth/getConnectionSid", {});
     }
+    static async url() {
+        return await this.get("/api/live/url", {});
+    }
 }

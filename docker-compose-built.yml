@@ -1,0 +1,10 @@
+version: '3'
+
+services:
+  ui:
+    container_name: ui
+    image: ${DOCKER_IMAGE_UI}
+    ports:
+      - "3001:3001"
+    env_file:
+      - .env
