@@ -71,7 +71,20 @@ export class ChatComponent {
                         create("div")
                             .classes("background-2", "chat-input", "flex", "align-center")
                             .children(
-                                CommonTemplates.textArea(messageText, "message", "Enter message", "Write something nice...", ["flex-grow"], ["full-width-h"]),
+                                CommonTemplates.textArea(messageText, "message", null, "Write something nice...", ["flex-grow"], ["full-width-h", "message-input"], () => {
+                                    if (!messageText.value || messageText.value.trim() === "" || sending.value) {
+                                        return;
+                                    }
+
+                                    sending.value = true;
+                                    Live.send({
+                                        type: "message",
+                                        channelId: activeChannel.value,
+                                        text: messageText.value,
+                                    });
+                                    sending.value = false;
+                                    messageText.value = "";
+                                }),
                                 create("div")
                                     .children(
                                         ChatComponent.sendButton(sending, messages, activeChannel, messageText),

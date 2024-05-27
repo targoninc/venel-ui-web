@@ -159,21 +159,45 @@ export class CommonTemplates {
             ).build();
     }
 
-    static textArea(value, id, label, placeholder, classes = [], subClasses = []) {
+    static textArea(value, id, label = null, placeholder = null, classes = [], subClasses = [], onenter = () => {}) {
+        const resize = (area) => {
+            area.style.height = "auto";
+            if (area.scrollHeight > 100) {
+                area.style.overflowY = "scroll";
+                area.style.height = "100px";
+            } else {
+                area.style.height = `${area.scrollHeight - 8}px`;
+            }
+        }
+
         return create("div")
             .classes("flex-v", "small-gap", ...classes)
             .children(
-                create("label")
+                ifjs(label, create("label")
                     .for(id)
                     .text(label)
-                    .build(),
+                    .build()),
                 create("textarea")
                     .id(id)
                     .classes(...subClasses)
                     .placeholder(placeholder)
                     .value(value)
+                    .attributes("rows", "1")
+                    .onkeydown((e) => {
+                        if (e.key === "Enter" && !e.shiftKey && !e.ctrlKey && !e.altKey && !e.metaKey) {
+                            e.preventDefault();
+                            onenter(e);
+                        } else {
+                            if (subClasses.includes("message-input")) {
+                                resize(e.target);
+                            }
+                        }
+                    })
                     .oninput((e) => {
                         value.value = e.target.value;
+                        if (subClasses.includes("message-input")) {
+                            resize(e.target);
+                        }
                     })
                     .build()
             ).build();

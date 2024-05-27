@@ -189,3 +189,11 @@ button:hover {
 .toast.positive {
     border-color: var(--green);
 }
+
+textarea:focus-visible {
+    outline: none;
+}
+
+.message-input {
+    resize: none;
+}
