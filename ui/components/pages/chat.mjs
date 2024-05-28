@@ -3,10 +3,11 @@ import {LayoutTemplates} from "../layout.mjs";
 import {Store} from "../../api/Store.mjs";
 import {CommonTemplates} from "../common.mjs";
 import {Api} from "../../api/Api.mjs";
-import {toast} from "../../actions.mjs";
-import {addMessage, Hooks, removeMessage} from "../../api/Hooks.mjs";
+import {popup, removePopups, toast} from "../../actions.mjs";
+import {Hooks, removeMessage} from "../../api/Hooks.mjs";
 import {Time} from "../../tooling/Time.mjs";
 import {Live} from "../../live/Live.mjs";
+import {PopupComponents} from "../popup.mjs";
 
 export class ChatComponent {
     static render() {
@@ -31,7 +32,7 @@ export class ChatComponent {
         return create("div")
             .classes("panes-v", "full-width", "full-height")
             .children(
-                ChatComponent.actions(user),
+                ChatComponent.actions(user, channels),
                 create("div")
                     .classes("panes", "full-width", "flex-grow")
                     .children(
@@ -117,14 +118,55 @@ export class ChatComponent {
         }, sending, ["rounded-max", "double"]);
     }
 
-    static actions(user) {
+    static actions(user, channels) {
+        const userSearchResults = signal([]);
+
         return create("div")
-            .classes("flex", "align-center", "full-width")
+            .classes("flex", "align-center", "full-width", "space-between")
             .children(
+                CommonTemplates.buttonWithIcon("person_add", "New DM", () => {
+                    popup(PopupComponents.searchPopup(() => {
+                        removePopups();
+                    }, (e) => {
+                        const query = e.target.value;
+                        if (query.length < 3) {
+                            userSearchResults.value = [];
+                            return;
+                        }
+
+                        Api.search(query).then((res) => {
+                            if (res.status !== 200) {
+                                toast("Failed to search for users", "error");
+                                return;
+                            }
+                            userSearchResults.value = res.data.filter(user => {
+                                return !channels.value.some(channel => {
+                                    return channel.type === "dm" && channel.members.some(member => member.id === user.id);
+                                });
+                            });
+                        })
+                    }, () => {}, userSearchResults, (result) => {
+                        return CommonTemplates.chatWithButton(result.username, () => {
+                            Api.createDirect(result.id).then((res) => {
+                                if (res.status !== 200) {
+                                    toast("Failed to create DM", "error");
+                                    removePopups();
+                                    return;
+                                }
+                                toast("DM created", "success");
+                                Live.send({
+                                    type: "createChannel",
+                                    channelId: res.data.id,
+                                });
+                                removePopups();
+                            });
+                        });
+                    }, "New DM", "Search for users"));
+                }),
                 create("div")
                     .classes("padded")
                     .children(
-                        CommonTemplates.userInList("face_5", user.displayname, user.username, () => {})
+                        CommonTemplates.userInList("face_5", user.displayname ?? user.displayname, user.username, () => {})
                     ).build(),
                 CommonTemplates.pageLink("Logout", "logout")
             ).build();

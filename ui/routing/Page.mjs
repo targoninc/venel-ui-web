@@ -12,6 +12,16 @@ export class Page {
         }
     }
 
+    static get popups() {
+        const popups = document.getElementById("popups");
+        if (!popups) {
+            Page.initialize();
+            return Page.popups;
+        } else {
+            return popups;
+        }
+    }
+
     static empty() {
         Page.container.innerHTML = "";
         Page.initialize();
@@ -19,6 +29,7 @@ export class Page {
 
     static initialize() {
         Page.container.appendChild(create("div").id("toasts").build());
+        Page.container.appendChild(create("div").id("popups").build());
     }
 
     static load(page, params, router) {

@@ -16,3 +16,24 @@ export function toast(message, type = "info", timeout = 5) {
         toast.remove();
     }, timeout * 10000);
 }
+
+export function popup(popup, classes = []) {
+    const container = create("div")
+        .classes("popup-container", ...classes)
+        .children(popup)
+        .build();
+
+    Page.popups.appendChild(container);
+
+    setTimeout(() => {
+        document.addEventListener("click", (event) => {
+            if (!container.contains(event.target)) {
+                container.remove();
+            }
+        }, {once: true});
+    }, 10);
+}
+
+export function removePopups() {
+    Page.popups.innerHTML = "";
+}

@@ -67,4 +67,7 @@ export class Api extends ApiBase {
     static async url() {
         return await this.get("/api/live/url", {});
     }
+    static async search(query = null) {
+        return await this.get("/api/users/search", {query});
+    }
 }

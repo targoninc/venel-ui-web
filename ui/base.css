@@ -117,6 +117,11 @@ button, input, textarea, select {
     height: max-content;
 }
 
+button.no-border, input.no-border, textarea.no-border, select.no-border {
+    border: none;
+    background: transparent;
+}
+
 button.positive, input.positive, textarea.positive, select.positive {
     border: var(--input-border-width) solid var(--green);
     color: var(--green);
@@ -167,6 +172,35 @@ button:hover {
     flex-direction: column;
     gap: var(--gap-v);
     padding: var(--gap-v);
+    z-index: 999;
+}
+
+#popups {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+    display: none;
+}
+
+#popups:has(.popup-container) {
+    display: flex;
+}
+
+.popup-container {
+    background: rgba(0, 0, 0, 0.5);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     z-index: 999;
 }
 

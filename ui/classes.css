@@ -150,6 +150,10 @@
     align-items: center;
 }
 
+.self-end {
+    align-self: end;
+}
+
 .card, .main-card {
     padding: calc(var(--gap-v) * 2);
     background: var(--bg-2);
@@ -242,4 +246,8 @@
 
 .message-content:hover {
     background: var(--bg-2);
+}
+
+.close-button {
+    align-self: end;
 }

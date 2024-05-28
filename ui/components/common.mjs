@@ -93,6 +93,19 @@ export class CommonTemplates {
             ).build();
     }
 
+    static chatWithButton(username, onclick) {
+        return create("button")
+            .classes("flex", "align-center", "small-gap", "full-width", "space-between")
+            .onclick(onclick)
+            .children(
+                CommonTemplates.icon("chat"),
+                create("span")
+                    .classes("bold")
+                    .text(username)
+                    .build(),
+            ).build();
+    }
+
     static input(type, id, label, placeholder, value, onchange, required = true, autocomplete = "off", onkeydown = () => {}) {
         return create("div")
             .classes("flex-v", "small-gap")
@@ -107,6 +120,31 @@ export class CommonTemplates {
                     .placeholder(placeholder)
                     .value(value)
                     .onchange(onchange)
+                    .onkeydown((e) => {
+                        if (e.key === "Enter") {
+                            e.preventDefault();
+                            onkeydown(e);
+                        }
+                    })
+                    .autocomplete(autocomplete)
+                    .build()
+            ).build();
+    }
+
+    static responsiveInput(type, id, label, placeholder, value, oninput, required = true, autocomplete = "off", onkeydown = () => {}) {
+        return create("div")
+            .classes("flex-v", "small-gap")
+            .children(
+                create("label")
+                    .for(id)
+                    .text(label)
+                    .build(),
+                create("input")
+                    .type(type)
+                    .id(id)
+                    .placeholder(placeholder)
+                    .value(value)
+                    .oninput(oninput)
                     .onkeydown((e) => {
                         if (e.key === "Enter") {
                             e.preventDefault();
