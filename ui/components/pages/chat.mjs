@@ -141,7 +141,11 @@ export class ChatComponent {
                             }
                             userSearchResults.value = res.data.filter(user => {
                                 return !channels.value.some(channel => {
-                                    return channel.type === "dm" && channel.members.some(member => member.id === user.id);
+                                    if (channel.type === "dm" && channel.members.length === 1) {
+                                        return channel.members[0].id === user.id;
+                                    }
+
+                                    return channel.type === "dm" && channel.members[1].id === user.id;
                                 });
                             });
                         })
