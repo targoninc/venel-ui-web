@@ -46,7 +46,7 @@ export class ChatComponent {
     static channelList(channels, activeChannel) {
         return signalMap(channels,
             create("div")
-                .classes("flex-v")
+                .classes("flex-v", "no-gap")
             , channel => {
                 if (channel.type === "gr") {
                     return ChatComponent.groupChannel(channel, activeChannel);

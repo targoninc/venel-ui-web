@@ -131,6 +131,10 @@ button.double, input.double, textarea.double, select.double {
     padding: var(--input-padding-v) calc(var(--input-padding-h) * 2);
 }
 
+div {
+    box-sizing: border-box;
+}
+
 a {
     color: var(--text);
     text-decoration: none;
