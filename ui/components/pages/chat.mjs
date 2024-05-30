@@ -24,6 +24,21 @@ export class ChatComponent {
                 activeChannel.value = newChannels[0]?.id || null;
             }
         });
+        const updateChannels = () => {
+            displayChannels.value = channels.value.sort((a, b) => {
+                const aLastMsg = messages.value[a.id]?.at(-1);
+                const bLastMsg = messages.value[b.id]?.at(-1);
+                if (!aLastMsg || !bLastMsg) {
+                    return 0;
+                }
+
+                return new Date(bLastMsg.createdAt).getTime() - new Date(aLastMsg.createdAt).getTime();
+            });
+        };
+        const displayChannels = signal(channels.value);
+        messages.subscribe(updateChannels);
+        channels.subscribe(updateChannels);
+
         activeChannel.subscribe(channel => {
             Store.set("currentChannelId", channel);
             Hooks.runActiveChannel(channel);
@@ -36,22 +51,22 @@ export class ChatComponent {
                 create("div")
                     .classes("panes", "full-width", "flex-grow")
                     .children(
-                        LayoutTemplates.pane(ChatComponent.channelList(channels, activeChannel), "25%", "200px"),
-                        ifjs(activeChannel, LayoutTemplates.pane(ChatComponent.chat(activeChannel, messages), "75%", "300px")),
-                        ifjs(activeChannel, LayoutTemplates.pane(create("span").text("No channel selected").build(), "75%", "300px"), true)
+                        LayoutTemplates.resizableFromRight(ChatComponent.channelList(displayChannels, messages, activeChannel), "50%", "200px", "50%"),
+                        ifjs(activeChannel, LayoutTemplates.flexPane(ChatComponent.chat(activeChannel, messages), "300px", "100%")),
+                        ifjs(activeChannel, LayoutTemplates.flexPane(create("span").text("No channel selected").build(), "300px", "100%"), true)
                     ).build()
             ).build();
     }
 
-    static channelList(channels, activeChannel) {
+    static channelList(channels, messages, activeChannel) {
         return signalMap(channels,
             create("div")
                 .classes("flex-v", "no-gap")
             , channel => {
                 if (channel.type === "gr") {
-                    return ChatComponent.groupChannel(channel, activeChannel);
+                    return ChatComponent.groupChannel(channel, messages, activeChannel);
                 } else {
-                    return ChatComponent.dmChannel(channel, activeChannel);
+                    return ChatComponent.dmChannel(channel, messages, activeChannel);
                 }
             });
     }
@@ -73,7 +88,7 @@ export class ChatComponent {
                     .classes("chat-content", "flex-v", "no-gap")
                     .children(
                         signalMap(messages, create("div")
-                                .classes("chat-messages", "flex-v", "flex-grow"),
+                                .classes("chat-messages", "flex-v", "flex-grow", "no-gap"),
                             message => ChatComponent.message(message, messages)),
                         create("div")
                             .classes("background-2", "chat-input", "flex", "align-center")
@@ -176,7 +191,7 @@ export class ChatComponent {
             ).build();
     }
 
-    static groupChannel(channel, activeChannel) {
+    static groupChannel(channel, messages, activeChannel) {
         const activeClass = computedSignal(activeChannel, (id) => id === channel.id ? "active" : "_");
         const editing = signal(false);
 
@@ -275,7 +290,7 @@ export class ChatComponent {
             ).build();
     }
 
-    static dmChannel(channel, activeChannel) {
+    static dmChannel(channel, messages, activeChannel) {
         const activeClass = computedSignal(activeChannel, (id) => id === channel.id ? "active" : "_");
 
         return create("div")
@@ -289,7 +304,7 @@ export class ChatComponent {
                     .build(),
                 create("span")
                     .classes("text-small")
-                    .text("DM")
+                    .text(messages.value[channel.id]?.at(-1)?.text || "No messages")
                     .build(),
             ).build();
     }

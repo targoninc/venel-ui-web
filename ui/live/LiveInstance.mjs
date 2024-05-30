@@ -1,4 +1,4 @@
-import {addMessage, removeMessage} from "../api/Hooks.mjs";
+import {addChannel, addMessage, removeMessage} from "../api/Hooks.mjs";
 import {toast} from "../actions.mjs";
 import {Api} from "../api/Api.mjs";
 
@@ -44,12 +44,16 @@ export class LiveInstance {
 
         this.server.onmessage = (event) => {
             const data = JSON.parse(event.data);
+            console.log(data);
             switch (data.type) {
                 case "message":
                     addMessage(data.message.channelId, data.message);
                     break;
                 case "removeMessage":
                     removeMessage(data.channelId, data.messageId);
+                    break;
+                case "newChannel":
+                    addChannel(data.channel);
                     break;
             }
         };

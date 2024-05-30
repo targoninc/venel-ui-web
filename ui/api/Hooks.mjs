@@ -16,6 +16,9 @@ export class Hooks {
         Api.getChannels().then((res) => {
             if (res.status === 200) {
                 store().setSignalValue('channels', res.data);
+                for (const channel of res.data) {
+                    Hooks.runActiveChannel(channel.id);
+                }
             } else {
                 toast("Failed to fetch channels", "negative");
                 store().setSignalValue('channels', []);
@@ -35,7 +38,6 @@ export class Hooks {
                 setMessages(channel, res.data);
             } else {
                 toast("Failed to fetch messages", "negative");
-                setMessages(channel, []);
             }
         });
     }
@@ -48,7 +50,7 @@ export function setMessages(channel, messages) {
 
     const ex = store().get('messages').value;
     setChannel(ex, channel);
-    store().setSignalValue('messages', {...ex, [channel]: messages});
+    store().setSignalValue('messages', {...ex, [channel]: messages.sort((a, b) => a.id - b.id)});
 }
 
 export function addMessage(channel, message) {
@@ -58,7 +60,7 @@ export function addMessage(channel, message) {
 
     const ex = store().get('messages').value;
     setChannel(ex, channel);
-    store().setSignalValue('messages', {...ex, [channel]: [message, ...ex[channel]]});
+    store().setSignalValue('messages', {...ex, [channel]: [...ex[channel], message]});
 }
 
 export function removeMessage(channel, messageId) {
@@ -75,4 +77,29 @@ export function setChannel(ex, channel) {
     if (!ex[channel]) {
         ex[channel] = [];
     }
+}
+
+export function addChannel(channel) {
+    if (!store().get('channels')) {
+        store().set('channels', signal([]));
+    }
+
+    if (store().get('channels').value.includes(channel)) {
+        return;
+    }
+
+    store().setSignalValue('channels', [channel, ...store().get('channels').value]);
+}
+
+export function removeChannel(channel) {
+    if (!store().get('channels')) {
+        store().set('channels', signal([]));
+    }
+
+    store().setSignalValue('channels', store().get('channels').value.filter((c) => c !== channel));
+}
+
+export function setActiveChannel(channel) {
+    store().set('activeChannel', signal(channel));
+    Hooks.runActiveChannel(channel);
 }

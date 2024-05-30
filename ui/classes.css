@@ -39,6 +39,11 @@
     width: calc(var(--width) - 2 * var(--input-border-width));
 }
 
+.flex-pane {
+    flex-grow: 1;
+    border: var(--input-border-width) solid var(--bg-4);
+}
+
 .padded {
     padding: var(--gap-h);
 }
@@ -231,6 +236,7 @@
 
 .message-content {
     position: relative;
+    padding: 0.25em;
 }
 
 .message-menu {
@@ -250,4 +256,23 @@
 
 .close-button {
     align-self: end;
+}
+
+.resizable {
+    position: relative;
+}
+
+.resize-indicator {
+    position: absolute;
+}
+
+.resize-indicator.v {
+    height: 100%;
+    width: 10px;
+    right: 0;
+    cursor: ew-resize;
+}
+
+.resize-indicator:hover {
+    background: rgba(150, 150, 150, 0.2);
 }
