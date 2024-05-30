@@ -2,12 +2,10 @@ import {computedSignal, create, ifjs, signal, signalMap} from "https://fjs.targo
 import {LayoutTemplates} from "../layout.mjs";
 import {Store} from "../../api/Store.mjs";
 import {CommonTemplates} from "../common.mjs";
-import {Api} from "../../api/Api.mjs";
-import {popup, removePopups, toast} from "../../actions.mjs";
 import {Hooks, removeMessage} from "../../api/Hooks.mjs";
 import {Time} from "../../tooling/Time.mjs";
 import {Live} from "../../live/Live.mjs";
-import {PopupComponents} from "../popup.mjs";
+import {ChannelTemplates} from "../channel.mjs";
 
 export class ChatComponent {
     static render() {
@@ -47,28 +45,15 @@ export class ChatComponent {
         return create("div")
             .classes("panes-v", "full-width", "full-height")
             .children(
-                ChatComponent.actions(user, channels),
+                CommonTemplates.actions(user, channels),
                 create("div")
                     .classes("panes", "full-width", "flex-grow")
                     .children(
-                        LayoutTemplates.resizableFromRight(ChatComponent.channelList(displayChannels, messages, activeChannel), "50%", "200px", "50%"),
+                        LayoutTemplates.resizableFromRight(ChannelTemplates.channelList(displayChannels, messages, activeChannel), "50%", "200px", "50%"),
                         ifjs(activeChannel, LayoutTemplates.flexPane(ChatComponent.chat(activeChannel, messages), "300px", "100%")),
                         ifjs(activeChannel, LayoutTemplates.flexPane(create("span").text("No channel selected").build(), "300px", "100%"), true)
                     ).build()
             ).build();
-    }
-
-    static channelList(channels, messages, activeChannel) {
-        return signalMap(channels,
-            create("div")
-                .classes("flex-v", "no-gap")
-            , channel => {
-                if (channel.type === "gr") {
-                    return ChatComponent.groupChannel(channel, messages, activeChannel);
-                } else {
-                    return ChatComponent.dmChannel(channel, messages, activeChannel);
-                }
-            });
     }
 
     static chat(activeChannel, allMessages) {
@@ -131,94 +116,6 @@ export class ChatComponent {
             sending.value = false;
             messageText.value = "";
         }, sending, ["rounded-max", "double"]);
-    }
-
-    static actions(user, channels) {
-        const userSearchResults = signal([]);
-
-        return create("div")
-            .classes("flex", "align-center", "full-width", "space-between")
-            .children(
-                CommonTemplates.buttonWithIcon("person_add", "New DM", () => {
-                    popup(PopupComponents.searchPopup(() => {
-                        removePopups();
-                    }, (e) => {
-                        const query = e.target.value;
-                        if (query.length < 3) {
-                            userSearchResults.value = [];
-                            return;
-                        }
-
-                        Api.search(query).then((res) => {
-                            if (res.status !== 200) {
-                                toast("Failed to search for users", "error");
-                                return;
-                            }
-                            userSearchResults.value = res.data.filter(user => {
-                                return !channels.value.some(channel => {
-                                    if (channel.type === "dm" && channel.members.length === 1) {
-                                        return channel.members[0].id === user.id;
-                                    }
-
-                                    return channel.type === "dm" && channel.members[1].id === user.id;
-                                });
-                            });
-                        })
-                    }, () => {}, userSearchResults, (result) => {
-                        return CommonTemplates.chatWithButton(result.username, () => {
-                            Api.createDirect(result.id).then((res) => {
-                                if (res.status !== 200) {
-                                    toast("Failed to create DM", "error");
-                                    removePopups();
-                                    return;
-                                }
-                                toast("DM created", "success");
-                                Live.send({
-                                    type: "createChannel",
-                                    channelId: res.data.id,
-                                });
-                                removePopups();
-                            });
-                        });
-                    }, "New DM", "Search for users"));
-                }),
-                create("div")
-                    .classes("padded")
-                    .children(
-                        CommonTemplates.userInList("face_5", user.displayname ?? user.displayname, user.username, () => {})
-                    ).build(),
-                CommonTemplates.pageLink("Logout", "logout")
-            ).build();
-    }
-
-    static groupChannel(channel, messages, activeChannel) {
-        const activeClass = computedSignal(activeChannel, (id) => id === channel.id ? "active" : "_");
-        const editing = signal(false);
-
-        return create("div")
-            .classes("channel", "flex-v", "full-width", activeClass)
-            .onclick(() => {
-                activeChannel.value = channel.id;
-            })
-            .children(
-                ifjs(editing, create("input")
-                    .type("text")
-                    .value(channel.name)
-                    .onchange((e) => {
-                        Live.send({
-                            type: "updateChannel",
-                            channelId: channel.id,
-                            name: e.target.value,
-                        });
-                    }).build()),
-                ifjs(editing, create("span")
-                    .text(channel.name)
-                    .build(), true),
-                create("span")
-                    .classes("text-small")
-                    .text("Group")
-                    .build(),
-            ).build();
     }
 
     static message(message, messages) {
@@ -287,25 +184,6 @@ export class ChatComponent {
                     });
                     removeMessage(message.channelId, message.id);
                 }),
-            ).build();
-    }
-
-    static dmChannel(channel, messages, activeChannel) {
-        const activeClass = computedSignal(activeChannel, (id) => id === channel.id ? "active" : "_");
-
-        return create("div")
-            .classes("channel", "flex-v", "full-width", activeClass)
-            .onclick(() => {
-                activeChannel.value = channel.id;
-            })
-            .children(
-                create("span")
-                    .text(channel.name)
-                    .build(),
-                create("span")
-                    .classes("text-small")
-                    .text(messages.value[channel.id]?.at(-1)?.text || "No messages")
-                    .build(),
             ).build();
     }
 }

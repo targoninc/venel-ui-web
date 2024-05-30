@@ -22,7 +22,7 @@ export class Store {
     static definition = {
         user: {
             type: "object",
-            default: null,
+            default: signal(null),
         },
         currentChannelId: {
             type: "number",

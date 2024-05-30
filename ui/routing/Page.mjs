@@ -73,6 +73,10 @@ export class Page {
         "uitest": {
             path: "uitest",
             component: "UiTestComponent"
+        },
+        "profile": {
+            path: "profile",
+            component: "ProfileComponent"
         }
     };
 }

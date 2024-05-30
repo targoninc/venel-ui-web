@@ -14,7 +14,7 @@ export function toast(message, type = "info", timeout = 5) {
 
     setTimeout(() => {
         toast.remove();
-    }, timeout * 10000);
+    }, timeout * 1000);
 }
 
 export function popup(popup, classes = []) {

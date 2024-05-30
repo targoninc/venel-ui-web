@@ -5,6 +5,7 @@ import {Api} from "./api/Api.mjs";
 import {Store} from "./api/Store.mjs";
 import {Hooks} from "./api/Hooks.mjs";
 import {Live} from "./live/Live.mjs";
+import {store} from "https://fjs.targoninc.com/f.js";
 
 Store.create();
 
@@ -14,10 +15,10 @@ window.router = new Router(routes, async (route, params) => {
 
     const res = await Api.getUser();
     if (res.status === 200) {
-        Store.set('user', res.data.user);
+        store().setSignalValue('user', res.data.user);
         Hooks.runUser(res.data.user);
     } else {
-        Store.set('user', null);
+        store().setSignalValue('user', null);
         if (route.noUser) {
             window.router.navigate(route.noUser);
             return;

@@ -25,5 +25,10 @@ export const routes = [
     {
         path: "uitest",
         title: "UI Test"
+    },
+    {
+        path: "profile",
+        title: "Profile",
+        noUser: "login"
     }
 ];

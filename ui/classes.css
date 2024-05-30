@@ -276,3 +276,9 @@
 .resize-indicator:hover {
     background: rgba(150, 150, 150, 0.2);
 }
+
+.one-line {
+    white-space: nowrap;
+    overflow: hidden;
+    max-width: 100%;
+}

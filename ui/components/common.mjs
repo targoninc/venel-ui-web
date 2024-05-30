@@ -1,4 +1,9 @@
-import {create, FjsObservable, ifjs} from "https://fjs.targoninc.com/f.js";
+import {create, FjsObservable, ifjs, signal, signalFromProperty} from "https://fjs.targoninc.com/f.js";
+import {popup, removePopups, toast} from "../actions.mjs";
+import {PopupComponents} from "./popup.mjs";
+import {Api} from "../api/Api.mjs";
+import {Live} from "../live/Live.mjs";
+import {Popups} from "../api/Popups.mjs";
 
 export class CommonTemplates {
     static icon(icon, classes = [], tag = "span") {
@@ -70,6 +75,26 @@ export class CommonTemplates {
                         .styles("animation-delay", `-${i * delay}s`)
                         .build();
                 })
+            ).build();
+    }
+
+    static actions(userSignal) {
+        const username = signalFromProperty(userSignal, "username");
+        const displayname = signalFromProperty(userSignal, "displayname");
+
+        return create("div")
+            .classes("flex", "align-center", "full-width", "space-between", "padded")
+            .children(
+                CommonTemplates.buttonWithIcon("chat", "Chat", () => window.router.navigate('chat')),
+                CommonTemplates.buttonWithIcon("person_add", "New DM", () => Popups.newDm()),
+                create("div")
+                    .classes("padded")
+                    .children(
+                        CommonTemplates.userInList("face_5", displayname, username, () => {
+                            window.router.navigate('profile');
+                        })
+                    ).build(),
+                CommonTemplates.pageLink("Logout", "logout")
             ).build();
     }
 
