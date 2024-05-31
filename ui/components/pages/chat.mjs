@@ -48,9 +48,9 @@ export class ChatComponent {
             .children(
                 CommonTemplates.actions(),
                 create("div")
-                    .classes("panes", "full-width", "flex-grow")
+                    .classes("panes", "full-width", "flex-grow", "nav-margin")
                     .children(
-                        LayoutTemplates.resizableFromRight(ChannelTemplates.channelList(displayChannels, messages, activeChannel), "50%", "200px", "50%"),
+                        LayoutTemplates.resizableFromRight(ChannelTemplates.channelList(displayChannels, messages, activeChannel), "20%", "200px", "50%"),
                         ifjs(activeChannel, LayoutTemplates.flexPane(ChatComponent.chat(activeChannel, messages), "300px", "100%")),
                         ifjs(activeChannel, LayoutTemplates.flexPane(create("span").text("No channel selected").build(), "300px", "100%"), true)
                     ).build()

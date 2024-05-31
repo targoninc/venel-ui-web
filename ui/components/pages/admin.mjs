@@ -20,7 +20,7 @@ export class AdminComponent {
             .children(
                 CommonTemplates.actions(),
                 create("div")
-                    .classes("panes", "full-width", "flex-grow")
+                    .classes("panes", "full-width", "flex-grow", "nav-margin")
                     .children(
                         LayoutTemplates.pane(LayoutTemplates.centeredContent(
                             create("div")

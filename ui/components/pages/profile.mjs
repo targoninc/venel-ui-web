@@ -1,5 +1,5 @@
 import {LayoutTemplates} from "../layout.mjs";
-import {computedSignal, create, signalFromProperty, store} from "https://fjs.targoninc.com/f.js";
+import {create, signalFromProperty, store} from "https://fjs.targoninc.com/f.js";
 import {CommonTemplates} from "../common.mjs";
 import {Store} from "../../api/Store.mjs";
 import {Api} from "../../api/Api.mjs";
@@ -18,7 +18,7 @@ export class ProfileComponent {
             .children(
                 CommonTemplates.actions(),
                 create("div")
-                    .classes("panes", "full-width", "flex-grow")
+                    .classes("panes", "full-width", "flex-grow", "nav-margin")
                     .children(
                         LayoutTemplates.pane(LayoutTemplates.centeredContent(
                             create("div")

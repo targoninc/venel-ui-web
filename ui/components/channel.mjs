@@ -11,7 +11,7 @@ export class ChannelTemplates {
         const lastMemberAvatar = channel.members.at(-1)?.avatar;
 
         return create("div")
-            .classes("channel", "flex", "full-width", activeClass)
+            .classes("channel", "flex", "no-wrap", "full-width", activeClass)
             .onclick(() => {
                 activeChannel.value = channel.id;
                 window.history.pushState({}, "", `/chat/${channel.id}`);
@@ -40,7 +40,7 @@ export class ChannelTemplates {
         const editing = signal(false);
 
         return create("div")
-            .classes("channel", "flex-v", "full-width", activeClass)
+            .classes("channel", "flex", "no-wrap", "full-width", activeClass)
             .onclick(() => {
                 activeChannel.value = channel.id;
             })

@@ -48,7 +48,7 @@ export class LayoutTemplates {
 
         return create("div")
             .classes("pane", "resizable")
-            .styles("--width", defaultWidth)
+            .styles("width", defaultWidth)
             .styles("min-width", minWidth)
             .styles("max-width", maxWidth)
             .id(uniqueId)

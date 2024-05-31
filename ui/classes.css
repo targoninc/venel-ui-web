@@ -26,6 +26,11 @@
     flex-wrap: nowrap;
 }
 
+.no-wrap {
+    flex-wrap: nowrap;
+    overflow: hidden;
+}
+
 .flex-grow {
     flex-grow: 1;
 }
@@ -371,4 +376,8 @@
 
 .rot270 {
     transform: rotate(270deg);
+}
+
+.nav-margin {
+    margin-top: 43px;
 }
