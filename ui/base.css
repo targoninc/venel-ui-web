@@ -66,7 +66,7 @@
 
 html, body {
     height: 100dvh;
-    width: 100vw;
+    width: 100dvw;
     margin: 0;
     padding: 0;
 }
@@ -241,4 +241,11 @@ textarea:focus-visible {
 
 .message-input {
     resize: none;
+}
+
+nav {
+    background: var(--bg);
+    border-bottom: 2px solid var(--text-3);
+    padding: var(--gap-h) var(--gap-v);
+    box-sizing: border-box;
 }

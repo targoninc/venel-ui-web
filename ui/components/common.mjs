@@ -83,8 +83,8 @@ export class CommonTemplates {
         const user = Store.get('user');
         const hasAnyRole = computedSignal(user, user => user && user.roles && user.roles.length > 0);
 
-        return create("div")
-            .classes("flex", "align-center", "full-width", "space-between", "padded")
+        return create("nav")
+            .classes("flex", "align-center", "full-width", "space-between", "padded", "fixed")
             .children(
                 create("div")
                     .classes("flex", "align-center")

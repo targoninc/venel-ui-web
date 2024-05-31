@@ -298,15 +298,37 @@ export class AdminComponent {
         const hasDeletePermission = computedSignal(permissions, ps => ps && ps.some(p => p.name === "deleteUser"));
 
         return create("div")
-            .classes("flex", "space-between")
+            .classes("flex-v")
             .children(
-                CommonTemplates.userInList(user.avatar ? user.avatar : testImage, user.displayname, user.username, () => {}),
                 create("div")
-                    .classes("flex")
+                    .classes("flex", "space-between")
                     .children(
-                        ifjs(hasEditPermission, CommonTemplates.buttonWithIcon("edit", "Edit", () => {})),
-                        ifjs(hasDeletePermission, CommonTemplates.buttonWithIcon("delete", "Delete", () => {})),
+                        CommonTemplates.userInList(user.avatar ? user.avatar : testImage, user.displayname, user.username, () => {}),
+                        create("div")
+                            .classes("flex")
+                            .children(
+                                ifjs(hasEditPermission, CommonTemplates.buttonWithIcon("edit", "Edit", () => {})),
+                                ifjs(hasDeletePermission, CommonTemplates.buttonWithIcon("delete", "Delete", () => {})),
+                            ).build(),
                     ).build(),
+                LayoutTemplates.collapsible("Roles", AdminComponent.userRoles(user)),
+                LayoutTemplates.collapsible("Permissions", AdminComponent.userPermissions(user)),
+            ).build();
+    }
+
+    static userRoles(user) {
+        return create("div")
+            .classes("flex")
+            .children(
+                user.roles.map(role => AdminComponent.role(role)),
+            ).build();
+    }
+
+    static userPermissions(user) {
+        return create("div")
+            .classes("flex")
+            .children(
+                user.permissions.map(permission => AdminComponent.permission(permission)),
             ).build();
     }
 }

@@ -23,6 +23,7 @@
 .flex-v, .panes-v {
     flex-direction: column;
     gap: var(--gap-v);
+    flex-wrap: nowrap;
 }
 
 .flex-grow {
@@ -328,4 +329,19 @@
 
 .circle-toggle:hover {
     background: var(--bg-3);
+}
+
+.collapsible-header {
+    cursor: pointer;
+}
+
+.collapsible {
+    background: var(--bg-2);
+    padding: var(--gap-h) var(--gap-v);
+    border-radius: var(--input-border-radius);
+    border: var(--input-border-width) solid var(--bg-4);
+}
+
+.fixed {
+    position: fixed;
 }

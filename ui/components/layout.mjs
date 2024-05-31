@@ -1,4 +1,5 @@
-import {create} from "https://fjs.targoninc.com/f.js";
+import {computedSignal, create, signal} from "https://fjs.targoninc.com/f.js";
+import {CommonTemplates} from "./common.mjs";
 
 export class LayoutTemplates {
     static pageFull(content) {
@@ -85,5 +86,34 @@ export class LayoutTemplates {
                 document.addEventListener("mouseup", onMouseUp);
             })
             .build();
+    }
+
+    static collapsible(text, content) {
+        const uniqueId = Math.random().toString(36).substring(7);
+        const toggled = signal(false);
+        const icon = computedSignal(toggled, on => on ? "expand_circle_up" : "expand_circle_down");
+        const display = computedSignal(toggled, on => on ? "block" : "none");
+
+        return create("div")
+            .classes("collapsible", "flex-v")
+            .children(
+                create("div")
+                    .classes("collapsible-header", "flex", "align-center")
+                    .onclick(() => {
+                        toggled.value = !toggled.value;
+                    }).children(
+                        CommonTemplates.icon(icon),
+                        create("span")
+                            .classes("collapsible-title")
+                            .text(text)
+                            .build()
+                    ).build(),
+                create("div")
+                    .classes("collapsible-content")
+                    .styles("display", display)
+                    .id(uniqueId)
+                    .children(content)
+                    .build()
+            ).build();
     }
 }
