@@ -10,6 +10,7 @@ export class ChannelTemplates {
             .classes("channel", "flex-v", "no-gap", "full-width", activeClass)
             .onclick(() => {
                 activeChannel.value = channel.id;
+                window.history.pushState({}, "", `/chat/${channel.id}`);
             })
             .children(
                 create("span")

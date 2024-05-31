@@ -10,7 +10,7 @@ import {store} from "https://fjs.targoninc.com/f.js";
 Store.create();
 
 window.router = new Router(routes, async (route, params) => {
-    console.log(`Route changed to ${route.path}`);
+    console.log(`Route changed to ${route.path} with params:`, params);
     document.title = `Venel - ${route.title}`;
 
     const res = await Api.getUser();

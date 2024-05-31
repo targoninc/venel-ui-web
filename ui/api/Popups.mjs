@@ -49,6 +49,7 @@ export class Popups {
                         channelId: res.data.id,
                     });
                     removePopups();
+                    window.router.navigate(`/chat/${res.data.id}`);
                 });
             });
         }, "New DM", "Search for users"));

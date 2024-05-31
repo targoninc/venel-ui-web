@@ -1,4 +1,4 @@
-import {computedSignal, create, ifjs, signal, signalMap} from "https://fjs.targoninc.com/f.js";
+import {computedSignal, create, ifjs, signal, signalMap, store} from "https://fjs.targoninc.com/f.js";
 import {LayoutTemplates} from "../layout.mjs";
 import {Store} from "../../api/Store.mjs";
 import {CommonTemplates} from "../common.mjs";
@@ -8,14 +8,14 @@ import {Live} from "../../live/Live.mjs";
 import {ChannelTemplates} from "../channel.mjs";
 
 export class ChatComponent {
-    static render() {
-        return LayoutTemplates.pageFull(ChatComponent.content());
+    static render(params) {
+        return LayoutTemplates.pageFull(ChatComponent.content(params));
     }
 
-    static content() {
+    static content(params) {
         const user = Store.get('user');
         const channels = Store.get("channels");
-        const activeChannel = signal(Store.get("currentChannelId") || channels[0]?.id || null);
+        const activeChannel = signal(params.channelId || Store.get("currentChannelId") || channels[0]?.id || null);
         const messages = Store.get("messages");
         channels.subscribe(newChannels => {
             if (!newChannels.some(channel => channel.id === activeChannel.value)) {

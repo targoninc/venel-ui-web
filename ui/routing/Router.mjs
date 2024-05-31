@@ -20,7 +20,15 @@ export class Router {
 
     async handleRouteChange() {
         const path = window.location.pathname.substring(1);
-        const route = this.routes.find(r => path === r.path || (r.aliases && r.aliases.some(a => path === a)));
+        const route = this.routes.find(r => {
+            return path.startsWith(r.path) || (r.aliases && r.aliases.some(a => {
+                if (a === "" || a === "/") {
+                    return path === a;
+                }
+
+                return path.startsWith(a);
+            }));
+        });
         this.currentRoute = route;
         if (route) {
             const params = this.getParams(path, route);

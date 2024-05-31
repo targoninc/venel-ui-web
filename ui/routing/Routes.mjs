@@ -20,7 +20,8 @@ export const routes = [
     {
         path: 'chat',
         title: 'Chat',
-        noUser: 'login'
+        noUser: 'login',
+        params: ['channelId'],
     },
     {
         path: "uitest",
