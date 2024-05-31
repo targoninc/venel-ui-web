@@ -31,5 +31,11 @@ export const routes = [
         path: "profile",
         title: "Profile",
         noUser: "login"
+    },
+    {
+        path: "admin",
+        title: "Administration",
+        noUser: "login",
+        noAdmin: "chat"
     }
 ];

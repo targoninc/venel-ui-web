@@ -1,9 +1,10 @@
-import {create, FjsObservable, ifjs, signal, signalFromProperty} from "https://fjs.targoninc.com/f.js";
+import {computedSignal, create, FjsObservable, ifjs, signal, signalFromProperty} from "https://fjs.targoninc.com/f.js";
 import {popup, removePopups, toast} from "../actions.mjs";
 import {PopupComponents} from "./popup.mjs";
 import {Api} from "../api/Api.mjs";
 import {Live} from "../live/Live.mjs";
 import {Popups} from "../api/Popups.mjs";
+import {Store} from "../api/Store.mjs";
 
 export class CommonTemplates {
     static icon(icon, classes = [], tag = "span") {
@@ -83,6 +84,8 @@ export class CommonTemplates {
         const activeIfActive = page => {
             return (currentRoute && currentRoute.path === page) ? "active" : "_";
         };
+        const user = Store.get('user');
+        const hasAnyRole = computedSignal(user, user => user && user.roles && user.roles.length > 0);
 
         return create("div")
             .classes("flex", "align-center", "full-width", "space-between", "padded")
@@ -93,12 +96,31 @@ export class CommonTemplates {
                         CommonTemplates.buttonWithIcon("chat", "Chat", () => window.router.navigate('chat'), [activeIfActive("chat")]),
                         CommonTemplates.buttonWithIcon("person_add", "New DM", () => Popups.newDm()),
                     ).build(),
+                ifjs(hasAnyRole, create("div")
+                    .classes("flex", "align-center")
+                    .children(
+                        CommonTemplates.buttonWithIcon("admin_panel_settings", "Administration", () => window.router.navigate('admin'), [activeIfActive("admin")]),
+                    ).build()),
                 create("div")
                     .classes("flex", "align-center")
                     .children(
                         CommonTemplates.buttonWithIcon("face_5", "Profile", () => window.router.navigate('profile'), [activeIfActive("profile")]),
                         CommonTemplates.pageLink("Logout", "logout")
                     ).build(),
+            ).build();
+    }
+
+    static circleIndicator(text, color = "var(--blue)") {
+        return create("div")
+            .classes("flex", "align-center")
+            .children(
+                create("span")
+                    .classes("circle")
+                    .styles("background-color", color)
+                    .build(),
+                create("span")
+                    .text(text)
+                    .build()
             ).build();
     }
 
@@ -266,6 +288,23 @@ export class CommonTemplates {
                             resize(e.target);
                         }
                     })
+                    .build()
+            ).build();
+    }
+
+    static checkbox(id, label, value, onchange) {
+        return create("div")
+            .classes("flex", "small-gap")
+            .children(
+                create("input")
+                    .type("checkbox")
+                    .id(id)
+                    .checked(value)
+                    .onchange(onchange)
+                    .build(),
+                create("label")
+                    .for(id)
+                    .text(label)
                     .build()
             ).build();
     }

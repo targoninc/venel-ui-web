@@ -77,6 +77,10 @@ export class Page {
         "profile": {
             path: "profile",
             component: "ProfileComponent"
+        },
+        "admin": {
+            path: "admin",
+            component: "AdminComponent"
         }
     };
 }

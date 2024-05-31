@@ -73,4 +73,10 @@ export class Api extends ApiBase {
     static async search(query = null) {
         return await this.get("/api/users/search", {query});
     }
+    static async getInstances() {
+        return await this.get("/api/bridging/getInstances", {});
+    }
+    static async addInstance(url = null, useAllowlist = null, enabled = null) {
+        return await this.post("/api/bridging/addInstance", {url, useAllowlist, enabled});
+    }
 }
