@@ -305,4 +305,15 @@ export class CommonTemplates {
                     .build()
             ).build();
     }
+
+    static smallCard(icon, text) {
+        return create("div")
+            .classes("small-card", "flex", "align-center")
+            .children(
+                CommonTemplates.icon(icon),
+                create("span")
+                    .text(text)
+                    .build()
+            ).build();
+    }
 }

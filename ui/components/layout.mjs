@@ -91,29 +91,40 @@ export class LayoutTemplates {
     static collapsible(text, content) {
         const uniqueId = Math.random().toString(36).substring(7);
         const toggled = signal(false);
-        const icon = computedSignal(toggled, on => on ? "expand_circle_up" : "expand_circle_down");
-        const display = computedSignal(toggled, on => on ? "block" : "none");
+        const iconClass = computedSignal(toggled, on => on ? "rot90" : "rot0");
+        const gapClass = computedSignal(toggled, v => v ? "gap" : "no-gap");
+        let contentElement;
+        const setMaxHeight = () => {
+            if (toggled.value) {
+                contentElement.style.maxHeight = contentElement.scrollHeight + 'px';
+            } else {
+                contentElement.style.maxHeight = '0';
+            }
+        };
+
+        contentElement = create("div")
+            .classes("collapsible-content")
+            .id(uniqueId)
+            .children(content)
+            .build()
 
         return create("div")
-            .classes("collapsible", "flex-v")
+            .classes("collapsible", "flex-v", gapClass)
             .children(
                 create("div")
                     .classes("collapsible-header", "flex", "align-center")
                     .onclick(() => {
                         toggled.value = !toggled.value;
-                    }).children(
-                        CommonTemplates.icon(icon),
+                        setMaxHeight();
+                    })
+                    .children(
+                        CommonTemplates.icon("expand_circle_right", [iconClass]),
                         create("span")
                             .classes("collapsible-title")
                             .text(text)
                             .build()
                     ).build(),
-                create("div")
-                    .classes("collapsible-content")
-                    .styles("display", display)
-                    .id(uniqueId)
-                    .children(content)
-                    .build()
+                contentElement
             ).build();
     }
 }

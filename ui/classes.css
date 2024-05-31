@@ -68,6 +68,7 @@
 .icon {
     width: 1em;
     height: 1em;
+    transition: transform var(--animation-time) ease;
 }
 
 .highlight {
@@ -170,7 +171,7 @@
     align-self: end;
 }
 
-.card, .main-card {
+.card, .main-card, .small-card {
     padding: calc(var(--gap-v) * 2);
     background: var(--bg-2);
     border-radius: var(--input-border-radius);
@@ -180,6 +181,10 @@
 .main-card {
     width: min(100%, 500px);
     justify-content: space-between;
+}
+
+.small-card {
+    padding: var(--gap-v);
 }
 
 .space-between {
@@ -337,11 +342,33 @@
 
 .collapsible {
     background: var(--bg-2);
-    padding: var(--gap-h) var(--gap-v);
+    padding: var(--gap-v);
     border-radius: var(--input-border-radius);
     border: var(--input-border-width) solid var(--bg-4);
 }
 
 .fixed {
     position: fixed;
+}
+
+.collapsible-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height var(--animation-time) ease-out;
+}
+
+.rot0 {
+    transform: rotate(0deg);
+}
+
+.rot90 {
+    transform: rotate(90deg);
+}
+
+.rot180 {
+    transform: rotate(180deg);
+}
+
+.rot270 {
+    transform: rotate(270deg);
 }

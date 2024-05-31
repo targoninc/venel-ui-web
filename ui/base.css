@@ -19,6 +19,7 @@
     --input-border-radius: 0.25rem;
     --input-border-width: 1px;
     --avatar-border-width: 2px;
+    --animation-time: 0.35s;
 }
 
 @media (prefers-color-scheme: light) {

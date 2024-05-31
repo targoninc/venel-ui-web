@@ -29,8 +29,7 @@ export class AdminComponent {
                                     create("h1")
                                         .text("Administration")
                                         .build(),
-                                    AdminComponent.roleList(user),
-                                    AdminComponent.permissionList(user),
+                                    AdminComponent.yourInfo(user),
                                     AdminComponent.usersSettings(permissions),
                                     AdminComponent.bridgeInstanceSettings(permissions)
                                 ).build()
@@ -39,19 +38,24 @@ export class AdminComponent {
             ).build();
     }
 
-    static roleList(user) {
+    static yourInfo(user) {
         const roles = signalFromProperty(user, 'roles');
+        const permissions = signalFromProperty(user, 'permissions');
 
         return create("div")
             .classes("flex-v", "card")
             .children(
                 create("h2")
-                    .text("Your Roles")
+                    .text("Your Access as @" + user.value.username)
                     .build(),
-                signalMap(roles,
+                LayoutTemplates.collapsible("Roles", signalMap(roles,
                     create("div")
                         .classes("flex"),
-                    role => AdminComponent.role(role)),
+                    role => AdminComponent.role(role))),
+                LayoutTemplates.collapsible("Permissions", signalMap(permissions,
+                    create("div")
+                        .classes("flex"),
+                    permission => AdminComponent.permission(permission)))
             ).build();
     }
 
@@ -61,22 +65,6 @@ export class AdminComponent {
             .text(role.name)
             .title(role.description)
             .build();
-    }
-
-    static permissionList(user) {
-        const permissions = signalFromProperty(user, 'permissions');
-
-        return create("div")
-            .classes("flex-v", "card")
-            .children(
-                create("h2")
-                    .text("Your Permissions")
-                    .build(),
-                signalMap(permissions,
-                    create("div")
-                        .classes("flex"),
-                    permission => AdminComponent.permission(permission)),
-            ).build();
     }
 
     static permission(permission) {
@@ -311,8 +299,10 @@ export class AdminComponent {
                                 ifjs(hasDeletePermission, CommonTemplates.buttonWithIcon("delete", "Delete", () => {})),
                             ).build(),
                     ).build(),
-                LayoutTemplates.collapsible("Roles", AdminComponent.userRoles(user)),
-                LayoutTemplates.collapsible("Permissions", AdminComponent.userPermissions(user)),
+                ifjs(user.roles.length > 0, LayoutTemplates.collapsible("Roles", AdminComponent.userRoles(user))),
+                ifjs(user.roles.length > 0, CommonTemplates.error("No roles"), true),
+                ifjs(user.permissions.length > 0, LayoutTemplates.collapsible("Permissions", AdminComponent.userPermissions(user))),
+                ifjs(user.permissions.length > 0, CommonTemplates.smallCard("info", "No permissions"), true),
             ).build();
     }
 
