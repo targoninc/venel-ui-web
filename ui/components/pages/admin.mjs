@@ -3,7 +3,7 @@ import {computedSignal, create, ifjs, signal, signalFromProperty, signalMap} fro
 import {CommonTemplates} from "../common.mjs";
 import {Store} from "../../api/Store.mjs";
 import {Api} from "../../api/Api.mjs";
-import {popup, removePopups, testImage, toast} from "../../actions.mjs";
+import {popup, removePopups, testImage, toast, toggleAllowlist, toggleInstanceEnabled} from "../../actions.mjs";
 import {PopupComponents} from "../popup.mjs";
 
 export class AdminComponent {
@@ -225,10 +225,10 @@ export class AdminComponent {
                 create("div")
                     .classes("flex")
                     .children(
-                        ifjs(instance.useAllowlist, CommonTemplates.circleIndicator("Only allowed users", "var(--purple)")),
-                        ifjs(instance.useAllowlist, CommonTemplates.circleIndicator("All users", "var(--green)"), true),
-                        ifjs(instance.enabled, CommonTemplates.circleIndicator("Enabled", "var(--green)")),
-                        ifjs(instance.enabled, CommonTemplates.circleIndicator("Disabled", "var(--red)"), true),
+                        ifjs(instance.useAllowlist, CommonTemplates.circleToggle("Only allowed users", "var(--purple)", () => toggleAllowlist(instances, instance))),
+                        ifjs(instance.useAllowlist, CommonTemplates.circleToggle("All users", "var(--green)", () => toggleAllowlist(instances, instance)), true),
+                        ifjs(instance.enabled, CommonTemplates.circleToggle("Enabled", "var(--green)", () => toggleInstanceEnabled(instances, instance))),
+                        ifjs(instance.enabled, CommonTemplates.circleToggle("Disabled", "var(--red)", () => toggleInstanceEnabled(instances, instance)), true),
                         ifjs(hasRemovePermission, CommonTemplates.buttonWithIcon("delete", "Remove", () => {
                             Api.removeInstance(instance.id).then(res => {
                                 if (res.status === 200) {

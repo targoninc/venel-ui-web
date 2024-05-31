@@ -106,9 +106,10 @@ export class CommonTemplates {
             ).build();
     }
 
-    static circleIndicator(text, color = "var(--blue)") {
+    static circleToggle(text, color = "var(--blue)", onclick = () => {}) {
         return create("div")
-            .classes("flex", "align-center")
+            .classes("flex", "align-center", "circle-toggle")
+            .onclick(onclick)
             .children(
                 create("span")
                     .classes("circle")

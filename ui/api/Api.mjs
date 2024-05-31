@@ -85,4 +85,10 @@ export class Api extends ApiBase {
     static async removeInstance(id = null) {
         return await this.delete("/api/bridging/removeInstance", {id});
     }
+    static async toggleAllowlist(id = null) {
+        return await this.patch("/api/bridging/toggleAllowlist", {id});
+    }
+    static async toggleEnabled(id = null) {
+        return await this.patch("/api/bridging/toggleEnabled", {id});
+    }
 }

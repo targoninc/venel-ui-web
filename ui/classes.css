@@ -320,3 +320,12 @@
 .max800 {
     max-width: 800px;
 }
+
+.circle-toggle {
+    cursor: pointer;
+    border-radius: var(--input-border-radius);
+}
+
+.circle-toggle:hover {
+    background: var(--bg-3);
+}
