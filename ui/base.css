@@ -18,6 +18,7 @@
     --input-padding-v: 0.25rem;
     --input-border-radius: 0.25rem;
     --input-border-width: 1px;
+    --avatar-border-width: 2px;
 }
 
 @media (prefers-color-scheme: light) {

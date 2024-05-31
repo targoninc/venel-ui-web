@@ -283,3 +283,11 @@
     overflow: hidden;
     max-width: 100%;
 }
+
+.big-avatar {
+    width: 200px;
+    height: 200px;
+    align-self: center;
+    border-radius: 50%;
+    border: var(--avatar-border-width) solid var(--bg-4);
+}

@@ -16,6 +16,9 @@ export class Api extends ApiBase {
     static async updateUser(username = null, displayname = null, description = null) {
         return await this.patch("/api/auth/updateUser", {username, displayname, description});
     }
+    static async updateAvatar(avatar = null) {
+        return await this.post("/api/auth/updateAvatar", {avatar});
+    }
     static async deleteUser(userId = null) {
         return await this.delete("/api/auth/deleteUser", {userId});
     }

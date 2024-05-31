@@ -1,5 +1,5 @@
 import {LayoutTemplates} from "../layout.mjs";
-import {create, signalFromProperty, store} from "https://fjs.targoninc.com/f.js";
+import {computedSignal, create, signalFromProperty, store} from "https://fjs.targoninc.com/f.js";
 import {CommonTemplates} from "../common.mjs";
 import {Store} from "../../api/Store.mjs";
 import {Api} from "../../api/Api.mjs";
@@ -20,7 +20,14 @@ export class ProfileComponent {
                 create("div")
                     .classes("panes", "full-width", "flex-grow")
                     .children(
-                        LayoutTemplates.pane(LayoutTemplates.centeredContent(ProfileComponent.basicInfoSection(user)), "100%", "500px", "100%")
+                        LayoutTemplates.pane(LayoutTemplates.centeredContent(
+                            create("div")
+                                .classes("flex-v")
+                                .children(
+                                    ProfileComponent.avatarSection(user),
+                                    ProfileComponent.basicInfoSection(user),
+                                ).build()
+                        ), "100%", "500px", "100%")
                     ).build()
             ).build();
     }
@@ -69,6 +76,53 @@ export class ProfileComponent {
                                 }, true),
                             ).build(),
                     ).build(),
+            ).build();
+    }
+
+    static uploadAvatar(avatar) {
+        const oldValue = avatar.value;
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.onchange = () => {
+            const reader = new FileReader();
+            reader.onload = () => {
+                const base64 = reader.result.split(',')[1];
+                avatar.value = base64;
+                Api.updateAvatar(base64).then((res) => {
+                    if (res.status !== 200) {
+                        toast("Failed to update avatar: " + res.data.error, "error");
+                        return;
+                    }
+
+                    toast("Avatar updated", "success");
+                    avatar.value = oldValue;
+                });
+            };
+            reader.readAsDataURL(input.files[0]);
+        };
+        input.click();
+    }
+
+    static avatarSection(user) {
+        const avatar = signalFromProperty(user, "avatar");
+
+        return create("div")
+            .classes("flex-v")
+            .children(
+                create("img")
+                    .classes("big-avatar")
+                    .src(avatar)
+                    .onclick(() => {
+                        ProfileComponent.uploadAvatar(avatar);
+                    }).build(),
+                create("span")
+                    .classes("text-small")
+                    .text("Maximum size: 1MB")
+                    .build(),
+                CommonTemplates.buttonWithIcon("upload_file", "Upload avatar", () => {
+                    ProfileComponent.uploadAvatar(avatar);
+                })
             ).build();
     }
 }

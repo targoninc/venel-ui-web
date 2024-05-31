@@ -5,7 +5,6 @@ import {truncate} from "../tooling/Text.mjs";
 export class ChannelTemplates {
     static dmChannel(channel, messages, activeChannel) {
         const activeClass = computedSignal(activeChannel, id => {
-            console.log(id, channel.id);
             return id === channel.id ? "active" : "_";
         });
 
