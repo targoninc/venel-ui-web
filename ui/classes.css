@@ -69,11 +69,6 @@
     height: 1em;
 }
 
-.icon.doublesize {
-    width: calc(2em + var(--gap-v));
-    height: calc(2em + var(--gap-v));
-}
-
 .highlight {
     background-color: var(--bg-3);
 }
@@ -312,6 +307,12 @@
 
 .channel-avatar {
     --size: 38px;
+    width: var(--size);
+    height: var(--size);
+}
+
+.message-avatar {
+    --size: 1em;
     width: var(--size);
     height: var(--size);
 }

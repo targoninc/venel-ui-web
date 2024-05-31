@@ -6,6 +6,7 @@ import {Hooks, removeMessage} from "../../api/Hooks.mjs";
 import {Time} from "../../tooling/Time.mjs";
 import {Live} from "../../live/Live.mjs";
 import {ChannelTemplates} from "../channel.mjs";
+import {testImage} from "../../actions.mjs";
 
 export class ChatComponent {
     static render(params) {
@@ -139,7 +140,7 @@ export class ChatComponent {
                 ifjs(shouldDisplaySender, create("div")
                     .classes("flex", "align-center")
                     .children(
-                        CommonTemplates.userInList("face_5", message.sender.displayname ?? message.sender.username, null, () => {})
+                        CommonTemplates.userInList(message.sender.avatar ?? testImage, message.sender.displayname ?? message.sender.username, null, () => {}, "message-avatar")
                     ).build()),
                 create("div")
                     .classes("message-content", "flex", "space-between", "full-width")

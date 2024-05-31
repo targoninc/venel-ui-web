@@ -13,6 +13,9 @@ export class Api extends ApiBase {
     static async getUser() {
         return await this.get("/api/auth/getUser", {});
     }
+    static async getUsers() {
+        return await this.get("/api/auth/getUsers", {});
+    }
     static async updateUser(username = null, displayname = null, description = null) {
         return await this.patch("/api/auth/updateUser", {username, displayname, description});
     }
@@ -78,5 +81,8 @@ export class Api extends ApiBase {
     }
     static async addInstance(url = null, useAllowlist = null, enabled = null) {
         return await this.post("/api/bridging/addInstance", {url, useAllowlist, enabled});
+    }
+    static async removeInstance(id = null) {
+        return await this.delete("/api/bridging/removeInstance", {id});
     }
 }

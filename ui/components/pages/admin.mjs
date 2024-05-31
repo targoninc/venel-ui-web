@@ -1,9 +1,9 @@
 import {LayoutTemplates} from "../layout.mjs";
-import {create, ifjs, signal, signalFromProperty, signalMap} from "https://fjs.targoninc.com/f.js";
+import {computedSignal, create, ifjs, signal, signalFromProperty, signalMap} from "https://fjs.targoninc.com/f.js";
 import {CommonTemplates} from "../common.mjs";
 import {Store} from "../../api/Store.mjs";
 import {Api} from "../../api/Api.mjs";
-import {popup, removePopups, toast} from "../../actions.mjs";
+import {popup, removePopups, testImage, toast} from "../../actions.mjs";
 import {PopupComponents} from "../popup.mjs";
 
 export class AdminComponent {
@@ -13,6 +13,7 @@ export class AdminComponent {
 
     static content() {
         const user = Store.get('user');
+        const permissions = signalFromProperty(user, 'permissions');
 
         return create("div")
             .classes("panes-v", "full-width", "full-height")
@@ -23,14 +24,15 @@ export class AdminComponent {
                     .children(
                         LayoutTemplates.pane(LayoutTemplates.centeredContent(
                             create("div")
-                                .classes("flex-v", "padded")
+                                .classes("flex-v", "padded", "max800")
                                 .children(
                                     create("h1")
                                         .text("Administration")
                                         .build(),
                                     AdminComponent.roleList(user),
                                     AdminComponent.permissionList(user),
-                                    AdminComponent.bridgeInstanceSettings()
+                                    AdminComponent.usersSettings(permissions),
+                                    AdminComponent.bridgeInstanceSettings(permissions)
                                 ).build()
                         ), "100%", "500px", "100%")
                     ).build()
@@ -48,7 +50,7 @@ export class AdminComponent {
                     .build(),
                 signalMap(roles,
                     create("div")
-                        .classes("flex", "max800"),
+                        .classes("flex"),
                     role => AdminComponent.role(role)),
             ).build();
     }
@@ -72,7 +74,7 @@ export class AdminComponent {
                     .build(),
                 signalMap(permissions,
                     create("div")
-                        .classes("flex", "max800"),
+                        .classes("flex"),
                     permission => AdminComponent.permission(permission)),
             ).build();
     }
@@ -85,17 +87,21 @@ export class AdminComponent {
             .build();
     }
 
-    static bridgeInstanceSettings() {
+    static bridgeInstanceSettings(permissions) {
+        const hasViewPermission = computedSignal(permissions, ps => ps && ps.some(p => p.name === "viewBridgedInstances"));
+
         const bridgedInstances = signal([]);
-        const loading = signal(true);
-        Api.getInstances().then(res => {
-            loading.value = false;
-            if (res.status === 200) {
-                bridgedInstances.value = res.data;
-            } else {
-                toast("Failed to fetch bridged instances", "negative");
-            }
-        });
+        const loading = signal(hasViewPermission.value);
+        if (hasViewPermission.value) {
+            Api.getInstances().then(res => {
+                loading.value = false;
+                if (res.status === 200) {
+                    bridgedInstances.value = res.data;
+                } else {
+                    toast("Failed to fetch bridged instances", "negative");
+                }
+            });
+        }
 
         return create("div")
             .classes("flex-v", "card")
@@ -103,16 +109,26 @@ export class AdminComponent {
                 create("h2")
                     .text("Bridged Instances")
                     .build(),
-                AdminComponent.bridgeInstanceActions(bridgedInstances),
-                ifjs(loading, CommonTemplates.spinner()),
-                signalMap(bridgedInstances,
-                    create("div")
-                        .classes("flex-v", "max800"),
-                    instance => AdminComponent.bridgeInstance(instance)),
+                ifjs(hasViewPermission, create("div")
+                    .classes("flex-v")
+                    .children(
+                        AdminComponent.bridgeInstanceActions(bridgedInstances, permissions),
+                        ifjs(loading, CommonTemplates.spinner()),
+                        signalMap(bridgedInstances,
+                            create("div")
+                                .classes("flex-v"),
+                            instance => AdminComponent.bridgeInstance(bridgedInstances, instance, permissions)),
+                    ).build()),
+                ifjs(hasViewPermission, create("span")
+                    .classes("error")
+                    .text("You do not have permission to view bridged instances")
+                    .build(), true),
             ).build();
     }
 
-    static bridgeInstanceActions(bridgedInstances) {
+    static bridgeInstanceActions(bridgedInstances, permissions) {
+        const hasAddPermission = computedSignal(permissions, ps => ps && ps.some(p => p.name === "addBridgedInstance"));
+
         return create("div")
             .classes("flex-v")
             .children(
@@ -120,13 +136,13 @@ export class AdminComponent {
                     .text("Bridged instances allow you to connect to other instances of Venel.")
                     .build(),
                 create("div")
-                    .classes("flex", "max800")
+                    .classes("flex")
                     .children(
-                        CommonTemplates.buttonWithIcon("add_link", "Add Bridged Instance", () => {
+                        ifjs(hasAddPermission, CommonTemplates.buttonWithIcon("add_link", "Add Bridged Instance", () => {
                             popup(AdminComponent.addBridgedInstancePopup(() => {
                                 removePopups();
                             }, bridgedInstances));
-                        }),
+                        })),
                     ).build(),
             ).build();
     }
@@ -151,7 +167,7 @@ export class AdminComponent {
                         PopupComponents.closeButton(onclose),
                     ).build(),
                 create("div")
-                    .classes("flex-v", "max800")
+                    .classes("flex-v")
                     .children(
                         CommonTemplates.input("url", "url", "URL", "URL of the instance", url, (e) => {
                             instanceInfo.value = {
@@ -185,7 +201,7 @@ export class AdminComponent {
                             Api.addInstance(url.value, useAllowlist.value, enabled.value).then(res => {
                                 if (res.status === 200) {
                                     toast("Bridged instance added", "positive");
-                                    bridgedInstances.value.push(res.data);
+                                    bridgedInstances.value = [...bridgedInstances.value, res.data];
                                     onclose();
                                 } else {
                                     toast("Failed to add bridged instance", "negative");
@@ -196,17 +212,101 @@ export class AdminComponent {
             ).build();
     }
 
-    static bridgeInstance(instance) {
+    static bridgeInstance(instances, instance, permissions) {
+        const hasRemovePermission = computedSignal(permissions, ps => ps && ps.some(p => p.name === "removeBridgedInstance"));
+
         return create("div")
-            .classes("flex", "max800")
+            .classes("flex", "space-between")
             .children(
                 create("span")
                     .classes("instance")
                     .text(instance.url)
                     .build(),
-                ifjs(instance.useAllowlist, CommonTemplates.circleIndicator("Only allowed users", "var(--green)")),
-                ifjs(instance.enabled, CommonTemplates.circleIndicator("Enabled", "var(--green)")),
-                ifjs(instance.enabled, CommonTemplates.circleIndicator("Disabled", "var(--red)"), true),
+                create("div")
+                    .classes("flex")
+                    .children(
+                        ifjs(instance.useAllowlist, CommonTemplates.circleIndicator("Only allowed users", "var(--purple)")),
+                        ifjs(instance.useAllowlist, CommonTemplates.circleIndicator("All users", "var(--green)"), true),
+                        ifjs(instance.enabled, CommonTemplates.circleIndicator("Enabled", "var(--green)")),
+                        ifjs(instance.enabled, CommonTemplates.circleIndicator("Disabled", "var(--red)"), true),
+                        ifjs(hasRemovePermission, CommonTemplates.buttonWithIcon("delete", "Remove", () => {
+                            Api.removeInstance(instance.id).then(res => {
+                                if (res.status === 200) {
+                                    toast("Bridged instance removed", "positive");
+                                    instances.value = instances.value.filter(i => i.id !== instance.id);
+                                } else {
+                                    toast("Failed to remove bridged instance", "negative");
+                                }
+                            });
+                        })),
+                    ).build(),
+            ).build();
+    }
+
+    static usersSettings(permissions) {
+        const hasViewPermission = computedSignal(permissions, ps => ps && ps.some(p => p.name === "viewUsers"));
+        const users = signal([]);
+        const loading = signal(hasViewPermission.value);
+        if (hasViewPermission.value) {
+            Api.getUsers().then(res => {
+                loading.value = false;
+                if (res.status === 200) {
+                    users.value = res.data.users;
+                } else {
+                    toast("Failed to fetch users", "negative");
+                }
+            });
+        }
+
+        return create("div")
+            .classes("flex-v", "card")
+            .children(
+                create("h2")
+                    .text("Users")
+                    .build(),
+                ifjs(hasViewPermission, create("div")
+                    .classes("flex-v")
+                    .children(
+                        AdminComponent.userActions(users, permissions),
+                        ifjs(loading, CommonTemplates.spinner()),
+                        signalMap(users,
+                            create("div")
+                                .classes("flex-v"),
+                            user => AdminComponent.user(users, user, permissions)),
+                    ).build()),
+                ifjs(hasViewPermission, create("span")
+                    .classes("error")
+                    .text("You do not have permission to view users")
+                    .build(), true),
+            ).build();
+    }
+
+    static userActions(users, permissions) {
+        return create("div")
+            .classes("flex-v")
+            .children(
+                create("div")
+                    .classes("flex")
+                    .children(
+                        CommonTemplates.buttonWithIcon("add", "Add User", () => {}),
+                    ).build(),
+            ).build();
+    }
+
+    static user(users, user, permissions) {
+        const hasEditPermission = computedSignal(permissions, ps => ps && ps.some(p => p.name === "editUser"));
+        const hasDeletePermission = computedSignal(permissions, ps => ps && ps.some(p => p.name === "deleteUser"));
+
+        return create("div")
+            .classes("flex", "space-between")
+            .children(
+                CommonTemplates.userInList(user.avatar ? user.avatar : testImage, user.displayname, user.username, () => {}),
+                create("div")
+                    .classes("flex")
+                    .children(
+                        ifjs(hasEditPermission, CommonTemplates.buttonWithIcon("edit", "Edit", () => {})),
+                        ifjs(hasDeletePermission, CommonTemplates.buttonWithIcon("delete", "Delete", () => {})),
+                    ).build(),
             ).build();
     }
 }

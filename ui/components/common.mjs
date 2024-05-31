@@ -1,14 +1,10 @@
-import {computedSignal, create, FjsObservable, ifjs, signal, signalFromProperty} from "https://fjs.targoninc.com/f.js";
-import {popup, removePopups, toast} from "../actions.mjs";
-import {PopupComponents} from "./popup.mjs";
-import {Api} from "../api/Api.mjs";
-import {Live} from "../live/Live.mjs";
+import {computedSignal, create, FjsObservable, ifjs} from "https://fjs.targoninc.com/f.js";
 import {Popups} from "../api/Popups.mjs";
 import {Store} from "../api/Store.mjs";
 
 export class CommonTemplates {
     static icon(icon, classes = [], tag = "span") {
-        if ((icon.constructor === String && icon.includes(".")) || (icon.constructor === FjsObservable && icon.value.includes("."))) {
+        if ((icon.constructor === String && (icon.includes(".") || icon.startsWith("data:image"))) || (icon.constructor === FjsObservable && icon.value.includes("."))) {
             return create("img")
                 .classes("icon", ...classes)
                 .src(icon)
@@ -124,12 +120,12 @@ export class CommonTemplates {
             ).build();
     }
 
-    static userInList(image, name, text, onclick) {
+    static userInList(image, name, text, onclick, avatarClass = "channel-avatar") {
         return create("button")
             .classes("flex")
             .onclick(onclick)
             .children(
-                CommonTemplates.icon(image, ["round", "doublesize"]),
+                CommonTemplates.icon(image, ["round", avatarClass]),
                 create("div")
                     .classes("flex-v", "no-gap")
                     .children(
