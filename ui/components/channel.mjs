@@ -1,27 +1,37 @@
-import {computedSignal, create, ifjs, signal, signalMap} from "https://fjs.targoninc.com/f.js";
+import {computedSignal, create, ifjs, signal, signalMap, store} from "https://fjs.targoninc.com/f.js";
 import {Live} from "../live/Live.mjs";
 import {truncate} from "../tooling/Text.mjs";
+import {testImage} from "../actions.mjs";
 
 export class ChannelTemplates {
     static dmChannel(channel, messages, activeChannel) {
         const activeClass = computedSignal(activeChannel, id => {
             return id === channel.id ? "active" : "_";
         });
+        const lastMemberAvatar = channel.members.at(-1)?.avatar;
 
         return create("div")
-            .classes("channel", "flex-v", "no-gap", "full-width", activeClass)
+            .classes("channel", "flex", "full-width", activeClass)
             .onclick(() => {
                 activeChannel.value = channel.id;
                 window.history.pushState({}, "", `/chat/${channel.id}`);
             })
             .children(
-                create("span")
-                    .text(channel.name)
+                create("img")
+                    .classes("channel-avatar")
+                    .src(channel.avatar ?? lastMemberAvatar ?? testImage)
                     .build(),
-                create("span")
-                    .classes("text-small", "one-line")
-                    .text(truncate(messages.value[channel.id]?.at(-1)?.text || "No messages", 100))
-                    .build(),
+                create("div")
+                    .classes("flex-v", "no-gap")
+                    .children(
+                        create("span")
+                            .text(channel.name)
+                            .build(),
+                        create("span")
+                            .classes("text-small", "one-line")
+                            .text(truncate(messages.value[channel.id]?.at(-1)?.text || "No messages", 100))
+                            .build(),
+                    ).build(),
             ).build();
     }
 

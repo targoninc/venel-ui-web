@@ -284,10 +284,19 @@
     max-width: 100%;
 }
 
-.big-avatar {
-    width: 200px;
-    height: 200px;
+.big-avatar, .channel-avatar {
     align-self: center;
     border-radius: 50%;
     border: var(--avatar-border-width) solid var(--bg-4);
+}
+
+.big-avatar {
+    width: 200px;
+    height: 200px;
+}
+
+.channel-avatar {
+    --size: 38px;
+    width: var(--size);
+    height: var(--size);
 }

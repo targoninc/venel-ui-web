@@ -118,7 +118,7 @@ export class ProfileComponent {
                     }).build(),
                 create("span")
                     .classes("text-small")
-                    .text("Maximum size: 1MB")
+                    .text("Maximum size: 50MB")
                     .build(),
                 CommonTemplates.buttonWithIcon("upload_file", "Upload avatar", () => {
                     ProfileComponent.uploadAvatar(avatar);
