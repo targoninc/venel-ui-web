@@ -131,6 +131,11 @@ button.double, input.double, textarea.double, select.double {
     padding: var(--input-padding-v) calc(var(--input-padding-h) * 2);
 }
 
+button.active {
+    background-color: var(--bg-2);
+    border-color: var(--blue);
+}
+
 div {
     box-sizing: border-box;
 }

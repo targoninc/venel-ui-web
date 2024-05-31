@@ -4,7 +4,10 @@ import {truncate} from "../tooling/Text.mjs";
 
 export class ChannelTemplates {
     static dmChannel(channel, messages, activeChannel) {
-        const activeClass = computedSignal(activeChannel, (id) => id === channel.id ? "active" : "_");
+        const activeClass = computedSignal(activeChannel, id => {
+            console.log(id, channel.id);
+            return id === channel.id ? "active" : "_";
+        });
 
         return create("div")
             .classes("channel", "flex-v", "no-gap", "full-width", activeClass)

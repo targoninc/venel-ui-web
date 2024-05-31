@@ -1,4 +1,4 @@
-import {computedSignal, create, ifjs, signal, signalMap, store} from "https://fjs.targoninc.com/f.js";
+import {computedSignal, create, ifjs, signal, signalMap} from "https://fjs.targoninc.com/f.js";
 import {LayoutTemplates} from "../layout.mjs";
 import {Store} from "../../api/Store.mjs";
 import {CommonTemplates} from "../common.mjs";
@@ -13,9 +13,9 @@ export class ChatComponent {
     }
 
     static content(params) {
-        const user = Store.get('user');
         const channels = Store.get("channels");
-        const activeChannel = signal(params.channelId || Store.get("currentChannelId") || channels[0]?.id || null);
+        const pathChannelId = params.channelId ? parseInt(params.channelId) : null;
+        const activeChannel = signal(pathChannelId || Store.get("currentChannelId") || channels[0]?.id || null);
         const messages = Store.get("messages");
         channels.subscribe(newChannels => {
             if (!newChannels.some(channel => channel.id === activeChannel.value)) {
@@ -45,7 +45,7 @@ export class ChatComponent {
         return create("div")
             .classes("panes-v", "full-width", "full-height")
             .children(
-                CommonTemplates.actions(user, channels),
+                CommonTemplates.actions(),
                 create("div")
                     .classes("panes", "full-width", "flex-grow")
                     .children(
@@ -73,7 +73,7 @@ export class ChatComponent {
                     .classes("chat-content", "flex-v", "no-gap")
                     .children(
                         signalMap(messages, create("div")
-                                .classes("chat-messages", "flex-v", "flex-grow", "no-gap"),
+                                .classes("chat-messages","flex-v", "flex-grow", "no-gap"),
                             message => ChatComponent.message(message, messages)),
                         create("div")
                             .classes("background-2", "chat-input", "flex", "align-center")
@@ -130,6 +130,8 @@ export class ChatComponent {
         const offset = new Date().getTimezoneOffset() * 60000;
         const localTimestamp = timestamp + offset;
         const menuShown = signal(false);
+        const messageMenuPositionX = signal(0);
+        const messageMenuPositionY = signal(0);
 
         return create("div")
             .classes("chat-message", "flex-v")
@@ -144,12 +146,14 @@ export class ChatComponent {
                     .oncontextmenu((e) => {
                         e.preventDefault();
                         menuShown.value = true;
+                        messageMenuPositionX.value = e.clientX;
+                        messageMenuPositionY.value = e.clientY;
                         document.addEventListener("click", () => {
                             menuShown.value = false;
                         });
                     })
                     .children(
-                        ifjs(menuShown, ChatComponent.messageMenu(message)),
+                        ifjs(menuShown, ChatComponent.messageMenu(message, messageMenuPositionX, messageMenuPositionY)),
                         create("div")
                             .classes("flex-v", "no-gap")
                             .children(
@@ -170,9 +174,13 @@ export class ChatComponent {
             ).build();
     }
 
-    static messageMenu(message) {
+    static messageMenu(message, posX, posY) {
+        const posXR = computedSignal(posX, x => x + "px");
+        const posYR = computedSignal(posY, y => y + "px");
+
         return create("div")
             .classes("message-menu", "flex-v")
+            .styles("top", posYR, "left", posXR)
             .children(
                 CommonTemplates.buttonWithIcon("edit", "Edit", () => {
                     // TODO: Implement edit message

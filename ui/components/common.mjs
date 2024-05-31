@@ -78,23 +78,27 @@ export class CommonTemplates {
             ).build();
     }
 
-    static actions(userSignal) {
-        const username = signalFromProperty(userSignal, "username");
-        const displayname = signalFromProperty(userSignal, "displayname");
+    static actions() {
+        const currentRoute = window.router.currentRoute;
+        const activeIfActive = page => {
+            return (currentRoute && currentRoute.path === page) ? "active" : "_";
+        };
 
         return create("div")
             .classes("flex", "align-center", "full-width", "space-between", "padded")
             .children(
-                CommonTemplates.buttonWithIcon("chat", "Chat", () => window.router.navigate('chat')),
-                CommonTemplates.buttonWithIcon("person_add", "New DM", () => Popups.newDm()),
                 create("div")
-                    .classes("padded")
+                    .classes("flex", "align-center")
                     .children(
-                        CommonTemplates.userInList("face_5", displayname, username, () => {
-                            window.router.navigate('profile');
-                        })
+                        CommonTemplates.buttonWithIcon("chat", "Chat", () => window.router.navigate('chat'), [activeIfActive("chat")]),
+                        CommonTemplates.buttonWithIcon("person_add", "New DM", () => Popups.newDm()),
                     ).build(),
-                CommonTemplates.pageLink("Logout", "logout")
+                create("div")
+                    .classes("flex", "align-center")
+                    .children(
+                        CommonTemplates.buttonWithIcon("face_5", "Profile", () => window.router.navigate('profile'), [activeIfActive("profile")]),
+                        CommonTemplates.pageLink("Logout", "logout")
+                    ).build(),
             ).build();
     }
 

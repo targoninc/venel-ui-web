@@ -12,12 +12,11 @@ export class ProfileComponent {
 
     static content() {
         const user = Store.get('user');
-        const channels = Store.get("channels");
 
         return create("div")
             .classes("panes-v", "full-width", "full-height")
             .children(
-                CommonTemplates.actions(user, channels),
+                CommonTemplates.actions(),
                 create("div")
                     .classes("panes", "full-width", "flex-grow")
                     .children(
