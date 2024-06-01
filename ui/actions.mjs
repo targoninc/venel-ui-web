@@ -124,6 +124,7 @@ export function playLoop(name) {
         window.playingLoops = [];
     }
 
+    stopPlayingLoop();
     const audio = new Audio(`/loops/${name}`);
     audio.loop = true;
     audio.play();

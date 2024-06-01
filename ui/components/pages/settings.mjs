@@ -442,6 +442,8 @@ export class SettingsComponent {
                             .children(
                                 CommonTemplates.select("Call sound", [
                                     { text: "Blossom", value: "blossom.mp3" },
+                                    { text: "Heartbeat", value: "heartbeat.mp3" },
+                                    { text: "Classic", value: "classic.mp3" },
                                 ], callSound, (value) => {
                                     callSound.value = value;
                                     playingLoop.value = true;

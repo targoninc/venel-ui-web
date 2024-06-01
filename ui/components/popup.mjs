@@ -83,6 +83,24 @@ export class PopupComponents {
         const newPassword = signal("");
         const confirmPassword = signal("");
         const errorState = signal(null);
+        const validate = () => {
+            if (newPassword.value !== confirmPassword.value) {
+                errorState.value = "Passwords do not match";
+                return;
+            }
+            if (newPassword.value.length < 8) {
+                errorState.value = "Password must be at least 8 characters";
+                return;
+            }
+            if (newPassword.value === oldPassword.value) {
+                errorState.value = "New password must be different from old password";
+                return;
+            }
+            errorState.value = null;
+        }
+        oldPassword.subscribe(validate);
+        newPassword.subscribe(validate);
+        confirmPassword.subscribe(validate);
 
         return create("div")
             .classes("card")

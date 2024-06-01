@@ -308,7 +308,7 @@
     max-width: 100%;
 }
 
-.big-avatar, .channel-avatar {
+.big-avatar, .channel-avatar, .message-avatar, .small-avatar {
     align-self: center;
     border-radius: 50%;
     border: var(--avatar-border-width) solid var(--bg-4);
