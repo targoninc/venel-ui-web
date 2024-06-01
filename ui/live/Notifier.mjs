@@ -10,9 +10,15 @@ export class Notifier {
             return;
         }
 
+        const reference = channel.type === "dm" ? "DM" : channel.name;
         notify(message.sender.avatar ?? testImage,
             message.sender.displayname ?? message.sender.username,
-            "in " + channel.name,
-            truncate(message.text, 150));
+            "in " + reference,
+            truncate(message.text, 150),
+            () => {
+                if (channelId !== Store.get('currentChannelId')) {
+                    window.router.navigate(`/chat/${channelId}`);
+                }
+            });
     }
 }

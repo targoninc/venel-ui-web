@@ -39,6 +39,7 @@ export class LayoutTemplates {
             .classes("flex-pane")
             .styles("min-width", minWidth)
             .styles("max-width", maxWidth)
+            .styles("width", maxWidth)
             .children(content)
             .id(id)
             .build();

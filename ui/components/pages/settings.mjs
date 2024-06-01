@@ -7,8 +7,9 @@ import {popup, removePopups, testImage, toast, toggleAllowlist, toggleInstanceEn
 import {PopupComponents} from "../popup.mjs";
 import {Popups} from "../../api/Popups.mjs";
 import {
-    localNotificationsEnabled,
-    setLocalNotificationsEnabled, setSystemNotificationsEnabled,
+    currentSound,
+    localNotificationsEnabled, setCurrentSound,
+    setLocalNotificationsEnabled, setSoundEnabled, setSystemNotificationsEnabled, soundEnabled,
     systemNotificationsEnabled
 } from "../../api/LocalSetting.mjs";
 
@@ -373,12 +374,26 @@ export class SettingsComponent {
 
     static settings() {
         const notifs_on = signal(localNotificationsEnabled());
+        const notifs_color = computedSignal(notifs_on, on => on ? "var(--green)" : "var(--red)");
         notifs_on.subscribe(v => {
             setLocalNotificationsEnabled(v ? "true" : "false");
         });
         const system_notifs_on = signal(systemNotificationsEnabled());
+        const system_notifs_color = computedSignal(system_notifs_on, on => on ? "var(--green)" : "var(--red)");
         system_notifs_on.subscribe(v => {
             setSystemNotificationsEnabled(v);
+        });
+        const notifText = computedSignal(notifs_on, on => on ? "Disable local notifications (in-window popups)" : "Enable local notifications (in-window popups)");
+        const systemNotifText = computedSignal(system_notifs_on, on => on ? "Disable system notifications" : "Enable system notifications");
+        const sound_on = signal(soundEnabled());
+        sound_on.subscribe(v => {
+            setSoundEnabled(v);
+        });
+        const sound_color = computedSignal(sound_on, on => on ? "var(--green)" : "var(--red)");
+        const soundText = computedSignal(sound_on, on => on ? "Disable sound" : "Enable sound");
+        const sound = signal(currentSound());
+        sound.subscribe(v => {
+            setCurrentSound(v);
         });
 
         return create("div")
@@ -390,12 +405,17 @@ export class SettingsComponent {
                 create("div")
                     .classes("flex-v")
                     .children(
-                        CommonTemplates.checkbox("notifications_check", "Enable local notifications (in-window popups)", notifs_on, (e) => {
-                            notifs_on.value = e.target.checked;
-                        }),
-                        CommonTemplates.checkbox("system_notifications_check", "Enable system notifications (browser popups)", system_notifs_on, (e) => {
-                            system_notifs_on.value = e.target.checked;
-                        }),
+                        CommonTemplates.circleToggle(notifText, notifs_color, () => { notifs_on.value = !notifs_on.value }),
+                        CommonTemplates.circleToggle(systemNotifText, system_notifs_color, () => { system_notifs_on.value = !system_notifs_on.value }),
+                        CommonTemplates.circleToggle(soundText, sound_color, () => { sound_on.value = !sound_on.value }),
+                        CommonTemplates.select("New message sound", [
+                            { text: "Bloom", value: "bloom" },
+                            { text: "Chord", value: "chord" },
+                            { text: "Drop", value: "drop" },
+                            { text: "Sky", value: "sky" },
+                        ], sound, (e) => {
+                            sound.value = e.target.value;
+                        })
                     ).build(),
             ).build();
     }

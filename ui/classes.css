@@ -392,6 +392,12 @@
 
 .notification {
     animation: fade-out var(--animation-time) forwards;
+    transition: transform var(--animation-time) ease;
+    cursor: pointer;
+}
+
+.notification:hover {
+    transform: translateX(-3px);
 }
 
 @keyframes fade-out {
@@ -419,4 +425,8 @@
 
 .notification-title, .notification-subtitle, .notification-message {
     word-wrap: anywhere;
+}
+
+.notification-message {
+    font-size: 0.8em;
 }

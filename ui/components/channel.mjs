@@ -25,6 +25,7 @@ export class ChannelTemplates {
                     .classes("flex-v", "no-gap")
                     .children(
                         create("span")
+                            .classes("bold")
                             .text(channel.name)
                             .build(),
                         create("span")

@@ -52,18 +52,29 @@ export class CommonTemplates {
             ).build();
     }
 
-    static select(options, onchange) {
+    static select(label, options, value, onchange) {
         return create("div")
-            .classes("select")
+            .classes("flex", "align-center")
             .children(
-                create("select")
-                    .onchange(onchange)
+                create("span")
+                    .text(label)
+                    .build(),
+                create("div")
+                    .classes("select")
                     .children(
-                        ...options.map(option => {
-                            return create("option")
-                                .text(option)
-                                .build();
-                        })
+                        create("select")
+                            .onchange(onchange)
+                            .children(
+                                ...options.map(option => {
+                                    const selected = computedSignal(value, value => option.value === value);
+
+                                    return create("option")
+                                        .text(option.text)
+                                        .value(option.value)
+                                        .selected(selected)
+                                        .build();
+                                })
+                            ).build()
                     ).build()
             ).build();
     }

@@ -10,6 +10,7 @@
     --white: #efe9e7ff;
     --white-2: #e7ddda;
     --white-3: #ded2ce;
+    --white-4: #d6c9c5;
     --blue: #16bac5ff;
     --green: #6a994eff;
     --red: #bc4749ff;
@@ -32,6 +33,7 @@
         --bg: var(--white);
         --bg-2: var(--white-2);
         --bg-3: var(--white-3);
+        --bg-4: var(--white-4);
         --text: var(--black);
         --text-2: var(--black-2);
         --text-3: var(--black-3);
@@ -51,6 +53,7 @@
         --text: var(--white);
         --text-2: var(--white-2);
         --text-3: var(--white-3);
+        --text-4: var(--white-4);
     }
 }
 

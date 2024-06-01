@@ -18,20 +18,21 @@ export function toast(message, type = "info", timeout = 5) {
     }, timeout * 1000);
 }
 
-export function notify(image, title, subtitle, message, timeout = 7) {
+export function notify(image, title, subtitle, message, onclick = () => {}, timeout = 7) {
     const notification = create("div")
         .classes("card", "flex", "notification")
         .styles("animation-duration", `${timeout}s`)
+        .onclick(onclick)
         .children(
             create("img")
                 .classes("notification-image")
                 .src(image)
                 .build(),
             create("div")
-                .classes("flex-v", "notification-content")
+                .classes("flex-v", "no-gap", "notification-content")
                 .children(
                     create("div")
-                        .classes("notification-title")
+                        .classes("notification-title", "bold")
                         .text(title)
                         .build(),
                     create("div")
@@ -111,4 +112,9 @@ export function toggleInstanceEnabled(instances, instance) {
             toast("Failed to toggle instance enabled", "negative");
         }
     });
+}
+
+export function playSound(name) {
+    const audio = new Audio(`/sounds/${name}.mp3`);
+    audio.play();
 }

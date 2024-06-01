@@ -1,9 +1,9 @@
 import {Api} from "./Api.mjs";
-import {toast} from "../actions.mjs";
+import {playSound, testImage, toast} from "../actions.mjs";
 import {signal, store} from "https://fjs.targoninc.com/f.js";
 import {Live} from "../live/Live.mjs";
 import {Store} from "./Store.mjs";
-import {localNotificationsEnabled, systemNotificationsEnabled} from "./LocalSetting.mjs";
+import {currentSound, localNotificationsEnabled, soundEnabled, systemNotificationsEnabled} from "./LocalSetting.mjs";
 import {Notifier} from "../live/Notifier.mjs";
 
 export class Hooks {
@@ -76,8 +76,11 @@ export function addMessage(channel, message) {
     if (systemNotificationsEnabled()) {
         new Notification(`New message from ${message.sender.displayname ?? message.sender.username}`, {
             body: message.text,
-            icon: message.sender.avatar,
+            icon: message.sender.avatar ?? testImage,
         });
+    }
+    if (soundEnabled()) {
+        playSound(currentSound());
     }
 }
 

@@ -40,3 +40,19 @@ export function setSystemNotificationsEnabled(enabled) {
     }
     LocalSetting.set("systemNotifications", enabled);
 }
+
+export function soundEnabled() {
+    return LocalSetting.getBoolean("sound");
+}
+
+export function setSoundEnabled(enabled) {
+    LocalSetting.set("sound", enabled);
+}
+
+export function currentSound() {
+    return LocalSetting.getString("currentSound");
+}
+
+export function setCurrentSound(sound) {
+    LocalSetting.set("currentSound", sound);
+}
