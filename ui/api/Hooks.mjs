@@ -66,7 +66,7 @@ export function addMessage(channel, message) {
     store().setSignalValue('messages', {...ex, [channel]: [...ex[channel], message]});
 
     const user = Store.get('user');
-    if (message.userId === user.value.id) {
+    if (message.sender.id === user.value.id) {
         return;
     }
 
