@@ -104,7 +104,7 @@ export class RegisterComponent {
                                             toast("Registration successful", "positive");
                                             window.router.navigate("chat");
                                         } else {
-                                            toast("Registration failed", "negative");
+                                            toast("Registration failed: " + res.data.error, "negative");
                                         }
                                     }).catch(() => {
                                         loading.value = false;

@@ -87,7 +87,7 @@ export class ProfileComponent {
         input.onchange = () => {
             const reader = new FileReader();
             reader.onload = () => {
-                const base64 = reader.result.split(',')[1];
+                const base64 = reader.result.toString();
                 avatar.value = base64;
                 Api.updateAvatar(base64).then((res) => {
                     if (res.status !== 200) {
