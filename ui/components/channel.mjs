@@ -9,7 +9,7 @@ export class ChannelTemplates {
             return id === channel.id ? "active" : "_";
         });
         let lastMemberAvatar = channel.members.at(-1)?.avatar;
-        if (channel.type === "dm") {
+        if (channel.type === "dm" && channel.members.length > 1) {
             lastMemberAvatar = channel.members.find(member => member.id !== store().get("user").value.id)?.avatar ?? testImage;
         }
 
