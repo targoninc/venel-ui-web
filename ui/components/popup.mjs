@@ -54,4 +54,27 @@ export class PopupComponents {
                     .build()
             ).build();
     }
+
+    static confirmPopup(message, onconfirm, oncancel, title = "Confirm", textConfirm = "Confirm", textCancel = "Cancel", iconConfirm = "check", iconCancel = "close") {
+        return create("div")
+            .classes("card")
+            .children(
+                create("div")
+                    .classes("flex-v")
+                    .children(
+                        create("h3")
+                            .text(title)
+                            .build(),
+                        create("p")
+                            .text(message)
+                            .build(),
+                        create("div")
+                            .classes("flex", "space-between")
+                            .children(
+                                CommonTemplates.buttonWithIcon(iconCancel, textCancel, oncancel),
+                                CommonTemplates.buttonWithIcon(iconConfirm, textConfirm, onconfirm),
+                            ).build()
+                    ).build()
+            ).build();
+    }
 }

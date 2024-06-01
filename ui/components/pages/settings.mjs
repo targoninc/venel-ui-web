@@ -5,10 +5,12 @@ import {Store} from "../../api/Store.mjs";
 import {Api} from "../../api/Api.mjs";
 import {popup, removePopups, testImage, toast, toggleAllowlist, toggleInstanceEnabled} from "../../actions.mjs";
 import {PopupComponents} from "../popup.mjs";
+import {Popups} from "../../api/Popups.mjs";
+import {localNotificationsEnabled, setLocalNotificationsEnabled} from "../../api/LocalSetting.mjs";
 
-export class AdminComponent {
+export class SettingsComponent {
     static render() {
-        return LayoutTemplates.pageFull(AdminComponent.content());
+        return LayoutTemplates.pageFull(SettingsComponent.content());
     }
 
     static content() {
@@ -27,11 +29,15 @@ export class AdminComponent {
                                 .classes("flex-v", "padded", "max800")
                                 .children(
                                     create("h1")
+                                        .text("Settings")
+                                        .build(),
+                                    SettingsComponent.settings(user),
+                                    create("h1")
                                         .text("Administration")
                                         .build(),
-                                    AdminComponent.yourInfo(user),
-                                    AdminComponent.usersSettings(permissions),
-                                    AdminComponent.bridgeInstanceSettings(permissions)
+                                    SettingsComponent.yourInfo(user),
+                                    SettingsComponent.usersSettings(permissions),
+                                    SettingsComponent.bridgeInstanceSettings(permissions)
                                 ).build()
                         ), "100%", "500px", "100%")
                     ).build()
@@ -51,11 +57,11 @@ export class AdminComponent {
                 LayoutTemplates.collapsible("Roles", signalMap(roles,
                     create("div")
                         .classes("flex"),
-                    role => AdminComponent.role(role))),
+                    role => SettingsComponent.role(role))),
                 LayoutTemplates.collapsible("Permissions", signalMap(permissions,
                     create("div")
                         .classes("flex"),
-                    permission => AdminComponent.permission(permission)))
+                    permission => SettingsComponent.permission(permission)))
             ).build();
     }
 
@@ -100,12 +106,12 @@ export class AdminComponent {
                 ifjs(hasViewPermission, create("div")
                     .classes("flex-v")
                     .children(
-                        AdminComponent.bridgeInstanceActions(bridgedInstances, permissions),
+                        SettingsComponent.bridgeInstanceActions(bridgedInstances, permissions),
                         ifjs(loading, CommonTemplates.spinner()),
                         signalMap(bridgedInstances,
                             create("div")
                                 .classes("flex-v"),
-                            instance => AdminComponent.bridgeInstance(bridgedInstances, instance, permissions)),
+                            instance => SettingsComponent.bridgeInstance(bridgedInstances, instance, permissions)),
                     ).build()),
                 ifjs(hasViewPermission, create("span")
                     .classes("error")
@@ -127,7 +133,7 @@ export class AdminComponent {
                     .classes("flex")
                     .children(
                         ifjs(hasAddPermission, CommonTemplates.buttonWithIcon("add_link", "Add Bridged Instance", () => {
-                            popup(AdminComponent.addBridgedInstancePopup(() => {
+                            popup(SettingsComponent.addBridgedInstancePopup(() => {
                                 removePopups();
                             }, bridgedInstances));
                         })),
@@ -204,30 +210,35 @@ export class AdminComponent {
         const hasRemovePermission = computedSignal(permissions, ps => ps && ps.some(p => p.name === "removeBridgedInstance"));
 
         return create("div")
-            .classes("flex", "space-between")
+            .classes("flex-v")
             .children(
-                create("span")
-                    .classes("instance")
-                    .text(instance.url)
-                    .build(),
                 create("div")
-                    .classes("flex")
+                    .classes("flex", "space-between")
                     .children(
-                        ifjs(instance.useAllowlist, CommonTemplates.circleToggle("Only allowed users", "var(--purple)", () => toggleAllowlist(instances, instance))),
-                        ifjs(instance.useAllowlist, CommonTemplates.circleToggle("All users", "var(--green)", () => toggleAllowlist(instances, instance)), true),
-                        ifjs(instance.enabled, CommonTemplates.circleToggle("Enabled", "var(--green)", () => toggleInstanceEnabled(instances, instance))),
-                        ifjs(instance.enabled, CommonTemplates.circleToggle("Disabled", "var(--red)", () => toggleInstanceEnabled(instances, instance)), true),
-                        ifjs(hasRemovePermission, CommonTemplates.buttonWithIcon("delete", "Remove", () => {
-                            Api.removeInstance(instance.id).then(res => {
-                                if (res.status === 200) {
-                                    toast("Bridged instance removed", "positive");
-                                    instances.value = instances.value.filter(i => i.id !== instance.id);
-                                } else {
-                                    toast("Failed to remove bridged instance", "negative");
-                                }
-                            });
-                        })),
+                        create("span")
+                            .classes("instance")
+                            .text(instance.url)
+                            .build(),
+                        create("div")
+                            .classes("flex")
+                            .children(
+                                ifjs(instance.useAllowlist, CommonTemplates.circleToggle("Only allowed users", "var(--purple)", () => toggleAllowlist(instances, instance))),
+                                ifjs(instance.useAllowlist, CommonTemplates.circleToggle("All users", "var(--green)", () => toggleAllowlist(instances, instance)), true),
+                                ifjs(instance.enabled, CommonTemplates.circleToggle("Enabled", "var(--green)", () => toggleInstanceEnabled(instances, instance))),
+                                ifjs(instance.enabled, CommonTemplates.circleToggle("Disabled", "var(--red)", () => toggleInstanceEnabled(instances, instance)), true),
+                                ifjs(hasRemovePermission, CommonTemplates.buttonWithIcon("delete", "Remove", () => {
+                                    Api.removeInstance(instance.id).then(res => {
+                                        if (res.status === 200) {
+                                            toast("Bridged instance removed", "positive");
+                                            instances.value = instances.value.filter(i => i.id !== instance.id);
+                                        } else {
+                                            toast("Failed to remove bridged instance", "negative");
+                                        }
+                                    });
+                                })),
+                            ).build(),
                     ).build(),
+                ifjs(instance.bridgedUsers, LayoutTemplates.collapsible("Allowlist", SettingsComponent.allowlist(instance))),
             ).build();
     }
 
@@ -255,12 +266,12 @@ export class AdminComponent {
                 ifjs(hasViewPermission, create("div")
                     .classes("flex-v")
                     .children(
-                        AdminComponent.userActions(users, permissions),
+                        SettingsComponent.userActions(users, permissions),
                         ifjs(loading, CommonTemplates.spinner()),
                         signalMap(users,
                             create("div")
                                 .classes("flex-v"),
-                            user => AdminComponent.user(users, user, permissions)),
+                            user => SettingsComponent.user(users, user, permissions)),
                     ).build()),
                 ifjs(hasViewPermission, create("span")
                     .classes("error")
@@ -296,12 +307,14 @@ export class AdminComponent {
                             .classes("flex")
                             .children(
                                 ifjs(hasEditPermission, CommonTemplates.buttonWithIcon("edit", "Edit", () => {})),
-                                ifjs(hasDeletePermission, CommonTemplates.buttonWithIcon("delete", "Delete", () => {})),
+                                ifjs(hasDeletePermission, CommonTemplates.buttonWithIcon("delete", "Delete", () => {
+                                    Popups.deleteUserPopup(users, user);
+                                })),
                             ).build(),
                     ).build(),
-                ifjs(user.roles.length > 0, LayoutTemplates.collapsible("Roles", AdminComponent.userRoles(user))),
+                ifjs(user.roles.length > 0, LayoutTemplates.collapsible("Roles", SettingsComponent.userRoles(user))),
                 ifjs(user.roles.length > 0, CommonTemplates.error("No roles"), true),
-                ifjs(user.permissions.length > 0, LayoutTemplates.collapsible("Permissions", AdminComponent.userPermissions(user))),
+                ifjs(user.permissions.length > 0, LayoutTemplates.collapsible("Permissions", SettingsComponent.userPermissions(user))),
                 ifjs(user.permissions.length > 0, CommonTemplates.smallCard("info", "No permissions"), true),
             ).build();
     }
@@ -310,7 +323,7 @@ export class AdminComponent {
         return create("div")
             .classes("flex")
             .children(
-                user.roles.map(role => AdminComponent.role(role)),
+                user.roles.map(role => SettingsComponent.role(role)),
             ).build();
     }
 
@@ -318,7 +331,61 @@ export class AdminComponent {
         return create("div")
             .classes("flex")
             .children(
-                user.permissions.map(permission => AdminComponent.permission(permission)),
+                user.permissions.map(permission => SettingsComponent.permission(permission)),
+            ).build();
+    }
+
+    static allowlist(instance) {
+        const allowList = signal(instance.bridgedUsers);
+
+        return create("div")
+            .classes("flex-v")
+            .children(
+                SettingsComponent.allowListActions(instance, allowList),
+                create("div")
+                    .classes("flex-v")
+                    .children(
+                        signalMap(allowList,
+                            create("div")
+                                .classes("flex-v"),
+                            user => CommonTemplates.userInList(user.avatar, user.displayname, user.username, () => {})),
+                    ).build(),
+            ).build();
+    }
+
+    static allowListActions(instance, allowList) {
+        return create("div")
+            .classes("flex-v")
+            .children(
+                create("div")
+                    .classes("flex")
+                    .children(
+                        CommonTemplates.buttonWithIcon("add", "Add User", () => {
+                            Popups.newBridgedUser(instance, allowList);
+                        }),
+                    ).build(),
+            ).build();
+    }
+
+    static settings(user) {
+        const notifs_on = signal(localNotificationsEnabled());
+        notifs_on.subscribe(v => {
+            setLocalNotificationsEnabled(v ? "true" : "false");
+        });
+
+        return create("div")
+            .classes("flex-v", "card")
+            .children(
+                create("h2")
+                    .text("Notifications")
+                    .build(),
+                create("div")
+                    .classes("flex-v")
+                    .children(
+                        CommonTemplates.checkbox("notifications_check", "Enable local notifications (in-window popups)", notifs_on, (e) => {
+                            notifs_on.value = e.target.checked;
+                        }),
+                    ).build(),
             ).build();
     }
 }

@@ -22,6 +22,16 @@ export class Page {
         }
     }
 
+    static get notifications() {
+        const notifications = document.getElementById("notifications");
+        if (!notifications) {
+            Page.initialize();
+            return Page.notifications;
+        } else {
+            return notifications;
+        }
+    }
+
     static empty() {
         Page.container.innerHTML = "";
         Page.initialize();
@@ -30,6 +40,7 @@ export class Page {
     static initialize() {
         Page.container.appendChild(create("div").id("toasts").build());
         Page.container.appendChild(create("div").id("popups").build());
+        Page.container.appendChild(create("div").id("notifications").build());
     }
 
     static load(page, params, router) {
@@ -78,9 +89,9 @@ export class Page {
             path: "profile",
             component: "ProfileComponent"
         },
-        "admin": {
-            path: "admin",
-            component: "AdminComponent"
+        "settings": {
+            path: "settings",
+            component: "SettingsComponent"
         }
     };
 }

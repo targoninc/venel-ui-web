@@ -54,4 +54,58 @@ export class Popups {
             });
         }, "New DM", "Search for users"));
     }
+
+    static newBridgedUser(instance, allowList) {
+        const userSearchResults = signal([]);
+
+        popup(PopupComponents.searchPopup(() => {
+            removePopups();
+        }, (e) => {
+            const query = e.target.value;
+            if (query.length < 3) {
+                userSearchResults.value = [];
+                return;
+            }
+
+            Api.search(query).then((res) => {
+                if (res.status !== 200) {
+                    toast("Failed to search for users", "error");
+                    return;
+                }
+                userSearchResults.value = res.data.filter(user => {
+                    return !allowList.value.some(bridgedUser => bridgedUser.id === user.id);
+                });
+            })
+        }, () => {}, userSearchResults, (result) => {
+            return CommonTemplates.addUserButton(result.username, () => {
+                Api.addBridgedUser(result.id, instance.id).then((res) => {
+                    if (res.status !== 200) {
+                        toast("Failed to add user", "error");
+                        removePopups();
+                        return;
+                    }
+                    toast("User added", "success");
+                    allowList.value = [...allowList.value, result.data];
+                    removePopups();
+                });
+            });
+        }, "Add bridged user", "Search for users"));
+    }
+
+    static deleteUserPopup(users, user) {
+        popup(PopupComponents.confirmPopup("Are you sure you want to delete this user?", () => {
+            Api.deleteUser(user.id).then((res) => {
+                if (res.status !== 200) {
+                    toast("Failed to delete user", "error");
+                    removePopups();
+                    return;
+                }
+                toast("User deleted", "success");
+                users.value = users.value.filter(u => u.id !== user.id);
+                removePopups();
+            });
+        }, () => {
+            removePopups();
+        }, "Delete user", "Yes", "No", "delete", "close"));
+    }
 }

@@ -33,9 +33,8 @@ export const routes = [
         noUser: "login"
     },
     {
-        path: "admin",
-        title: "Administration",
+        path: "settings",
+        title: "Settings",
         noUser: "login",
-        noAdmin: "chat"
     }
 ];

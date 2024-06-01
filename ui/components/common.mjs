@@ -1,10 +1,16 @@
 import {computedSignal, create, FjsObservable, ifjs} from "https://fjs.targoninc.com/f.js";
 import {Popups} from "../api/Popups.mjs";
 import {Store} from "../api/Store.mjs";
+import {testImage} from "../actions.mjs";
 
 export class CommonTemplates {
     static icon(icon, classes = [], tag = "span") {
-        if ((icon.constructor === String && (icon.includes(".") || icon.startsWith("data:image"))) || (icon.constructor === FjsObservable && icon.value.includes("."))) {
+        if (!icon) {
+            icon = testImage;
+        }
+
+        if ((icon.constructor === String && (icon.includes(".") || icon.startsWith("data:image"))) || (icon.constructor === FjsObservable && icon.value &&
+            (icon.value.includes(".") || icon.value.startsWith("data:image")))) {
             return create("img")
                 .classes("icon", ...classes)
                 .src(icon)
@@ -81,6 +87,7 @@ export class CommonTemplates {
             return (currentRoute && currentRoute.path === page) ? "active" : "_";
         };
         const user = Store.get('user');
+        const avatar = computedSignal(user, user => user && user.avatar ? user.avatar : testImage);
         const hasAnyRole = computedSignal(user, user => user && user.roles && user.roles.length > 0);
 
         return create("nav")
@@ -95,12 +102,12 @@ export class CommonTemplates {
                 ifjs(hasAnyRole, create("div")
                     .classes("flex", "align-center")
                     .children(
-                        CommonTemplates.buttonWithIcon("admin_panel_settings", "Administration", () => window.router.navigate('admin'), [activeIfActive("admin")]),
+                        CommonTemplates.buttonWithIcon("settings", "Settings", () => window.router.navigate('settings'), [activeIfActive("settings")]),
                     ).build()),
                 create("div")
                     .classes("flex", "align-center")
                     .children(
-                        CommonTemplates.buttonWithIcon("face_5", "Profile", () => window.router.navigate('profile'), [activeIfActive("profile")]),
+                        CommonTemplates.buttonWithIcon(avatar, "Profile", () => window.router.navigate('profile'), [activeIfActive("profile")]),
                         CommonTemplates.pageLink("Logout", "logout")
                     ).build(),
             ).build();
@@ -147,6 +154,19 @@ export class CommonTemplates {
             .onclick(onclick)
             .children(
                 CommonTemplates.icon("chat"),
+                create("span")
+                    .classes("bold")
+                    .text(username)
+                    .build(),
+            ).build();
+    }
+
+    static addUserButton(username, onclick) {
+        return create("button")
+            .classes("flex", "align-center", "small-gap", "full-width", "space-between")
+            .onclick(onclick)
+            .children(
+                CommonTemplates.icon("person_add"),
                 create("span")
                     .classes("bold")
                     .text(username)
@@ -313,6 +333,19 @@ export class CommonTemplates {
                 CommonTemplates.icon(icon),
                 create("span")
                     .text(text)
+                    .build()
+            ).build();
+    }
+
+    static chatUser(avatar, name, onclick) {
+        return create("div")
+            .classes("flex", "align-center", "chat-user")
+            .onclick(onclick)
+            .children(
+                CommonTemplates.icon(avatar, ["round", "message-avatar"]),
+                create("span")
+                    .classes("bold", "message-username")
+                    .text(name)
                     .build()
             ).build();
     }

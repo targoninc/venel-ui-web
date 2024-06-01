@@ -91,4 +91,10 @@ export class Api extends ApiBase {
     static async toggleEnabled(id = null) {
         return await this.patch("/api/bridging/toggleEnabled", {id});
     }
+    static async addBridgedUser(userId = null, instanceId = null) {
+        return await this.post("/api/bridging/addBridgedUser", {userId, instanceId});
+    }
+    static async removeBridgedUser(userId = null, instanceId = null) {
+        return await this.delete("/api/bridging/removeBridgedUser", {userId, instanceId});
+    }
 }

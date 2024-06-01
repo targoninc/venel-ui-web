@@ -48,7 +48,7 @@ export class ChatComponent {
             .children(
                 CommonTemplates.actions(),
                 create("div")
-                    .classes("panes", "full-width", "flex-grow", "nav-margin")
+                    .classes("panes", "full-width", "flex-grow", "nav-margin", "no-wrap")
                     .children(
                         LayoutTemplates.resizableFromRight(ChannelTemplates.channelList(displayChannels, messages, activeChannel), "20%", "200px", "50%"),
                         ifjs(activeChannel, LayoutTemplates.flexPane(ChatComponent.chat(activeChannel, messages), "300px", "100%")),
@@ -135,12 +135,12 @@ export class ChatComponent {
         const messageMenuPositionY = signal(0);
 
         return create("div")
-            .classes("chat-message", "flex-v")
+            .classes("chat-message", "flex-v", "no-gap")
             .children(
                 ifjs(shouldDisplaySender, create("div")
                     .classes("flex", "align-center")
                     .children(
-                        CommonTemplates.userInList(message.sender.avatar ?? testImage, message.sender.displayname ?? message.sender.username, null, () => {}, "message-avatar")
+                        CommonTemplates.chatUser(message.sender.avatar ?? testImage, message.sender.displayname ?? message.sender.username, () => {})
                     ).build()),
                 create("div")
                     .classes("message-content", "flex", "space-between", "full-width")
@@ -155,6 +155,10 @@ export class ChatComponent {
                     })
                     .children(
                         ifjs(menuShown, ChatComponent.messageMenu(message, messageMenuPositionX, messageMenuPositionY)),
+                        create("span")
+                            .classes("message-text")
+                            .text(message.text)
+                            .build(),
                         create("div")
                             .classes("flex-v", "no-gap")
                             .children(
@@ -163,14 +167,10 @@ export class ChatComponent {
                                     .text("edited")
                                     .build()),
                                 create("span")
-                                    .classes("message-text")
-                                    .text(message.text)
+                                    .classes("message-timestamp", "text-small")
+                                    .text(Time.ago(localTimestamp))
                                     .build(),
                             ).build(),
-                        create("span")
-                            .classes("message-timestamp", "text-small")
-                            .text(Time.ago(localTimestamp))
-                            .build(),
                     ).build()
             ).build();
     }

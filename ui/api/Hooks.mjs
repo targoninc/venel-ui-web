@@ -2,6 +2,9 @@ import {Api} from "./Api.mjs";
 import {toast} from "../actions.mjs";
 import {signal, store} from "https://fjs.targoninc.com/f.js";
 import {Live} from "../live/Live.mjs";
+import {Store} from "./Store.mjs";
+import {localNotificationsEnabled} from "./LocalSetting.mjs";
+import {Notifier} from "../live/Notifier.mjs";
 
 export class Hooks {
     static runUser(user) {
@@ -61,6 +64,12 @@ export function addMessage(channel, message) {
     const ex = store().get('messages').value;
     setChannel(ex, channel);
     store().setSignalValue('messages', {...ex, [channel]: [...ex[channel], message]});
+
+    const user = Store.get('user');
+    //  && message.userId !== user.value.id
+    if (localNotificationsEnabled()) {
+        Notifier.sendMessage(channel, message);
+    }
 }
 
 export function removeMessage(channel, messageId) {

@@ -151,6 +151,7 @@
     background: var(--blue);
     color: var(--bg);
     font-size: 0.8em;
+    font-weight: bold;
 }
 
 .pill {
@@ -232,12 +233,22 @@
     overflow-y: auto;
 }
 
+.chat-user {
+    margin-top: var(--gap-v);
+    position: relative;
+}
+
 .rounded-max {
     border-radius: 9999px;
 }
 
+.message-username {
+    padding-left: var(--message-padding-left);
+}
+
 .message-text {
-    padding-left: 1em;
+    padding-left: calc(var(--message-padding-left) - 0.25em);
+    max-width: calc(100% - 200px);
 }
 
 .message-timestamp {
@@ -258,6 +269,7 @@
 .message-content {
     padding: 0.25em;
     border-radius: var(--input-border-radius);
+    word-wrap: anywhere;
 }
 
 .message-menu {
@@ -265,7 +277,7 @@
     right: 0;
     top: 0;
     padding: 0.5em;
-    background: var(--bg-2);
+    background: var(--bg-3);
     border-radius: var(--input-border-radius);
     border: var(--input-border-width) solid var(--bg-4);
     z-index: 999;
@@ -323,9 +335,12 @@
 }
 
 .message-avatar {
-    --size: 1em;
+    --size: 2em;
     width: var(--size);
     height: var(--size);
+    position: absolute;
+    top: 0;
+    left: .5em;
 }
 
 .max800 {
@@ -380,4 +395,35 @@
 
 .nav-margin {
     margin-top: 43px;
+}
+
+.notification {
+    animation: fade-out var(--animation-time) forwards;
+}
+
+@keyframes fade-out {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+
+.notification-image {
+    width: 2em;
+    height: 2em;
+    border-radius: 50%;
+    border: var(--input-border-width) solid var(--bg-4);
+}
+
+.notification-content {
+    max-width: 200px;
+}
+
+.notification-title, .notification-subtitle, .notification-message {
+    word-wrap: anywhere;
 }

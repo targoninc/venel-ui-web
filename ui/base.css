@@ -1,8 +1,12 @@
 :root {
-    --black: #040403ff;
+    /*--black: #040403ff;
     --black-2: #10100e;
     --black-3: #171712;
-    --black-4: #23231a;
+    --black-4: #23231a;*/
+    --black: #0f0f12;
+    --black-2: #151519;
+    --black-3: #1b1b20;
+    --black-4: #1e1e24;
     --white: #efe9e7ff;
     --white-2: #e7ddda;
     --white-3: #ded2ce;
@@ -19,7 +23,8 @@
     --input-border-radius: 0.25rem;
     --input-border-width: 1px;
     --avatar-border-width: 2px;
-    --animation-time: 0.35s;
+    --animation-time: 0.25s;
+    --message-padding-left: 3em;
 }
 
 @media (prefers-color-scheme: light) {
@@ -180,6 +185,18 @@ button:hover {
     top: 0;
     left: 50%;
     transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-v);
+    padding: var(--gap-v);
+    z-index: 999;
+}
+
+#notifications {
+    position: fixed;
+    top: 50%;
+    right: 0;
+    transform: translateY(-50%);
     display: flex;
     flex-direction: column;
     gap: var(--gap-v);

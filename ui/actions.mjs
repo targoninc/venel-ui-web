@@ -18,6 +18,40 @@ export function toast(message, type = "info", timeout = 5) {
     }, timeout * 1000);
 }
 
+export function notify(image, title, subtitle, message, timeout = 7) {
+    const notification = create("div")
+        .classes("card", "flex", "notification")
+        .styles("animation-duration", `${timeout}s`)
+        .children(
+            create("img")
+                .classes("notification-image")
+                .src(image)
+                .build(),
+            create("div")
+                .classes("flex-v", "notification-content")
+                .children(
+                    create("div")
+                        .classes("notification-title")
+                        .text(title)
+                        .build(),
+                    create("div")
+                        .classes("notification-subtitle")
+                        .text(subtitle)
+                        .build(),
+                    create("span")
+                        .classes("notification-message")
+                        .text(message)
+                        .build()
+                ).build()
+        ).build();
+
+    Page.notifications.appendChild(notification);
+
+    setTimeout(() => {
+        notification.remove();
+    }, timeout * 1000);
+}
+
 export function popup(popup, classes = []) {
     const container = create("div")
         .classes("popup-container", ...classes)

@@ -102,6 +102,7 @@ export class RegisterComponent {
                                         loading.value = false;
                                         if (res.status === 200) {
                                             toast("Registration successful", "positive");
+                                            window.router.navigate("chat");
                                         } else {
                                             toast("Registration failed", "negative");
                                         }

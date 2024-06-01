@@ -1,5 +1,5 @@
 import {LayoutTemplates} from "../layout.mjs";
-import {create, signalFromProperty, store} from "https://fjs.targoninc.com/f.js";
+import {computedSignal, create, signal, signalFromProperty, store} from "https://fjs.targoninc.com/f.js";
 import {CommonTemplates} from "../common.mjs";
 import {Store} from "../../api/Store.mjs";
 import {Api} from "../../api/Api.mjs";
@@ -92,11 +92,11 @@ export class ProfileComponent {
                 Api.updateAvatar(base64).then((res) => {
                     if (res.status !== 200) {
                         toast("Failed to update avatar: " + res.data.error, "error");
+                        avatar.value = oldValue;
                         return;
                     }
 
                     toast("Avatar updated", "success");
-                    avatar.value = oldValue;
                 });
             };
             reader.readAsDataURL(input.files[0]);
@@ -106,6 +106,7 @@ export class ProfileComponent {
 
     static avatarSection(user) {
         const avatar = signalFromProperty(user, "avatar");
+        const buttonText = signal("Upload avatar");
 
         return create("div")
             .classes("flex-v")
@@ -114,14 +115,18 @@ export class ProfileComponent {
                     .classes("big-avatar")
                     .src(avatar)
                     .onclick(() => {
+                        buttonText.value = "Uploading...";
                         ProfileComponent.uploadAvatar(avatar);
+                        buttonText.value = "Upload avatar";
                     }).build(),
                 create("span")
                     .classes("text-small")
                     .text("Maximum size: 50MB")
                     .build(),
-                CommonTemplates.buttonWithIcon("upload_file", "Upload avatar", () => {
+                CommonTemplates.buttonWithIcon("upload_file", buttonText, () => {
+                    buttonText.value = "Uploading...";
                     ProfileComponent.uploadAvatar(avatar);
+                    buttonText.value = "Upload avatar";
                 })
             ).build();
     }
