@@ -3,7 +3,7 @@ import {toast} from "../actions.mjs";
 import {signal, store} from "https://fjs.targoninc.com/f.js";
 import {Live} from "../live/Live.mjs";
 import {Store} from "./Store.mjs";
-import {localNotificationsEnabled} from "./LocalSetting.mjs";
+import {localNotificationsEnabled, systemNotificationsEnabled} from "./LocalSetting.mjs";
 import {Notifier} from "../live/Notifier.mjs";
 
 export class Hooks {
@@ -66,9 +66,18 @@ export function addMessage(channel, message) {
     store().setSignalValue('messages', {...ex, [channel]: [...ex[channel], message]});
 
     const user = Store.get('user');
-    //  && message.userId !== user.value.id
+    if (message.userId === user.value.id) {
+        return;
+    }
+
     if (localNotificationsEnabled()) {
         Notifier.sendMessage(channel, message);
+    }
+    if (systemNotificationsEnabled()) {
+        new Notification(`New message from ${message.sender.displayname ?? message.sender.username}`, {
+            body: message.text,
+            icon: message.sender.avatar,
+        });
     }
 }
 

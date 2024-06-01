@@ -6,7 +6,11 @@ import {Api} from "../../api/Api.mjs";
 import {popup, removePopups, testImage, toast, toggleAllowlist, toggleInstanceEnabled} from "../../actions.mjs";
 import {PopupComponents} from "../popup.mjs";
 import {Popups} from "../../api/Popups.mjs";
-import {localNotificationsEnabled, setLocalNotificationsEnabled} from "../../api/LocalSetting.mjs";
+import {
+    localNotificationsEnabled,
+    setLocalNotificationsEnabled, setSystemNotificationsEnabled,
+    systemNotificationsEnabled
+} from "../../api/LocalSetting.mjs";
 
 export class SettingsComponent {
     static render() {
@@ -31,7 +35,7 @@ export class SettingsComponent {
                                     create("h1")
                                         .text("Settings")
                                         .build(),
-                                    SettingsComponent.settings(user),
+                                    SettingsComponent.settings(),
                                     create("h1")
                                         .text("Administration")
                                         .build(),
@@ -367,10 +371,14 @@ export class SettingsComponent {
             ).build();
     }
 
-    static settings(user) {
+    static settings() {
         const notifs_on = signal(localNotificationsEnabled());
         notifs_on.subscribe(v => {
             setLocalNotificationsEnabled(v ? "true" : "false");
+        });
+        const system_notifs_on = signal(systemNotificationsEnabled());
+        system_notifs_on.subscribe(v => {
+            setSystemNotificationsEnabled(v);
         });
 
         return create("div")
@@ -384,6 +392,9 @@ export class SettingsComponent {
                     .children(
                         CommonTemplates.checkbox("notifications_check", "Enable local notifications (in-window popups)", notifs_on, (e) => {
                             notifs_on.value = e.target.checked;
+                        }),
+                        CommonTemplates.checkbox("system_notifications_check", "Enable system notifications (browser popups)", system_notifs_on, (e) => {
+                            system_notifs_on.value = e.target.checked;
                         }),
                     ).build(),
             ).build();

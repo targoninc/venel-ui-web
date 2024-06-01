@@ -19,3 +19,24 @@ export function localNotificationsEnabled() {
 export function setLocalNotificationsEnabled(enabled) {
     LocalSetting.set("notifications", enabled);
 }
+
+export function systemNotificationsAllowed() {
+    return Notification.permission === "granted";
+}
+
+export function systemNotificationsEnabled() {
+    return systemNotificationsAllowed() && LocalSetting.getBoolean("systemNotifications");
+}
+
+export function setSystemNotificationsEnabled(enabled) {
+    if (enabled) {
+        Notification.requestPermission().then((permission) => {
+            if (permission === "granted") {
+                LocalSetting.set("systemNotifications", true);
+            } else {
+                LocalSetting.set("systemNotifications", false);
+            }
+        });
+    }
+    LocalSetting.set("systemNotifications", enabled);
+}

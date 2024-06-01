@@ -42,6 +42,7 @@ export class ChatComponent {
             Store.set("currentChannelId", channel);
             Hooks.runActiveChannel(channel);
         });
+        const inverseRefId = Math.random().toString(36).substring(7);
 
         return create("div")
             .classes("panes-v", "full-width", "full-height")
@@ -50,9 +51,9 @@ export class ChatComponent {
                 create("div")
                     .classes("panes", "full-width", "flex-grow", "nav-margin", "no-wrap")
                     .children(
-                        LayoutTemplates.resizableFromRight(ChannelTemplates.channelList(displayChannels, messages, activeChannel), "20%", "200px", "50%"),
-                        ifjs(activeChannel, LayoutTemplates.flexPane(ChatComponent.chat(activeChannel, messages), "300px", "100%")),
-                        ifjs(activeChannel, LayoutTemplates.flexPane(create("span").text("No channel selected").build(), "300px", "100%"), true)
+                        LayoutTemplates.resizableFromRight(ChannelTemplates.channelList(displayChannels, messages, activeChannel), inverseRefId, "20%", "10%", "50%"),
+                        ifjs(activeChannel, LayoutTemplates.flexPane(ChatComponent.chat(activeChannel, messages), "300px", "100%", inverseRefId)),
+                        ifjs(activeChannel, LayoutTemplates.flexPane(create("span").text("No channel selected").build(), "300px", "100%", inverseRefId), true)
                     ).build()
             ).build();
     }

@@ -34,46 +34,67 @@ export class LayoutTemplates {
             .build();
     }
 
-    static flexPane(content, minWidth = "300px", maxWidth = "100%") {
+    static flexPane(content, minWidth = "300px", maxWidth = "100%", id = null) {
         return create("div")
             .classes("flex-pane")
             .styles("min-width", minWidth)
             .styles("max-width", maxWidth)
             .children(content)
+            .id(id)
             .build();
     }
 
-    static resizableFromRight(content, defaultWidth = "50%", minWidth = "300px", maxWidth = "100%") {
+    static resizableFromRight(content, inverseRefId = null, defaultWidth = "50%", minWidth = "300px", maxWidth = "100%") {
         const uniqueId = Math.random().toString(36).substring(7);
 
         return create("div")
-            .classes("pane", "resizable")
+            .classes("resizable")
             .styles("width", defaultWidth)
             .styles("min-width", minWidth)
             .styles("max-width", maxWidth)
             .id(uniqueId)
             .children(
-                LayoutTemplates.resizeIndicator(uniqueId, "v"),
+                LayoutTemplates.resizeIndicator(uniqueId, "v", minWidth, maxWidth, inverseRefId),
                 content
             ).build();
     }
 
-    static resizeIndicator(refId, type = "v") {
+    /**
+     *
+     * @param refId
+     * @param type
+     * @param minSize percentage of parent
+     * @param maxSize percentage of parent
+     * @param inverseRefId
+     * @returns {*}
+     */
+    static resizeIndicator(refId, type = "v", minSize, maxSize, inverseRefId = null) {
         const propertyToSet = type === "v" ? "width" : "height";
         const clientProperty = type === "v" ? "clientX" : "clientY";
+        const minSizeAsNumber = parseInt(minSize.replaceAll("%", ""));
+        const maxSizeAsNumber = parseInt(maxSize.replaceAll("%", ""));
 
         return create("div")
             .classes("resize-indicator", type)
             .onmousedown(e => {
                 const startPos = e[clientProperty];
                 const pane = document.getElementById(refId);
-                const startSize = parseInt(getComputedStyle(pane)[propertyToSet], 10);
+                const inversePane = inverseRefId ? document.getElementById(inverseRefId) : null;
+                const startSize = pane.getBoundingClientRect()[propertyToSet];
                 document.body.style.userSelect = "none";
 
                 const onMouseMove = e => {
                     e.preventDefault();
                     const newSize = startSize + (e[clientProperty] - startPos);
-                    pane.style.setProperty(propertyToSet, `${newSize}px`);
+                    const parentSize = pane.parentElement.getBoundingClientRect()[propertyToSet];
+                    const newPercent = newSize / parentSize * 100;
+                    if (newPercent < minSizeAsNumber || newPercent > maxSizeAsNumber) {
+                        return;
+                    }
+                    pane.style.setProperty(propertyToSet, `${newPercent}%`);
+                    if (inversePane) {
+                        inversePane.style.setProperty(propertyToSet, `${100 - newPercent}%`);
+                    }
                 };
 
                 const onMouseUp = () => {

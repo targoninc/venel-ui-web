@@ -68,7 +68,7 @@ export class ChannelTemplates {
     static channelList(channels, messages, activeChannel) {
         return signalMap(channels,
             create("div")
-                .classes("flex-v", "no-gap")
+                .classes("flex-v", "no-gap", "full-width", "full-height")
             , channel => {
                 if (channel.type === "gr") {
                     return ChannelTemplates.groupChannel(channel, messages, activeChannel);

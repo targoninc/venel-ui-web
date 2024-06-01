@@ -41,13 +41,6 @@
 
 .pane {
     border: var(--input-border-width) solid var(--bg-4);
-    --width: 50%;
-    width: calc(var(--width) - 2 * var(--input-border-width));
-}
-
-.flex-pane {
-    flex-grow: 1;
-    border: var(--input-border-width) solid var(--bg-4);
 }
 
 .padded {
