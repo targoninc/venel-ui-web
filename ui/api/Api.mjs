@@ -16,6 +16,9 @@ export class Api extends ApiBase {
     static async getUsers() {
         return await this.get("/api/auth/getUsers", {});
     }
+    static async changePassword(oldPassword = null, newPassword = null) {
+        return await this.patch("/api/auth/changePassword", {oldPassword, newPassword});
+    }
     static async updateUser(username = null, displayname = null, description = null) {
         return await this.patch("/api/auth/updateUser", {username, displayname, description});
     }

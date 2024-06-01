@@ -23,12 +23,12 @@ export class CommonTemplates {
             .build();
     }
 
-    static buttonWithIcon(icon, text, onclick, classes = []) {
+    static buttonWithIcon(icon, text, onclick, classes = [], iconClasses = []) {
         return create("button")
             .classes("flex", ...classes)
             .onclick(onclick)
             .children(
-                CommonTemplates.icon(icon),
+                CommonTemplates.icon(icon, iconClasses),
                 create("span")
                     .text(text)
                     .build(),
@@ -63,7 +63,9 @@ export class CommonTemplates {
                     .classes("select")
                     .children(
                         create("select")
-                            .onchange(onchange)
+                            .onchange((e) => {
+                                onchange(e.target.value);
+                            })
                             .children(
                                 ...options.map(option => {
                                     const selected = computedSignal(value, value => option.value === value);
@@ -72,6 +74,9 @@ export class CommonTemplates {
                                         .text(option.text)
                                         .value(option.value)
                                         .selected(selected)
+                                        .onclick(() => {
+                                            onchange(option.value);
+                                        })
                                         .build();
                                 })
                             ).build()
@@ -118,7 +123,7 @@ export class CommonTemplates {
                 create("div")
                     .classes("flex", "align-center")
                     .children(
-                        CommonTemplates.buttonWithIcon(avatar, "Profile", () => window.router.navigate('profile'), [activeIfActive("profile")]),
+                        CommonTemplates.buttonWithIcon(avatar, "Profile", () => window.router.navigate('profile'), [activeIfActive("profile")], ["small-avatar"]),
                         CommonTemplates.pageLink("Logout", "logout")
                     ).build(),
             ).build();

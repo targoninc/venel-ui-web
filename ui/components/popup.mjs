@@ -1,4 +1,4 @@
-import {create, ifjs, signalMap} from "https://fjs.targoninc.com/f.js";
+import {create, ifjs, signal, signalMap} from "https://fjs.targoninc.com/f.js";
 import {CommonTemplates} from "./common.mjs";
 
 export class PopupComponents {
@@ -73,6 +73,44 @@ export class PopupComponents {
                             .children(
                                 CommonTemplates.buttonWithIcon(iconCancel, textCancel, oncancel),
                                 CommonTemplates.buttonWithIcon(iconConfirm, textConfirm, onconfirm),
+                            ).build()
+                    ).build()
+            ).build();
+    }
+
+    static changePassword(onconfirm = (oldPass, newPass, errorState) => {}, oncancel = () => {}) {
+        const oldPassword = signal("");
+        const newPassword = signal("");
+        const confirmPassword = signal("");
+        const errorState = signal(null);
+
+        return create("div")
+            .classes("card")
+            .children(
+                create("div")
+                    .classes("flex-v")
+                    .children(
+                        create("h3")
+                            .text("Change password")
+                            .build(),
+                        CommonTemplates.input("password", "old-password", "Old password", "Old password", oldPassword, (e) => {
+                            oldPassword.value = e.target.value;
+                        }, true, "old-password"),
+                        CommonTemplates.input("password", "new-password", "New password", "New password", newPassword, (e) => {
+                            newPassword.value = e.target.value;
+                        }, true, "new-password"),
+                        CommonTemplates.input("password", "confirm-password", "Confirm new password", "Confirm new password", confirmPassword, (e) => {
+                            confirmPassword.value = e.target.value;
+                        }, true, "confirm-password"),
+                        ifjs(errorState, create("p")
+                            .classes("error")
+                            .text(errorState)
+                            .build()),
+                        create("div")
+                            .classes("flex", "space-between")
+                            .children(
+                                CommonTemplates.buttonWithIcon("close", "Cancel", oncancel),
+                                CommonTemplates.buttonWithIcon("check", "Confirm", () => onconfirm(oldPassword.value, newPassword.value, errorState)),
                             ).build()
                     ).build()
             ).build();

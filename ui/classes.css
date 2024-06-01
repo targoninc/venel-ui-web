@@ -334,6 +334,12 @@
     left: .5em;
 }
 
+.small-avatar {
+    --size: 1em;
+    width: var(--size);
+    height: var(--size);
+}
+
 .max800 {
     max-width: 800px;
 }

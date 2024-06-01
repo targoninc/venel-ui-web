@@ -118,3 +118,28 @@ export function playSound(name) {
     const audio = new Audio(`/sounds/${name}`);
     audio.play();
 }
+
+export function playLoop(name) {
+    if (!window.playingLoops) {
+        window.playingLoops = [];
+    }
+
+    const audio = new Audio(`/loops/${name}`);
+    audio.loop = true;
+    audio.play();
+    window.playingLoops.push(audio);
+
+    return () => {
+        audio.pause();
+        audio.remove();
+    };
+}
+
+export function stopPlayingLoop() {
+    if (window.playingLoops) {
+        window.playingLoops.forEach(audio => {
+            audio.pause();
+            audio.remove();
+        });
+    }
+}

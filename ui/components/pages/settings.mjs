@@ -4,9 +4,10 @@ import {CommonTemplates} from "../common.mjs";
 import {Store} from "../../api/Store.mjs";
 import {Api} from "../../api/Api.mjs";
 import {
+    playLoop,
     playSound,
     popup,
-    removePopups,
+    removePopups, stopPlayingLoop,
     testImage,
     toast,
     toggleAllowlist,
@@ -15,8 +16,9 @@ import {
 import {PopupComponents} from "../popup.mjs";
 import {Popups} from "../../api/Popups.mjs";
 import {
+    currentCallSound,
     currentSound,
-    localNotificationsEnabled, setCurrentSound,
+    localNotificationsEnabled, setCurrentCallSound, setCurrentSound,
     setLocalNotificationsEnabled, setSoundEnabled, setSystemNotificationsEnabled, soundEnabled,
     systemNotificationsEnabled
 } from "../../api/LocalSetting.mjs";
@@ -403,6 +405,11 @@ export class SettingsComponent {
         sound.subscribe(v => {
             setCurrentSound(v);
         });
+        const callSound = signal(currentCallSound());
+        callSound.subscribe(v => {
+            setCurrentCallSound(v);
+        });
+        const playingLoop = signal(false);
 
         return create("div")
             .classes("flex-v", "card")
@@ -426,10 +433,25 @@ export class SettingsComponent {
                             { text: "In", value: "in.wav" },
                             { text: "Log", value: "log.wav" },
                             { text: "Out", value: "out.wav" },
-                        ], sound, (e) => {
-                            sound.value = e.target.value;
+                        ], sound, (value) => {
+                            sound.value = value;
                             playSound(sound.value);
-                        })
+                        }),
+                        create("div")
+                            .classes("flex")
+                            .children(
+                                CommonTemplates.select("Call sound", [
+                                    { text: "Blossom", value: "blossom.mp3" },
+                                ], callSound, (value) => {
+                                    callSound.value = value;
+                                    playingLoop.value = true;
+                                    playLoop(callSound.value);
+                                }),
+                                ifjs(playingLoop, CommonTemplates.buttonWithIcon("stop", "Stop playing", () => {
+                                    stopPlayingLoop();
+                                    playingLoop.value = false;
+                                }))
+                            ).build(),
                     ).build(),
             ).build();
     }

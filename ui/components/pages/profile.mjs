@@ -5,6 +5,7 @@ import {Store} from "../../api/Store.mjs";
 import {Api} from "../../api/Api.mjs";
 import {toast} from "../../actions.mjs";
 import {Live} from "../../live/Live.mjs";
+import {Popups} from "../../api/Popups.mjs";
 
 export class ProfileComponent {
     static render() {
@@ -27,6 +28,7 @@ export class ProfileComponent {
                                 .children(
                                     ProfileComponent.avatarSection(user),
                                     ProfileComponent.basicInfoSection(user),
+                                    ProfileComponent.accountSection(user),
                                 ).build()
                         ), "100%", "500px", "100%")
                     ).build()
@@ -122,6 +124,16 @@ export class ProfileComponent {
                     buttonText.value = "Uploading...";
                     ProfileComponent.uploadAvatar(avatar);
                     buttonText.value = "Upload avatar";
+                })
+            ).build();
+    }
+
+    static accountSection(user) {
+        return create("div")
+            .classes("flex-v")
+            .children(
+                CommonTemplates.buttonWithIcon("password", "Change password", () => {
+                    Popups.updatePassword(user);
                 })
             ).build();
     }

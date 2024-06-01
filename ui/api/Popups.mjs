@@ -108,4 +108,18 @@ export class Popups {
             removePopups();
         }, "Delete user", "Yes", "No", "delete", "close"));
     }
+
+    static updatePassword() {
+        popup(PopupComponents.changePassword((oldPassword, newPassword, errorState) => {
+            Api.changePassword(oldPassword, newPassword).then((res) => {
+                if (res.status !== 200) {
+                    errorState.value = res.data.error;
+                    toast("Failed to update password", "error");
+                    return;
+                }
+                toast("Password updated", "success");
+                removePopups();
+            });
+        }));
+    }
 }

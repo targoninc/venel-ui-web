@@ -56,3 +56,11 @@ export function currentSound() {
 export function setCurrentSound(sound) {
     LocalSetting.set("currentSound", sound);
 }
+
+export function currentCallSound() {
+    return LocalSetting.getString("currentCallSound");
+}
+
+export function setCurrentCallSound(sound) {
+    LocalSetting.set("currentCallSound", sound);
+}
