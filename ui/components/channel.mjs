@@ -8,7 +8,10 @@ export class ChannelTemplates {
         const activeClass = computedSignal(activeChannel, id => {
             return id === channel.id ? "active" : "_";
         });
-        const lastMemberAvatar = channel.members.at(-1)?.avatar;
+        let lastMemberAvatar = channel.members.at(-1)?.avatar;
+        if (channel.type === "dm") {
+            lastMemberAvatar = channel.members.find(member => member.id !== store().get("user").value.id)?.avatar ?? testImage;
+        }
 
         return create("div")
             .classes("channel", "flex", "no-wrap", "full-width", activeClass)
