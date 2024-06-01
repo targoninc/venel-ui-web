@@ -85,7 +85,7 @@ export class Popups {
                         return;
                     }
                     toast("User added", "success");
-                    allowList.value = [...allowList.value, result.data];
+                    allowList.value = [...allowList.value, result];
                     removePopups();
                 });
             });
@@ -107,6 +107,15 @@ export class Popups {
         }, () => {
             removePopups();
         }, "Delete user", "Yes", "No", "delete", "close"));
+    }
+
+    static removeBridgedUserPopup(user, instance, onRemove) {
+        popup(PopupComponents.confirmPopup(`Are you sure you want to remove ${user.username} from bridged users on ${instance.url}?`, () => {
+            onRemove();
+            removePopups();
+        }, () => {
+            removePopups();
+        }, "Remove user", "Yes", "No", "delete", "close"));
     }
 
     static updatePassword() {

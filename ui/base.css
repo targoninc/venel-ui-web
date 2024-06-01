@@ -246,6 +246,7 @@ button:hover {
     align-self: end;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.08);
     max-width: max-content;
+    pointer-events: none;
 }
 
 .toast.negative {

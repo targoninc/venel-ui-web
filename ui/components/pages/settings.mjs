@@ -363,7 +363,18 @@ export class SettingsComponent {
                         signalMap(allowList,
                             create("div")
                                 .classes("flex-v"),
-                            user => CommonTemplates.userInList(user.avatar, user.displayname, user.username, () => {})),
+                            user => CommonTemplates.userInList(user.avatar, user.displayname, user.username, () => {
+                                Popups.removeBridgedUserPopup(user, instance, () => {
+                                    Api.removeBridgedUser(user.id, instance.id).then(res => {
+                                        if (res.status === 200) {
+                                            allowList.value = allowList.value.filter(u => u.id !== user.id);
+                                            toast("User removed", "success");
+                                        } else {
+                                            toast("Failed to remove user", "error");
+                                        }
+                                    });
+                                });
+                            })),
                     ).build(),
             ).build();
     }
