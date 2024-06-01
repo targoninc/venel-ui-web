@@ -107,7 +107,7 @@ export class SettingsComponent {
                 if (res.status === 200) {
                     bridgedInstances.value = res.data;
                 } else {
-                    toast("Failed to fetch bridged instances", "negative");
+                    toast("Failed to fetch bridged instances: " + res.data.error, "error");
                 }
             });
         }
@@ -203,17 +203,17 @@ export class SettingsComponent {
                         CommonTemplates.buttonWithIcon("close", "Cancel" , onclose),
                         CommonTemplates.buttonWithIcon("add_link", "Add", () => {
                             if (!url.value) {
-                                toast("URL is required", "negative");
+                                toast("URL is required", "error");
                                 return;
                             }
 
                             Api.addInstance(url.value, useAllowlist.value, enabled.value).then(res => {
                                 if (res.status === 200) {
-                                    toast("Bridged instance added", "positive");
+                                    toast("Bridged instance added", "success");
                                     bridgedInstances.value = [...bridgedInstances.value, res.data];
                                     onclose();
                                 } else {
-                                    toast("Failed to add bridged instance", "negative");
+                                    toast("Failed to add bridged instance: " + res.data.error, "error");
                                 }
                             });
                         }),
@@ -244,10 +244,10 @@ export class SettingsComponent {
                                 ifjs(hasRemovePermission, CommonTemplates.buttonWithIcon("delete", "Remove", () => {
                                     Api.removeInstance(instance.id).then(res => {
                                         if (res.status === 200) {
-                                            toast("Bridged instance removed", "positive");
+                                            toast("Bridged instance removed", "success");
                                             instances.value = instances.value.filter(i => i.id !== instance.id);
                                         } else {
-                                            toast("Failed to remove bridged instance", "negative");
+                                            toast("Failed to remove bridged instance: " + res.data.error, "error");
                                         }
                                     });
                                 })),
@@ -267,7 +267,7 @@ export class SettingsComponent {
                 if (res.status === 200) {
                     users.value = res.data.users;
                 } else {
-                    toast("Failed to fetch users", "negative");
+                    toast("Failed to fetch users: " + res.data.error, "error");
                 }
             });
         }
@@ -370,7 +370,7 @@ export class SettingsComponent {
                                             allowList.value = allowList.value.filter(u => u.id !== user.id);
                                             toast("User removed", "success");
                                         } else {
-                                            toast("Failed to remove user", "error");
+                                            toast("Failed to remove user: " + res.data.error, "error");
                                         }
                                     });
                                 });

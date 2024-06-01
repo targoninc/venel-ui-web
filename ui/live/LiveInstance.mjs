@@ -24,13 +24,11 @@ export class LiveInstance {
         let connectSid = await this.getConnectSid();
         if (!connectSid) {
             console.error("No connect.sid cookie found");
-            toast("Could not connect to live server. You have to refresh the page to get any updates.");
             return;
         }
         const res = await Api.url();
         if (res.status !== 200) {
-            console.error("Failed to get live server URL");
-            toast("Could not connect to live server. You have to refresh the page to get any updates.");
+            toast("Could not get live server URL: " + res.data.error, "error");
             return;
         }
         this.server = new WebSocket(encodeURI(`${res.data}?cid=${connectSid}`));
@@ -42,7 +40,8 @@ export class LiveInstance {
         this.server.onclose = () => {
             this.onStop();
             setTimeout(() => {
-                console.log("Reconnecting to live server...");
+                console.log("Lost connection to live server, reconnecting...");
+                toast("Lost connection to live server, reconnecting...", "info");
                 this.start();
             }, 1000);
         };

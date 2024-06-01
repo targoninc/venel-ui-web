@@ -22,7 +22,7 @@ export class Popups {
 
             Api.search(query).then((res) => {
                 if (res.status !== 200) {
-                    toast("Failed to search for users", "error");
+                    toast("Failed to search for users: " + res.data.error, "error");
                     return;
                 }
                 userSearchResults.value = res.data.filter(user => {
@@ -39,7 +39,7 @@ export class Popups {
             return CommonTemplates.chatWithButton(result.username, () => {
                 Api.createDirect(result.id).then((res) => {
                     if (res.status !== 200) {
-                        toast("Failed to create DM", "error");
+                        toast("Failed to create DM: " + res.data.error, "error");
                         removePopups();
                         return;
                     }
@@ -69,7 +69,7 @@ export class Popups {
 
             Api.search(query).then((res) => {
                 if (res.status !== 200) {
-                    toast("Failed to search for users", "error");
+                    toast("Failed to search for users: " + res.data.error, "error");
                     return;
                 }
                 userSearchResults.value = res.data.filter(user => {
@@ -80,7 +80,7 @@ export class Popups {
             return CommonTemplates.addUserButton(result.username, () => {
                 Api.addBridgedUser(result.id, instance.id).then((res) => {
                     if (res.status !== 200) {
-                        toast("Failed to add user", "error");
+                        toast("Failed to add user: " + res.data.error, "error");
                         removePopups();
                         return;
                     }
@@ -96,7 +96,7 @@ export class Popups {
         popup(PopupComponents.confirmPopup("Are you sure you want to delete this user?", () => {
             Api.deleteUser(user.id).then((res) => {
                 if (res.status !== 200) {
-                    toast("Failed to delete user", "error");
+                    toast("Failed to delete user: " + res.data.error, "error");
                     removePopups();
                     return;
                 }
@@ -123,12 +123,28 @@ export class Popups {
             Api.changePassword(oldPassword, newPassword).then((res) => {
                 if (res.status !== 200) {
                     errorState.value = res.data.error;
-                    toast("Failed to update password", "error");
+                    toast("Failed to update password: " + res.data.error, "error");
                     return;
                 }
                 toast("Password updated", "success");
                 removePopups();
             });
         }));
+    }
+
+    static deleteAccount(user) {
+        popup(PopupComponents.confirmPopup("Are you sure you want to delete your account?", () => {
+            Api.deleteUser(user.value.id).then((res) => {
+                if (res.status !== 200) {
+                    toast("Failed to delete user: " + res.data.error, "error");
+                    removePopups();
+                    return;
+                }
+                toast("User deleted", "success");
+                window.router.navigate("/logout");
+            });
+        }, () => {
+            removePopups();
+        }, "Delete account", "Yes", "No", "delete", "close"));
     }
 }

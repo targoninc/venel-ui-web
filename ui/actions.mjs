@@ -79,7 +79,7 @@ export const testImage = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgAAAAIA
 export function toggleAllowlist(instances, instance) {
     Api.toggleAllowlist(instance.id).then(res => {
         if (res.status === 200) {
-            toast("Allowlist toggled", "positive");
+            toast("Allowlist toggled", "success");
             instances.value = instances.value.map(i => {
                 if (i.id === instance.id) {
                     return {
@@ -90,7 +90,7 @@ export function toggleAllowlist(instances, instance) {
                 return i;
             });
         } else {
-            toast("Failed to toggle allowlist", "negative");
+            toast("Failed to toggle allowlist: " + res.data.error, "error");
         }
     });
 }
@@ -98,7 +98,7 @@ export function toggleAllowlist(instances, instance) {
 export function toggleInstanceEnabled(instances, instance) {
     Api.toggleEnabled(instance.id).then(res => {
         if (res.status === 200) {
-            toast("Instance enabled toggled", "positive");
+            toast("Instance enabled toggled", "success");
             instances.value = instances.value.map(i => {
                 if (i.id === instance.id) {
                     return {
@@ -109,7 +109,7 @@ export function toggleInstanceEnabled(instances, instance) {
                 return i;
             });
         } else {
-            toast("Failed to toggle instance enabled", "negative");
+            toast("Failed to toggle instance enabled: " + res.data.error, "error");
         }
     });
 }

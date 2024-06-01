@@ -138,6 +138,11 @@ button.positive, input.positive, textarea.positive, select.positive {
     color: var(--green);
 }
 
+button.negative, input.negative, textarea.negative, select.negative {
+    border: var(--input-border-width) solid var(--red);
+    color: var(--red);
+}
+
 button.double, input.double, textarea.double, select.double {
     padding: var(--input-padding-v) calc(var(--input-padding-h) * 2);
 }

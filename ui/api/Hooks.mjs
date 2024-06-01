@@ -23,7 +23,7 @@ export class Hooks {
                     Hooks.runActiveChannel(channel.id);
                 }
             } else {
-                toast("Failed to fetch channels", "negative");
+                toast("Failed to fetch channels: " + res.data.error, "negative");
                 store().setSignalValue('channels', []);
             }
         });
@@ -40,7 +40,7 @@ export class Hooks {
             if (res.status === 200) {
                 setMessages(channel, res.data);
             } else {
-                toast("Failed to fetch messages", "negative");
+                toast("Failed to fetch messages: " + res.data.error, "negative");
             }
         });
     }

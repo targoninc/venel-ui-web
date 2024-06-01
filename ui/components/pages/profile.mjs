@@ -42,13 +42,13 @@ export class ProfileComponent {
         const updateUser = () => {
             Api.updateUser(username.value, displayname.value, description.value).then((res) => {
                 if (res.status !== 200) {
-                    toast("Failed to update user info", "error");
+                    toast("Failed to update user info: " + res.data.error, "error");
                     return;
                 }
                 toast("User info updated", "success");
                 Api.getUser().then((res) => {
                     if (res.status !== 200) {
-                        toast("Failed to get user info", "error");
+                        toast("Failed to get user info: " + res.data.error, "error");
                         return;
                     }
                     store().setSignalValue('user', res.data.user);
@@ -134,7 +134,10 @@ export class ProfileComponent {
             .children(
                 CommonTemplates.buttonWithIcon("password", "Change password", () => {
                     Popups.updatePassword(user);
-                })
+                }),
+                CommonTemplates.buttonWithIcon("delete", "Delete account", () => {
+                    Popups.deleteAccount(user);
+                }, ["negative"])
             ).build();
     }
 }

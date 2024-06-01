@@ -9,7 +9,7 @@ export class LogoutComponent {
             if (res.status === 200) {
                 window.router.navigate('login');
             } else {
-                toast("Failed to log out", "negative");
+                toast("Failed to log out: " + res.data.error, "error");
             }
         });
 

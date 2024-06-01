@@ -101,10 +101,10 @@ export class RegisterComponent {
                                     Api.register(username.value, password.value).then((res) => {
                                         loading.value = false;
                                         if (res.status === 200) {
-                                            toast("Registration successful", "positive");
+                                            toast("Registration successful", "success");
                                             window.router.navigate("chat");
                                         } else {
-                                            toast("Registration failed: " + res.data.error, "negative");
+                                            toast("Registration failed: " + res.data.error, "error");
                                         }
                                     }).catch(() => {
                                         loading.value = false;

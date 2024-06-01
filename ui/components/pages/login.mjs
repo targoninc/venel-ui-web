@@ -95,10 +95,10 @@ export class LoginComponent {
                                         loading.value = false;
                                         if (res.status !== 200) {
                                             actionError.value = res.data.error;
-                                            toast("Login failed", "negative");
+                                            toast("Login failed: " + res.data.error, "error");
                                         } else {
                                             actionError.value = null;
-                                            toast("Login successful", "positive");
+                                            toast("Login successful", "success");
                                             window.router.navigate("chat");
                                         }
                                     });
