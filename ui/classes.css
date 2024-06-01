@@ -220,9 +220,7 @@
 .chat-messages {
     padding: var(--gap-v);
     flex-grow: 1;
-}
-
-.chat-messages {
+    border-left: 1px solid var(--bg-4);
     overflow-y: auto;
 }
 
