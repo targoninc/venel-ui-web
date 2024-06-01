@@ -35,16 +35,25 @@ export class LiveInstance {
         }
         this.server = new WebSocket(encodeURI(`${res.data}?cid=${connectSid}`));
         this.server.onopen = () => {
+            console.log("Connected to live server!");
             this.onStart();
         };
 
         this.server.onclose = () => {
             this.onStop();
+            setTimeout(() => {
+                console.log("Reconnecting to live server...");
+                this.start();
+            }, 1000);
         };
+
+        this.server.onerror = (error) => {
+            console.error("WebSocket error", error);
+        }
 
         this.server.onmessage = (event) => {
             const data = JSON.parse(event.data);
-            console.log(data);
+            console.log('Received live message', data);
             switch (data.type) {
                 case "message":
                     addMessage(data.message.channelId, data.message);
