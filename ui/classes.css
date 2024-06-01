@@ -394,6 +394,8 @@
     animation: fade-out var(--animation-time) forwards;
     transition: transform var(--animation-time) ease;
     cursor: pointer;
+    max-width: max-content;
+    align-self: end;
 }
 
 .notification:hover {
@@ -427,6 +429,6 @@
     word-wrap: anywhere;
 }
 
-.notification-message {
+.notification-subtitle, .notification-message {
     font-size: 0.8em;
 }

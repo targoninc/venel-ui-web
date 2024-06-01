@@ -4,6 +4,7 @@ import {CommonTemplates} from "../common.mjs";
 import {Store} from "../../api/Store.mjs";
 import {Api} from "../../api/Api.mjs";
 import {toast} from "../../actions.mjs";
+import {Live} from "../../live/Live.mjs";
 
 export class ProfileComponent {
     static render() {
@@ -80,7 +81,6 @@ export class ProfileComponent {
     }
 
     static uploadAvatar(avatar) {
-        const oldValue = avatar.value;
         const input = document.createElement('input');
         input.type = 'file';
         input.accept = 'image/*';
@@ -89,14 +89,9 @@ export class ProfileComponent {
             reader.onload = () => {
                 const base64 = reader.result.toString();
                 avatar.value = base64;
-                Api.updateAvatar(base64).then((res) => {
-                    if (res.status !== 200) {
-                        toast("Failed to update avatar: " + res.data.error, "error");
-                        avatar.value = oldValue;
-                        return;
-                    }
-
-                    toast("Avatar updated", "success");
+                Live.send({
+                    type: "updateAvatar",
+                    avatar: base64
                 });
             };
             reader.readAsDataURL(input.files[0]);

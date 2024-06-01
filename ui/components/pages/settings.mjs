@@ -3,7 +3,15 @@ import {computedSignal, create, ifjs, signal, signalFromProperty, signalMap} fro
 import {CommonTemplates} from "../common.mjs";
 import {Store} from "../../api/Store.mjs";
 import {Api} from "../../api/Api.mjs";
-import {popup, removePopups, testImage, toast, toggleAllowlist, toggleInstanceEnabled} from "../../actions.mjs";
+import {
+    playSound,
+    popup,
+    removePopups,
+    testImage,
+    toast,
+    toggleAllowlist,
+    toggleInstanceEnabled
+} from "../../actions.mjs";
 import {PopupComponents} from "../popup.mjs";
 import {Popups} from "../../api/Popups.mjs";
 import {
@@ -409,12 +417,18 @@ export class SettingsComponent {
                         CommonTemplates.circleToggle(systemNotifText, system_notifs_color, () => { system_notifs_on.value = !system_notifs_on.value }),
                         CommonTemplates.circleToggle(soundText, sound_color, () => { sound_on.value = !sound_on.value }),
                         CommonTemplates.select("New message sound", [
-                            { text: "Bloom", value: "bloom" },
-                            { text: "Chord", value: "chord" },
-                            { text: "Drop", value: "drop" },
-                            { text: "Sky", value: "sky" },
+                            { text: "Bloom", value: "bloom.mp3" },
+                            { text: "Chord", value: "chord.mp3" },
+                            { text: "Drop", value: "drop.mp3" },
+                            { text: "Sky", value: "sky.mp3" },
+                            { text: "Affirm", value: "affirm.wav" },
+                            { text: "Hello", value: "hello.wav" },
+                            { text: "In", value: "in.wav" },
+                            { text: "Log", value: "log.wav" },
+                            { text: "Out", value: "out.wav" },
                         ], sound, (e) => {
                             sound.value = e.target.value;
+                            playSound(sound.value);
                         })
                     ).build(),
             ).build();
