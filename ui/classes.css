@@ -178,7 +178,7 @@
 }
 
 .main-card {
-    width: min(100%, 500px);
+    width: min(100%, 800px);
     justify-content: space-between;
 }
 
