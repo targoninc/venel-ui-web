@@ -163,6 +163,7 @@ export class ChatComponent {
                     })
                     .children(
                         ifjs(menuShown, ChatComponent.messageMenu(message, messages, messageMenuPositionX, messageMenuPositionY)),
+                        ChatComponent.reactionTrigger(message, messages),
                         create("span")
                             .classes("message-text")
                             .text(message.text)
@@ -207,6 +208,90 @@ export class ChatComponent {
                     });
                     removeMessage(message.channelId, message.id);
                 })),
+            ).build();
+    }
+
+    static reactionTrigger(message, messages) {
+        const menuShown = signal(false);
+
+        return create("div")
+            .classes("reaction-trigger", "flex")
+            .children(
+                CommonTemplates.buttonWithIcon("add_reaction", "React", e => {
+                    e.preventDefault();
+                    menuShown.value = true;
+                    setTimeout(() => {
+                        document.addEventListener("click", (e) => {
+                            if (e.target.closest(".reaction-menu")) {
+                                return;
+                            }
+                            menuShown.value = false;
+                        }, {once: true});
+                    }, 0);
+                }),
+                ifjs(menuShown, ChatComponent.reactionMenu(message, messages)),
+                // TODO: Add reactions existing on message
+            ).build();
+    }
+
+    static reactionMenu(message) {
+        const reactions = Store.get("reactions");
+        const groups = Store.get("reactionGroups");
+        const search = signal("");
+        const filteredReactions = computedSignal(search, search => {
+            return reactions.value.filter(reaction => reaction.identifier.includes(search));
+        });
+        const groupedFilteredReactions = computedSignal(filteredReactions, (reactions) => {
+            const out = {};
+            reactions.forEach(reaction => {
+                const group = groups.value.find(group => group.id === reaction.groupId);
+                if (!out[group.id]) {
+                    out[group.id] = [];
+                }
+                out[group.id].push(reaction);
+            });
+            return out;
+        });
+
+        return create("div")
+            .classes("reaction-menu", "card", "flex-v")
+            .children(
+                CommonTemplates.input("text", "reaction_search", "Search reactions", "👀", search, () => {}, false, "off", () => {}, (e) => {
+                    search.value = e.target.value;
+                }),
+                signalMap(groups, create("div")
+                    .classes("flex-v", "reaction-icons"),
+                    group => ChatComponent.reactionGroup(group, groupedFilteredReactions, message)),
+            ).build();
+    }
+
+    static reaction(reaction, message) {
+        return create("div")
+            .classes("reaction-icon")
+            .text(reaction.content)
+            .on("click", () => {
+                Live.send({
+                    type: "addReaction",
+                    messageId: message.id,
+                    reactionId: reaction.id,
+                });
+            }).build();
+    }
+
+    static reactionGroup(group, groupedFilteredReactions, message) {
+        const reactions = computedSignal(groupedFilteredReactions, reactions => reactions[group.id] || []);
+        const hasReactions = computedSignal(reactions, reactions => reactions.length > 0);
+
+        return create("div")
+            .classes("flex-v")
+            .children(
+                ifjs(hasReactions, create("h3")
+                    .classes("text-small")
+                    .text(group.display)
+                    .build()),
+                signalMap(reactions, create("div")
+                        .classes("flex"),
+                    reaction => ChatComponent.reaction(reaction, message))
             ).build();
     }
 }

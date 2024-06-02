@@ -1,5 +1,7 @@
 import {signal, store} from "https://fjs.targoninc.com/f.js";
 import {currentCallSound, currentSound, setCurrentCallSound, setCurrentSound} from "./LocalSetting.mjs";
+import {Api} from "./Api.mjs";
+import {toast} from "../actions.mjs";
 
 export class Store {
     static clear() {
@@ -24,6 +26,20 @@ export class Store {
         if (!currentCallSound()) {
             setCurrentCallSound("blossom.mp3");
         }
+        Api.getReactionGroups().then(res => {
+            if (res.status === 200) {
+                store().setSignalValue('reactionGroups', res.data);
+            } else {
+                toast("Failed to get reaction groups: " + res.data.error, "error");
+            }
+        });
+        Api.getAvailableReactions().then(res => {
+            if (res.status === 200) {
+                store().setSignalValue('reactions', res.data);
+            } else {
+                toast("Failed to get available reactions: " + res.data.error, "error");
+            }
+        });
     }
 
     static definition = {
@@ -42,6 +58,14 @@ export class Store {
         selectedMessageId: {
             type: "number",
             default: 0,
+        },
+        reactions: {
+            type: "array",
+            default: signal([]),
+        },
+        reactionGroups: {
+            type: "array",
+            default: signal([]),
         },
     }
 }

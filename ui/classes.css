@@ -227,6 +227,7 @@
 .chat-user {
     margin-top: var(--gap-v);
     position: relative;
+    z-index: 1;
 }
 
 .rounded-max {
@@ -266,6 +267,7 @@
     padding: 0.25em;
     border-radius: var(--input-border-radius);
     word-wrap: anywhere;
+    position: relative;
 }
 
 .message-menu {
@@ -286,6 +288,34 @@
 
 .message-content:hover {
     background: var(--bg-2);
+}
+
+.reaction-trigger {
+    display: none;
+    position: absolute;
+    left: 4em;
+    top: 100%;
+    z-index: 999;
+    max-width: max-content;
+}
+
+.message-content:hover .reaction-trigger {
+    display: flex;
+}
+
+.reaction-icons {
+    max-width: 400px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.reaction-icon {
+    cursor: pointer;
+    font-size: 1.5em;
+}
+
+.reaction-icon:hover {
+    transform: scale(1.1);
 }
 
 .close-button {
@@ -379,6 +409,10 @@
 
 .fixed {
     position: fixed;
+}
+
+.hidden {
+    display: none;
 }
 
 .collapsible-content {

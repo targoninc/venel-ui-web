@@ -52,6 +52,12 @@ export class Api extends ApiBase {
     static async removeRoleFromUser(userId = null, roleId = null) {
         return await this.delete("/api/auth/removeRoleFromUser", {userId, roleId});
     }
+    static async getAvailableReactions() {
+        return await this.get("/api/reactions/getAvailableReactions", {});
+    }
+    static async getReactionGroups() {
+        return await this.get("/api/reactions/getReactionGroups", {});
+    }
     static async sendMessage(channelId = null, text = null) {
         return await this.post("/api/messaging/sendMessage", {channelId, text});
     }

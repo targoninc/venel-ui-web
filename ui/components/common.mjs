@@ -223,7 +223,7 @@ export class CommonTemplates {
             ).build();
     }
 
-    static input(type, id, label, placeholder, value, onchange, required = true, autocomplete = "off", onkeydown = () => {}) {
+    static input(type, id, label, placeholder, value, onchange, required = true, autocomplete = "off", onkeydown = () => {}, ontype = () => {}) {
         return create("div")
             .classes("flex-v", "small-gap")
             .children(
@@ -242,6 +242,7 @@ export class CommonTemplates {
                             e.preventDefault();
                             onkeydown(e);
                         }
+                        ontype(e);
                     })
                     .autocomplete(autocomplete)
                     .build()
