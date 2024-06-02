@@ -280,6 +280,10 @@
     max-width: max-content;
 }
 
+.message-menu.no-content {
+    padding: 0;
+}
+
 .message-content:hover {
     background: var(--bg-2);
 }

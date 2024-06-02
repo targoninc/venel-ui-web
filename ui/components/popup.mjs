@@ -78,6 +78,30 @@ export class PopupComponents {
             ).build();
     }
 
+    static simpleTextEditPopup(title, text, onconfirm, oncancel) {
+        const textValue = signal(text);
+        return create("div")
+            .classes("card")
+            .children(
+                create("div")
+                    .classes("flex-v")
+                    .children(
+                        create("h3")
+                            .text(title)
+                            .build(),
+                        CommonTemplates.textArea(textValue, "text", null, "Enter text here...", ["flex-grow"], ["full-width-h"], () => {
+                            onconfirm(textValue.value);
+                        }),
+                        create("div")
+                            .classes("flex", "space-between")
+                            .children(
+                                CommonTemplates.buttonWithIcon("close", "Cancel", oncancel),
+                                CommonTemplates.buttonWithIcon("check", "Confirm", () => onconfirm(textValue.value)),
+                            ).build()
+                    ).build()
+            ).build();
+    }
+
     static changePassword(onconfirm = (oldPass, newPass, errorState) => {}, oncancel = () => {}) {
         const oldPassword = signal("");
         const newPassword = signal("");

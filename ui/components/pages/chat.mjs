@@ -1,4 +1,4 @@
-import {computedSignal, create, ifjs, signal, signalMap} from "https://fjs.targoninc.com/f.js";
+import {computedSignal, create, ifjs, signal, signalFromProperty, signalMap} from "https://fjs.targoninc.com/f.js";
 import {LayoutTemplates} from "../layout.mjs";
 import {Store} from "../../api/Store.mjs";
 import {CommonTemplates} from "../common.mjs";
@@ -7,6 +7,7 @@ import {Time} from "../../tooling/Time.mjs";
 import {Live} from "../../live/Live.mjs";
 import {ChannelTemplates} from "../channel.mjs";
 import {testImage} from "../../actions.mjs";
+import {Popups} from "../../api/Popups.mjs";
 
 export class ChatComponent {
     static render(params) {
@@ -161,7 +162,7 @@ export class ChatComponent {
                         });
                     })
                     .children(
-                        ifjs(menuShown, ChatComponent.messageMenu(message, messageMenuPositionX, messageMenuPositionY)),
+                        ifjs(menuShown, ChatComponent.messageMenu(message, messages, messageMenuPositionX, messageMenuPositionY)),
                         create("span")
                             .classes("message-text")
                             .text(message.text)
@@ -182,24 +183,30 @@ export class ChatComponent {
             ).build();
     }
 
-    static messageMenu(message, posX, posY) {
+    static messageMenu(message, messages, posX, posY) {
         const posXR = computedSignal(posX, x => x + "px");
         const posYR = computedSignal(posY, y => y + "px");
+        const user = Store.get("user");
+        const permissions = signalFromProperty(user, "permissions");
+        const sameUser = computedSignal(user, u => u.id === message.sender.id);
+        const hasDeletePermission = computedSignal(permissions, p => p.some(perm => perm.name === "deleteMessage"));
+        const canDelete = computedSignal(sameUser, isSame => isSame || hasDeletePermission.value);
+        const menuClass = computedSignal(canDelete, can => (can || sameUser.value) ? "_" : "no-content");
 
         return create("div")
-            .classes("message-menu", "flex-v")
+            .classes("message-menu", "flex-v", menuClass)
             .styles("top", posYR, "left", posXR)
             .children(
-                CommonTemplates.buttonWithIcon("edit", "Edit", () => {
-                    // TODO: Implement edit message
-                }),
-                CommonTemplates.buttonWithIcon("delete", "Delete", () => {
+                ifjs(sameUser, CommonTemplates.buttonWithIcon("edit", "Edit", () => {
+                    Popups.editMessage(message, messages);
+                })),
+                ifjs(canDelete, CommonTemplates.buttonWithIcon("delete", "Delete", () => {
                     Live.send({
                         type: "removeMessage",
                         messageId: message.id,
                     });
                     removeMessage(message.channelId, message.id);
-                }),
+                })),
             ).build();
     }
 }

@@ -34,6 +34,7 @@ export function setSystemNotificationsEnabled(enabled) {
             if (permission === "granted") {
                 LocalSetting.set("systemNotifications", true);
             } else {
+                console.warn("System notifications permission denied");
                 LocalSetting.set("systemNotifications", false);
             }
         });

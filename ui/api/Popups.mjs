@@ -5,6 +5,7 @@ import {Live} from "../live/Live.mjs";
 import {CommonTemplates} from "../components/common.mjs";
 import {signal} from "https://fjs.targoninc.com/f.js";
 import {Store} from "./Store.mjs";
+import {removeMessage} from "./Hooks.mjs";
 
 export class Popups {
     static newDm() {
@@ -45,8 +46,8 @@ export class Popups {
                     }
                     toast("DM created", "success");
                     Live.send({
-                        type: "createChannel",
-                        channelId: res.data.id,
+                        type: "channelCreated",
+                        channelId: res.data.channelId,
                     });
                     removePopups();
                     window.router.navigate(`/chat/${res.data.id}`);
@@ -161,5 +162,29 @@ export class Popups {
         }, () => {
             removePopups();
         }, "Remove instance", "Yes", "No", "delete", "close"));
+    }
+
+    static editMessage(message, messages) {
+        popup(PopupComponents.simpleTextEditPopup("Edit message", message.text, (text) => {
+            if (text.trim().length === 0) {
+                Live.send({
+                    type: "removeMessage",
+                    messageId: message.id,
+                });
+                removeMessage(message.channelId, message.id);
+            }
+
+            Live.send({
+                type: "editMessage",
+                messageId: message.id,
+                text: text,
+            });
+            messages.value = messages.value.map(m => {
+                if (m.id === message.id) {
+                    m.text = text;
+                }
+                return m;
+            });
+        }));
     }
 }
