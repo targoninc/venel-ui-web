@@ -134,14 +134,20 @@ export class ChatComponent {
         const menuShown = signal(false);
         const messageMenuPositionX = signal(0);
         const messageMenuPositionY = signal(0);
+        const cardShown = signal(false);
 
         return create("div")
             .classes("chat-message", "flex-v", "no-gap")
             .children(
                 ifjs(shouldDisplaySender, create("div")
-                    .classes("flex", "align-center")
+                    .classes("flex", "align-center", "relative")
                     .children(
-                        CommonTemplates.chatUser(message.sender.avatar ?? testImage, message.sender.displayname ?? message.sender.username, () => {})
+                        CommonTemplates.chatUser(message.sender.avatar ?? testImage, message.sender.displayname ?? message.sender.username, () => {
+                            cardShown.value = true;
+                        }, () => {
+                            cardShown.value = true;
+                        }),
+                        CommonTemplates.profileCard(message.sender, cardShown),
                     ).build()),
                 create("div")
                     .classes("message-content", "flex", "space-between", "full-width")

@@ -95,6 +95,10 @@ export class ProfileComponent {
                     type: "updateAvatar",
                     avatar: base64
                 });
+                Store.get('user').value = {
+                    ...Store.get('user').value,
+                    avatar: base64
+                };
             };
             reader.readAsDataURL(input.files[0]);
         };

@@ -129,6 +129,39 @@ export class CommonTemplates {
             ).build();
     }
 
+    static profileCard(user, shown) {
+        const cardStyle = computedSignal(shown, isShown => isShown ? "flex" : "none");
+        shown.subscribe(is => {
+            if (is) {
+                setTimeout(() => {
+                    document.addEventListener("click", () => {
+                        shown.value = false;
+                    }, {once: true});
+                }, 0);
+            }
+        })
+
+        return create("div")
+            .classes("flex-v", "profile-card")
+            .styles("display", cardStyle)
+            .children(
+                create("img")
+                    .classes("big-avatar")
+                    .src(user.avatar ?? testImage)
+                    .build(),
+                create("span")
+                    .classes("bold")
+                    .text(user.displayname ?? user.username)
+                    .build(),
+                create("span")
+                    .text(user.username)
+                    .build(),
+                create("p")
+                    .text(user.description)
+                    .build(),
+            ).build();
+    }
+
     static circleToggle(text, color = "var(--blue)", onclick = () => {}) {
         return create("div")
             .classes("flex", "align-center", "circle-toggle")
@@ -353,10 +386,23 @@ export class CommonTemplates {
             ).build();
     }
 
-    static chatUser(avatar, name, onclick) {
+    static chatUser(avatar, name, onclick, onlonghover = () => {}, onhoverout = () => {}) {
+        let timeout = null;
+
         return create("div")
             .classes("flex", "align-center", "chat-user")
             .onclick(onclick)
+            .onmouseenter(() => {
+                timeout = setTimeout((e) => {
+                    onlonghover(e);
+                }, 1000);
+            })
+            .onmouseleave((e) => {
+                if (timeout) {
+                    clearTimeout(timeout);
+                    onhoverout(e);
+                }
+            })
             .children(
                 CommonTemplates.icon(avatar, ["round", "message-avatar"]),
                 create("span")
