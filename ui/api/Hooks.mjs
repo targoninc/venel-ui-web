@@ -63,6 +63,10 @@ export function addMessage(channel, message) {
 
     const ex = store().get('messages').value;
     setChannel(ex, channel);
+
+    if (ex[channel].find((m) => m.id === message.id)) {
+        return;
+    }
     store().setSignalValue('messages', {...ex, [channel]: [...ex[channel], message]});
 
     const user = Store.get('user');
@@ -105,7 +109,7 @@ export function addChannel(channel) {
         store().set('channels', signal([]));
     }
 
-    if (store().get('channels').value.includes(channel)) {
+    if (store().get('channels').value.some((c) => c.id === channel.id)) {
         return;
     }
 

@@ -172,7 +172,7 @@ export class ChatComponent {
                             .children(
                                 ifjs(edited, create("span")
                                     .classes("message-note")
-                                    .text("edited")
+                                    .text("edited " + Time.ago(new Date(message.updatedAt).getTime() + offset))
                                     .build()),
                                 create("span")
                                     .classes("message-timestamp", "text-small")

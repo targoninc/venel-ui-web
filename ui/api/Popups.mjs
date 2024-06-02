@@ -130,6 +130,8 @@ export class Popups {
                 toast("Password updated", "success");
                 removePopups();
             });
+        }, () => {
+            removePopups();
         }));
     }
 
@@ -185,6 +187,9 @@ export class Popups {
                 }
                 return m;
             });
+            removePopups();
+        }, () => {
+            removePopups();
         }));
     }
 }
