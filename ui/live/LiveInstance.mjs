@@ -7,6 +7,7 @@ export class LiveInstance {
         this.onStop = onStop;
         this.onStart = onStart;
         this.server = null;
+        this.interval = null;
 
         this.start();
     }
@@ -18,6 +19,19 @@ export class LiveInstance {
         }
 
         return null;
+    }
+
+    async startPing() {
+        if (!this.server || this.interval) {
+            return;
+        }
+
+        this.interval = setInterval(() => {
+            if (this.server.readyState !== WebSocket.OPEN) {
+                return;
+            }
+            this.server.send(JSON.stringify({type: "ping"}));
+        }, 10000);
     }
 
     async start() {
@@ -35,6 +49,7 @@ export class LiveInstance {
         this.server.onopen = () => {
             console.log("Connected to live server!");
             this.onStart();
+            this.startPing();
         };
 
         this.server.onclose = () => {

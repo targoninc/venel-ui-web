@@ -147,4 +147,19 @@ export class Popups {
             removePopups();
         }, "Delete account", "Yes", "No", "delete", "close"));
     }
+
+    static removeInstancePopup(instance, instances) {
+        popup(PopupComponents.confirmPopup(`Are you sure you want to remove ${instance.url} from bridged instances?`, () => {
+            Api.removeInstance(instance.id).then(res => {
+                if (res.status === 200) {
+                    toast("Bridged instance removed", "success");
+                    instances.value = instances.value.filter(i => i.id !== instance.id);
+                } else {
+                    toast("Failed to remove bridged instance: " + res.data.error, "error");
+                }
+            });
+        }, () => {
+            removePopups();
+        }, "Remove instance", "Yes", "No", "delete", "close"));
+    }
 }

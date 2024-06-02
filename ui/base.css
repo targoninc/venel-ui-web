@@ -143,6 +143,11 @@ button.negative, input.negative, textarea.negative, select.negative {
     color: var(--red);
 }
 
+button.sensitive, input.sensitive, textarea.sensitive, select.sensitive {
+    border: var(--input-border-width) solid var(--yellow);
+    color: var(--yellow);
+}
+
 button.double, input.double, textarea.double, select.double {
     padding: var(--input-padding-v) calc(var(--input-padding-h) * 2);
 }

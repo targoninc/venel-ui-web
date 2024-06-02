@@ -160,7 +160,8 @@ export class SettingsComponent {
         const instanceInfo = signal({
             url: "",
             useAllowlist: false,
-            enabled: true
+            enabled: true,
+            allowList: [],
         });
         const url = signalFromProperty(instanceInfo, 'url');
         const useAllowlist = signalFromProperty(instanceInfo, 'useAllowlist');
@@ -242,14 +243,7 @@ export class SettingsComponent {
                                 ifjs(instance.enabled, CommonTemplates.circleToggle("Enabled", "var(--green)", () => toggleInstanceEnabled(instances, instance))),
                                 ifjs(instance.enabled, CommonTemplates.circleToggle("Disabled", "var(--red)", () => toggleInstanceEnabled(instances, instance)), true),
                                 ifjs(hasRemovePermission, CommonTemplates.buttonWithIcon("delete", "Remove", () => {
-                                    Api.removeInstance(instance.id).then(res => {
-                                        if (res.status === 200) {
-                                            toast("Bridged instance removed", "success");
-                                            instances.value = instances.value.filter(i => i.id !== instance.id);
-                                        } else {
-                                            toast("Failed to remove bridged instance: " + res.data.error, "error");
-                                        }
-                                    });
+                                    Popups.removeInstancePopup(instance, instances);
                                 })),
                             ).build(),
                     ).build(),

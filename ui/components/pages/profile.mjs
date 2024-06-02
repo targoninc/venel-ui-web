@@ -3,7 +3,7 @@ import {computedSignal, create, signal, signalFromProperty, store} from "https:/
 import {CommonTemplates} from "../common.mjs";
 import {Store} from "../../api/Store.mjs";
 import {Api} from "../../api/Api.mjs";
-import {toast} from "../../actions.mjs";
+import {testImage, toast} from "../../actions.mjs";
 import {Live} from "../../live/Live.mjs";
 import {Popups} from "../../api/Popups.mjs";
 
@@ -106,7 +106,8 @@ export class ProfileComponent {
     }
 
     static avatarSection(user) {
-        const avatar = signalFromProperty(user, "avatar");
+        const realAvatar = signalFromProperty(user, "avatar");
+        const avatar = computedSignal(realAvatar, av => av ?? testImage);
         const buttonText = signal("Upload avatar");
 
         return create("div")
@@ -128,20 +129,32 @@ export class ProfileComponent {
                     buttonText.value = "Uploading...";
                     ProfileComponent.uploadAvatar(avatar);
                     buttonText.value = "Upload avatar";
-                })
+                }),
+                CommonTemplates.buttonWithIcon("delete", "Delete avatar", () => {
+                    Live.send({
+                        type: "updateAvatar",
+                        avatar: null
+                    });
+                    Store.get('user').value = {
+                        ...Store.get('user').value,
+                        avatar: null
+                    };
+                }, ["negative"])
             ).build();
     }
 
     static accountSection(user) {
-        return create("div")
-            .classes("flex-v")
-            .children(
-                CommonTemplates.buttonWithIcon("password", "Change password", () => {
-                    Popups.updatePassword(user);
-                }),
-                CommonTemplates.buttonWithIcon("delete", "Delete account", () => {
-                    Popups.deleteAccount(user);
-                }, ["negative"])
-            ).build();
+        return LayoutTemplates.collapsible("Account",
+            create("div")
+                .classes("flex-v")
+                .children(
+                    CommonTemplates.buttonWithIcon("password", "Change password", () => {
+                        Popups.updatePassword(user);
+                    }, ["sensitive"]),
+                    CommonTemplates.buttonWithIcon("delete", "Delete account", () => {
+                        Popups.deleteAccount(user);
+                    }, ["negative"])
+                ).build()
+        );
     }
 }
