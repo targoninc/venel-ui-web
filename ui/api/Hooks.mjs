@@ -128,3 +128,19 @@ export function setActiveChannel(channel) {
     store().set('activeChannel', signal(channel));
     Hooks.runActiveChannel(channel);
 }
+
+export function addReaction(messageId, reactionId, userId) {
+    if (!store().get('messages')) {
+        store().set('messages', signal({}));
+    }
+
+    const ex = store().get('messages').value;
+    for (const channel in ex) {
+        const message = ex[channel].find((m) => m.id === messageId);
+        if (message) {
+            message.reactions.push({ id: reactionId, userId });
+            store().setSignalValue('messages', ex);
+            return;
+        }
+    }
+}

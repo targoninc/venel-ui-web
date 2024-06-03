@@ -214,10 +214,17 @@ export class ChatComponent {
 
     static reactionTrigger(message, messages) {
         const menuShown = signal(false);
+        const reactions = message.reactions.map(reaction => {
+            return {
+                ...reaction,
+                content: Store.get("reactions").value.find(r => r.id === reaction.id).content,
+            };
+        });
 
         return create("div")
             .classes("reaction-trigger", "flex")
             .children(
+                ifjs(reactions.length > 0, ChatComponent.reactionDisplay(reactions)),
                 CommonTemplates.buttonWithIcon("add_reaction", "React", e => {
                     e.preventDefault();
                     menuShown.value = true;
@@ -229,9 +236,8 @@ export class ChatComponent {
                             menuShown.value = false;
                         }, {once: true});
                     }, 0);
-                }),
+                }, ["reaction-button"]),
                 ifjs(menuShown, ChatComponent.reactionMenu(message, messages)),
-                // TODO: Add reactions existing on message
             ).build();
     }
 
@@ -293,6 +299,33 @@ export class ChatComponent {
                 signalMap(reactions, create("div")
                         .classes("flex"),
                     reaction => ChatComponent.reaction(reaction, message))
+            ).build();
+    }
+
+    static reactionDisplay(reactions) {
+        const reactionCounts = {};
+        reactions.forEach(reaction => {
+            if (!reactionCounts[reaction.id]) {
+                reactionCounts[reaction.id] = 0;
+            }
+            reactionCounts[reaction.id]++;
+        });
+        const uniqueReactions = reactions.filter((reaction, index, self) => {
+            return self.findIndex(r => r.id === reaction.id) === index;
+        });
+        const user = Store.get("user");
+
+        return create("div")
+            .classes("flex")
+            .children(
+                uniqueReactions.map(reaction => {
+                    const activeClass = reactions.some(r => r.id === reaction.id && r.userId === user.value.id) ? "active" : "_";
+
+                    return create("div")
+                        .classes("reaction-display", "pill", activeClass)
+                        .text(reaction.content + " " + reactionCounts[reaction.id])
+                        .build();
+                }),
             ).build();
     }
 }

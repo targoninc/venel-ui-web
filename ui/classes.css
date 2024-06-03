@@ -291,7 +291,6 @@
 }
 
 .reaction-trigger {
-    display: none;
     position: absolute;
     left: 4em;
     top: 100%;
@@ -299,14 +298,19 @@
     max-width: max-content;
 }
 
-.message-content:hover .reaction-trigger {
+.reaction-button {
+    display: none;
+}
+
+.message-content:hover .reaction-button {
     display: flex;
 }
 
 .reaction-icons {
     max-width: 400px;
-    max-height: 400px;
+    max-height: 300px;
     overflow-y: auto;
+    width: max-content;
 }
 
 .reaction-icon {
@@ -316,6 +320,25 @@
 
 .reaction-icon:hover {
     transform: scale(1.1);
+}
+
+.reaction-display {
+    font-size: 0.8em;
+    background: var(--bg-3);
+    border: var(--input-border-width) solid var(--bg-4);
+    padding: 0.3em 0.4em;
+    color: var(--text-3);
+    height: max-content;
+    cursor: pointer;
+}
+
+.reaction-display.active {
+    border: var(--input-border-width) solid var(--text-4);
+}
+
+.reaction-menu {
+    position: absolute;
+    top: calc(100% + var(--gap-h));
 }
 
 .close-button {
