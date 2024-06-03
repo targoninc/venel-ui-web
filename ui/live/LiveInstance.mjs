@@ -1,4 +1,4 @@
-import {addChannel, addMessage, addReaction, removeMessage} from "../api/Hooks.mjs";
+import {addChannel, addMessage, addReaction, removeMessage, removeReaction} from "../api/Hooks.mjs";
 import {toast} from "../actions.mjs";
 import {Api} from "../api/Api.mjs";
 
@@ -74,6 +74,9 @@ export class LiveInstance {
                     break;
                 case "addReaction":
                     addReaction(data.messageId, data.reactionId, data.userId);
+                    break;
+                case "removeReaction":
+                    removeReaction(data.messageId, data.reactionId, data.userId);
                     break;
                 case "removeMessage":
                     removeMessage(data.channelId, data.messageId);

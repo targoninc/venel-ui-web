@@ -6,7 +6,7 @@ import {Hooks, removeMessage} from "../../api/Hooks.mjs";
 import {Time} from "../../tooling/Time.mjs";
 import {Live} from "../../live/Live.mjs";
 import {ChannelTemplates} from "../channel.mjs";
-import {testImage} from "../../actions.mjs";
+import {playReactionAnimation, testImage} from "../../actions.mjs";
 import {Popups} from "../../api/Popups.mjs";
 
 export class ChatComponent {
@@ -137,6 +137,12 @@ export class ChatComponent {
         const messageMenuPositionX = signal(0);
         const messageMenuPositionY = signal(0);
         const cardShown = signal(false);
+        const reactions = message.reactions.map(reaction => {
+            return {
+                ...reaction,
+                content: Store.get("reactions").value.find(r => r.id === reaction.id).content,
+            };
+        });
 
         return create("div")
             .classes("chat-message", "flex-v", "no-gap")
@@ -165,10 +171,14 @@ export class ChatComponent {
                     .children(
                         ifjs(menuShown, ChatComponent.messageMenu(message, messages, messageMenuPositionX, messageMenuPositionY)),
                         ChatComponent.reactionTrigger(message, messages),
-                        create("span")
-                            .classes("message-text")
-                            .text(message.text)
-                            .build(),
+                        create("div")
+                            .classes("flex-v", "message-text")
+                            .children(
+                                create("span")
+                                    .text(message.text)
+                                    .build(),
+                                ifjs(reactions.length > 0, ChatComponent.reactionDisplay(reactions, message)),
+                            ).build(),
                         create("div")
                             .classes("flex-v", "no-gap")
                             .children(
@@ -214,18 +224,11 @@ export class ChatComponent {
 
     static reactionTrigger(message, messages) {
         const menuShown = signal(false);
-        const reactions = message.reactions.map(reaction => {
-            return {
-                ...reaction,
-                content: Store.get("reactions").value.find(r => r.id === reaction.id).content,
-            };
-        });
 
         return create("div")
             .classes("reaction-trigger", "flex")
             .children(
-                ifjs(reactions.length > 0, ChatComponent.reactionDisplay(reactions)),
-                CommonTemplates.buttonWithIcon("add_reaction", "React", e => {
+                CommonTemplates.buttonWithIcon("add_reaction", "", e => {
                     e.preventDefault();
                     menuShown.value = true;
                     setTimeout(() => {
@@ -276,12 +279,13 @@ export class ChatComponent {
         return create("div")
             .classes("reaction-icon")
             .text(reaction.content)
-            .on("click", () => {
+            .on("click", e => {
                 Live.send({
                     type: "addReaction",
                     messageId: message.id,
                     reactionId: reaction.id,
                 });
+                playReactionAnimation(reaction.content, e.clientX, e.clientY);
             }).build();
     }
 
@@ -302,7 +306,7 @@ export class ChatComponent {
             ).build();
     }
 
-    static reactionDisplay(reactions) {
+    static reactionDisplay(reactions, message) {
         const reactionCounts = {};
         reactions.forEach(reaction => {
             if (!reactionCounts[reaction.id]) {
@@ -324,6 +328,23 @@ export class ChatComponent {
                     return create("div")
                         .classes("reaction-display", "pill", activeClass)
                         .text(reaction.content + " " + reactionCounts[reaction.id])
+                        .onclick(e => {
+                            if (activeClass !== "active") {
+                                Live.send({
+                                    type: "addReaction",
+                                    messageId: message.id,
+                                    reactionId: reaction.id,
+                                });
+                                playReactionAnimation(reaction.content, e.clientX, e.clientY);
+                                return;
+                            }
+
+                            Live.send({
+                                type: "removeReaction",
+                                messageId: message.id,
+                                reactionId: reaction.id,
+                            });
+                        })
                         .build();
                 }),
             ).build();

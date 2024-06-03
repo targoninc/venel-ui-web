@@ -144,3 +144,24 @@ export function stopPlayingLoop() {
         });
     }
 }
+
+export function playReactionAnimation(content, x, y, count = 12) {
+    const directions = ["top", "top-right", "right", "bottom-right", "bottom", "bottom-left", "left", "top-left"];
+
+    for (let i = 0; i < count; i++) {
+        const direction = directions[Math.floor(Math.random() * directions.length)];
+        const particle = create("div")
+            .classes("reaction-particle")
+            .styles("left", `${x}px`, "top", `${y}px`)
+            .styles("animation-name", `reaction-${direction}`)
+            .styles("animation-delay", `${Math.random()}s`)
+            .text(content)
+            .build();
+
+        document.body.appendChild(particle);
+
+        setTimeout(() => {
+            particle.remove();
+        }, 2000);
+    }
+}

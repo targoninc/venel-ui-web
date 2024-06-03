@@ -29,9 +29,9 @@ export class CommonTemplates {
             .onclick(onclick)
             .children(
                 CommonTemplates.icon(icon, iconClasses),
-                create("span")
+                ifjs(text, create("span")
                     .text(text)
-                    .build(),
+                    .build()),
             ).build();
     }
 

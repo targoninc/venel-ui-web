@@ -144,3 +144,21 @@ export function addReaction(messageId, reactionId, userId) {
         }
     }
 }
+
+export function removeReaction(messageId, reactionId, userId) {
+    if (!store().get('messages')) {
+        store().set('messages', signal({}));
+    }
+
+    const ex = store().get('messages').value;
+    for (const channel in ex) {
+        const message = ex[channel].find((m) => m.id === messageId);
+        if (message) {
+            message.reactions = message.reactions.filter((r) => {
+                return !(r.id === reactionId && r.userId === userId);
+            });
+            store().setSignalValue('messages', ex);
+            return;
+        }
+    }
+}
