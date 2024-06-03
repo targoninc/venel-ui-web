@@ -68,6 +68,7 @@ export class ChatComponent {
                 return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
             });
         });
+        const menuShownForMessageId = signal(null);
 
         return create("div")
             .classes("flex-v", "full-height")
@@ -77,7 +78,7 @@ export class ChatComponent {
                     .children(
                         signalMap(messages, create("div")
                                 .classes("chat-messages","flex-v", "flex-grow", "no-gap"),
-                            message => ChatComponent.message(message, messages)),
+                            message => ChatComponent.message(message, messages, menuShownForMessageId)),
                         create("div")
                             .classes("background-2", "chat-input", "flex", "align-center")
                             .children(
@@ -121,7 +122,7 @@ export class ChatComponent {
         }, sending, ["rounded-max", "double"]);
     }
 
-    static message(message, messages) {
+    static message(message, messages, menuShownForMessageId) {
         const messageIndex = messages.value.indexOf(message);
         const previousMessage = messages.value[messageIndex - 1];
         let shouldDisplaySender = true;
@@ -132,7 +133,7 @@ export class ChatComponent {
         const timestamp = new Date(message.createdAt).getTime();
         const offset = new Date().getTimezoneOffset() * 60000;
         const localTimestamp = timestamp + offset;
-        const menuShown = signal(false);
+        const menuShown = computedSignal(menuShownForMessageId, id => id === message.id);
         const messageMenuPositionX = signal(0);
         const messageMenuPositionY = signal(0);
         const cardShown = signal(false);
@@ -154,12 +155,12 @@ export class ChatComponent {
                     .classes("message-content", "flex", "space-between", "full-width")
                     .oncontextmenu((e) => {
                         e.preventDefault();
-                        menuShown.value = true;
-                        messageMenuPositionX.value = e.clientX;
-                        messageMenuPositionY.value = e.clientY;
+                        menuShownForMessageId.value = message.id;
+                        messageMenuPositionX.value = e.clientX - e.target.getBoundingClientRect().left;
+                        messageMenuPositionY.value = e.clientY - e.target.getBoundingClientRect().top;
                         document.addEventListener("click", () => {
-                            menuShown.value = false;
-                        });
+                            menuShownForMessageId.value = null;
+                        }, {once: true});
                     })
                     .children(
                         ifjs(menuShown, ChatComponent.messageMenu(message, messages, messageMenuPositionX, messageMenuPositionY)),
