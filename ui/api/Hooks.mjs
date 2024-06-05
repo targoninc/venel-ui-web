@@ -138,7 +138,11 @@ export function addReaction(messageId, reactionId, userId) {
     for (const channel in ex) {
         const message = ex[channel].find((m) => m.id === messageId);
         if (message) {
-            message.reactions.push({ id: reactionId, userId });
+            message.reactions = message.reactions.map(r => {
+                r.isNew = false;
+                return r;
+            });
+            message.reactions.push({ id: reactionId, userId, isNew: userId === Store.get('user').value.id });
             store().setSignalValue('messages', ex);
             return;
         }

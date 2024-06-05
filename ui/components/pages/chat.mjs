@@ -279,13 +279,13 @@ export class ChatComponent {
         return create("div")
             .classes("reaction-icon")
             .text(reaction.content)
+            .title(`:${reaction.identifier}:`)
             .on("click", e => {
                 Live.send({
                     type: "addReaction",
                     messageId: message.id,
                     reactionId: reaction.id,
                 });
-                playReactionAnimation(reaction.content, e.clientX, e.clientY);
             }).build();
     }
 
@@ -301,7 +301,7 @@ export class ChatComponent {
                     .text(group.display)
                     .build()),
                 signalMap(reactions, create("div")
-                        .classes("flex"),
+                        .classes("flex", "reaction-icon-grid"),
                     reaction => ChatComponent.reaction(reaction, message))
             ).build();
     }
@@ -325,7 +325,7 @@ export class ChatComponent {
                 uniqueReactions.map(reaction => {
                     const activeClass = reactions.some(r => r.id === reaction.id && r.userId === user.value.id) ? "active" : "_";
 
-                    return create("div")
+                    const reactionDom = create("div")
                         .classes("reaction-display", "pill", activeClass)
                         .text(reaction.content + " " + reactionCounts[reaction.id])
                         .onclick(e => {
@@ -346,6 +346,17 @@ export class ChatComponent {
                             });
                         })
                         .build();
+
+                    if (reaction.isNew) {
+                        setTimeout(() => {
+                            const rect = reactionDom.getBoundingClientRect();
+                            const x = rect.left + rect.width / 2;
+                            const y = rect.top + rect.height / 2;
+                            playReactionAnimation(reaction.content, x, y);
+                        }, 100);
+                    }
+
+                    return reactionDom;
                 }),
             ).build();
     }

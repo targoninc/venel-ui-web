@@ -326,11 +326,14 @@
 
 .reaction-icon {
     cursor: pointer;
-    font-size: 1.5em;
+    --size: 1.7em;
+    font-size: var(--size);
+    width: var(--size);
+    text-align: center;
 }
 
 .reaction-icon:hover {
-    transform: scale(1.1);
+    transform: scale(1.25);
 }
 
 .reaction-display {
