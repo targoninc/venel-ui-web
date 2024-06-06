@@ -161,6 +161,10 @@ export function removeReaction(messageId, reactionId, userId) {
             message.reactions = message.reactions.filter((r) => {
                 return !(r.id === reactionId && r.userId === userId);
             });
+            message.reactions = message.reactions.map(r => {
+                r.isNew = false;
+                return r;
+            });
             store().setSignalValue('messages', ex);
             return;
         }
