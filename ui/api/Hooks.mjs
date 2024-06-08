@@ -3,7 +3,13 @@ import {playSound, testImage, toast} from "../actions.mjs";
 import {signal, store} from "https://fjs.targoninc.com/f.js";
 import {Live} from "../live/Live.mjs";
 import {Store} from "./Store.mjs";
-import {currentSound, localNotificationsEnabled, soundEnabled, systemNotificationsEnabled} from "./LocalSetting.mjs";
+import {
+    currentSound,
+    localNotificationsEnabled,
+    Setting,
+    soundEnabled,
+    systemNotificationsEnabled
+} from "./Setting.mjs";
 import {Notifier} from "../live/Notifier.mjs";
 
 export class Hooks {
@@ -15,6 +21,8 @@ export class Hooks {
         if (!store().get('channels')) {
             store().set('channels', signal([]));
         }
+
+        Setting.initializeLocalStoreFromUser(user);
 
         Api.getChannels().then((res) => {
             if (res.status === 200) {

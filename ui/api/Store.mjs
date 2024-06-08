@@ -1,5 +1,5 @@
 import {signal, store} from "https://fjs.targoninc.com/f.js";
-import {currentCallSound, currentSound, setCurrentCallSound, setCurrentSound} from "./LocalSetting.mjs";
+import {currentCallSound, currentSound, setCurrentCallSound, setCurrentSound} from "./Setting.mjs";
 import {Api} from "./Api.mjs";
 import {toast} from "../actions.mjs";
 

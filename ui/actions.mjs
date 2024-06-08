@@ -2,6 +2,12 @@ import {create} from "https://fjs.targoninc.com/f.js";
 import {Page} from "./routing/Page.mjs";
 import {Api} from "./api/Api.mjs";
 
+/**
+ *
+ * @param message {string}
+ * @param type {"info" | "success" | "warning" | "error"}
+ * @param timeout {number} seconds
+ */
 export function toast(message, type = "info", timeout = 5) {
     const toast = create("div")
         .classes("toast", type)

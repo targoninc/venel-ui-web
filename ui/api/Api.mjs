@@ -28,6 +28,9 @@ export class Api extends ApiBase {
     static async deleteUser(userId = null) {
         return await this.delete("/api/auth/deleteUser", {userId});
     }
+    static async updateSetting(setting = null, value = null) {
+        return await this.patch("/api/auth/updateSetting", {setting, value});
+    }
     static async roles() {
         return await this.get("/api/auth/roles", {});
     }

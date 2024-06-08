@@ -21,7 +21,7 @@ import {
     localNotificationsEnabled, setCurrentCallSound, setCurrentSound,
     setLocalNotificationsEnabled, setSoundEnabled, setSystemNotificationsEnabled, soundEnabled,
     systemNotificationsEnabled
-} from "../../api/LocalSetting.mjs";
+} from "../../api/Setting.mjs";
 
 export class SettingsComponent {
     static render() {
