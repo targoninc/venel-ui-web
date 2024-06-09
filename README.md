@@ -2,6 +2,8 @@
 
 This guide assumes you have Node.js and npm installed and running on your machine.
 
+Backend: https://github.com/targoninc/venel-api
+
 ## Environment variables
 
 ```apacheconf
