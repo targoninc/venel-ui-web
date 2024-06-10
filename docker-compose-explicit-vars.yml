@@ -10,3 +10,4 @@ services:
       - "3001:3001"
     environment:
       - API_URL=${API_URL}
+      - PORT=${PORT}
