@@ -12,7 +12,7 @@ const app = express();
 app.use(express.static(path.join(__dirname, "ui")));
 
 app.get('/apiurl', (req, res) => {
-    res.send(process.env.API_URL ?? 'http://localhost:3000');
+    res.send(process.env.API_URL ?? 'http://localhost:3001');
 });
 
 app.get('*', (req, res) => {
