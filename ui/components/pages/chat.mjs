@@ -174,6 +174,10 @@ export class ChatComponent {
                         }),
                         CommonTemplates.profileCard(message.sender, cardShown),
                     ).build()),
+                create("span")
+                    .classes("message-timestamp", "text-small")
+                    .text(Time.ago(localTimestamp))
+                    .build(),
                 create("div")
                     .classes("message-content", "flex", "space-between", "full-width")
                     .oncontextmenu((e) => {
@@ -188,6 +192,11 @@ export class ChatComponent {
                     .children(
                         ifjs(menuShown, ChatComponent.messageMenu(message, messages, messageMenuPositionX, messageMenuPositionY)),
                         ChatComponent.reactionTrigger(message, messages),
+                        ifjs(message.attachments.length > 0, create("div")
+                            .classes("flex", "align-center", "attachments", "full-width")
+                            .children(
+                                message.attachments.map(attachment => ChatComponent.attachment(attachment)),
+                            ).build()),
                         create("div")
                             .classes("flex-v", "message-text")
                             .children(
@@ -203,12 +212,8 @@ export class ChatComponent {
                                     .classes("message-note")
                                     .text("edited " + Time.ago(new Date(message.updatedAt).getTime() + offset))
                                     .build()),
-                                create("span")
-                                    .classes("message-timestamp", "text-small")
-                                    .text(Time.ago(localTimestamp))
-                                    .build(),
                             ).build(),
-                    ).build()
+                    ).build(),
             ).build();
     }
 
@@ -387,10 +392,14 @@ export class ChatComponent {
                 for (const file of input.files) {
                     const reader = new FileReader();
                     reader.onload = () => {
-                        const base64 = reader.result.split(',')[1];
+                        let base64 = reader.result.split(',')[1];
+                        if (base64.constructor.name === "Buffer") {
+                            base64 = base64.toString("base64");
+                        }
                         toBeSentAttachments.value = [...toBeSentAttachments.value, {
+                            filename: file.name,
                             type: file.type,
-                            data: file.type.startsWith("image") ? `data:${file.type};base64,${base64}` : null,
+                            data: base64,
                         }];
                     };
                     reader.readAsDataURL(file);
@@ -404,13 +413,66 @@ export class ChatComponent {
         return create("div")
             .classes("flex-v", "align-center", "relative")
             .children(
-                create("img")
-                    .classes("attachment-preview-image")
-                    .src(attachment.data)
-                    .build(),
+                ChatComponent.attachmentPreviewContent(attachment),
                 CommonTemplates.smallIconButton("delete", "Delete", () => {
                     toBeSentAttachments.value = toBeSentAttachments.value.filter(a => a.filename !== attachment.filename);
                 }, ["attachment-remove-button"]),
+            ).build();
+    }
+
+    static attachmentPreviewContent(attachment) {
+        let tag;
+        switch (attachment.type.split("/")[0]) {
+            case "image":
+                tag = "img";
+                break;
+            case "video":
+                tag = "video";
+                break;
+            case "audio":
+                tag = "audio";
+                break;
+            default:
+                tag = "div";
+                break;
+        }
+        return create(tag)
+            .classes(`attachment-preview-${attachment.type.split("/")[0]}`)
+            .src(`data:${attachment.type};base64,${attachment.data}`)
+            .build();
+    }
+
+    static attachment(attachment) {
+        const apiUrl = sessionStorage.getItem("apiUrl");
+        const url = apiUrl + `/attachments/${encodeURIComponent(attachment.messageId)}/${encodeURIComponent(attachment.filename)}`;
+        let tag;
+        switch (attachment.type.split("/")[0]) {
+            case "image":
+                tag = "img";
+                break;
+            case "video":
+                tag = "video";
+                break;
+            case "audio":
+                tag = "audio";
+                break;
+            default:
+                tag = "div";
+                break;
+        }
+        const isFullImage = signal(false);
+        const imageClass = computedSignal(isFullImage, isFull => isFull ? "full-image" : `attachment-${attachment.type.split("/")[0]}`);
+
+        return create("div")
+            .classes("attachment", attachment.type.split("/")[0])
+            .onclick(() => {
+                isFullImage.value = !isFullImage.value;
+            })
+            .children(
+                create("img")
+                    .classes(imageClass)
+                    .src(url)
+                    .build()
             ).build();
     }
 }
