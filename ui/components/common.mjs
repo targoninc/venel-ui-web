@@ -412,4 +412,14 @@ export class CommonTemplates {
                     .build()
             ).build();
     }
+
+    static smallIconButton(icon, title, onclick, classes = []) {
+        return create("div")
+            .classes("small-icon-button", "flex", "align-center", ...classes)
+            .onclick(onclick)
+            .title(title)
+            .children(
+                CommonTemplates.icon(icon)
+            ).build();
+    }
 }

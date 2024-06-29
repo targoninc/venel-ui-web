@@ -69,6 +69,11 @@ export class ChatComponent {
             });
         });
         const menuShownForMessageId = signal(null);
+        const toBeSentAttachments = signal([]);
+        const hasAttachments = computedSignal(toBeSentAttachments, attachments => {
+            console.log(attachments);
+            return attachments.length > 0;
+        });
 
         return create("div")
             .classes("flex-v", "full-height")
@@ -79,9 +84,17 @@ export class ChatComponent {
                         signalMap(messages, create("div")
                                 .classes("chat-messages","flex-v", "flex-grow", "no-gap"),
                             message => ChatComponent.message(message, messages, menuShownForMessageId)),
+                        ifjs(hasAttachments, create("div")
+                            .classes("flex", "align-center", "full-width")
+                            .children(
+                                signalMap(toBeSentAttachments, create("div")
+                                        .classes("flex", "align-center", "attachment-preview", "full-width"),
+                                    attachment => ChatComponent.attachmentPreview(attachment)),
+                            ).build()),
                         create("div")
                             .classes("background-2", "chat-input", "flex", "align-center")
                             .children(
+                                ChatComponent.attachmentButton(activeChannel, messageText, toBeSentAttachments),
                                 CommonTemplates.textArea(messageText, "message", null, "Write something nice...", ["flex-grow"], ["full-width-h", "message-input"], () => {
                                     if (!messageText.value || messageText.value.trim() === "" || sending.value) {
                                         return;
@@ -92,20 +105,22 @@ export class ChatComponent {
                                         type: "message",
                                         channelId: activeChannel.value,
                                         text: messageText.value,
+                                        attachments: toBeSentAttachments.value,
                                     });
                                     sending.value = false;
                                     messageText.value = "";
+                                    toBeSentAttachments.value = [];
                                 }),
                                 create("div")
                                     .children(
-                                        ChatComponent.sendButton(sending, messages, activeChannel, messageText),
+                                        ChatComponent.sendButton(sending, messages, toBeSentAttachments, activeChannel, messageText),
                                     ).build()
                             ).build(),
                     ).build(),
             ).build();
     }
 
-    static sendButton(sending, messages, activeChannel, messageText) {
+    static sendButton(sending, messages, toBeSentAttachments, activeChannel, messageText) {
         return CommonTemplates.buttonWithSpinner("send", "Send", "send", () => {
             if (!messageText.value || messageText.value.trim() === "" || sending.value) {
                 return;
@@ -116,9 +131,11 @@ export class ChatComponent {
                 type: "message",
                 channelId: activeChannel.value,
                 text: messageText.value,
+                attachments: toBeSentAttachments.value,
             });
             sending.value = false;
             messageText.value = "";
+            toBeSentAttachments.value = [];
         }, sending, ["rounded-max", "double"]);
     }
 
@@ -358,6 +375,42 @@ export class ChatComponent {
 
                     return reactionDom;
                 }),
+            ).build();
+    }
+
+    static attachmentButton(activeChannel, messageText, toBeSentAttachments) {
+        return CommonTemplates.buttonWithIcon("attach_file", "", () => {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.multiple = true;
+            input.onchange = () => {
+                for (const file of input.files) {
+                    const reader = new FileReader();
+                    reader.onload = () => {
+                        const base64 = reader.result.split(',')[1];
+                        toBeSentAttachments.value = [...toBeSentAttachments.value, {
+                            type: file.type,
+                            data: file.type.startsWith("image") ? `data:${file.type};base64,${base64}` : null,
+                        }];
+                    };
+                    reader.readAsDataURL(file);
+                }
+            };
+            input.click();
+        }, ["rounded-max", "double"]);
+    }
+
+    static attachmentPreview(attachment, toBeSentAttachments) {
+        return create("div")
+            .classes("flex-v", "align-center", "relative")
+            .children(
+                create("img")
+                    .classes("attachment-preview-image")
+                    .src(attachment.data)
+                    .build(),
+                CommonTemplates.smallIconButton("delete", "Delete", () => {
+                    toBeSentAttachments.value = toBeSentAttachments.value.filter(a => a.filename !== attachment.filename);
+                }, ["attachment-remove-button"]),
             ).build();
     }
 }
