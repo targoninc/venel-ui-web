@@ -190,7 +190,11 @@ export class ChatComponent {
                         }, {once: true});
                     })
                     .children(
-                        ifjs(menuShown, ChatComponent.messageMenu(message, messages, messageMenuPositionX, messageMenuPositionY)),
+                        create("div")
+                            .classes("relative")
+                            .children(
+                                ifjs(menuShown, ChatComponent.messageMenu(message, messages, messageMenuPositionX, messageMenuPositionY)),
+                            ).build(),
                         ifjs(message.attachments.length > 0, create("div")
                             .classes("flex", "align-center", "attachments", "full-width")
                             .children(
@@ -406,7 +410,7 @@ export class ChatComponent {
                 }
             };
             input.click();
-        }, ["rounded-max", "double"]);
+        }, ["icon-button"]);
     }
 
     static attachmentPreview(attachment, toBeSentAttachments) {
