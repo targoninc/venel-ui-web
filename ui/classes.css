@@ -271,7 +271,6 @@
     padding: 0.25em;
     border-radius: var(--input-border-radius);
     word-wrap: anywhere;
-    position: relative;
 }
 
 .message-menu {
@@ -296,9 +295,9 @@
 
 .reaction-trigger {
     position: absolute;
-    left: calc(var(--message-padding-left) - 1.5em);
-    bottom: var(--gap-h);
-    z-index: 999;
+    left: calc(var(--message-padding-left) - 1.75em);
+    bottom: 1px;
+    z-index: 666;
     max-width: max-content;
 }
 

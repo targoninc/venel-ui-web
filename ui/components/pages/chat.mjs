@@ -191,19 +191,19 @@ export class ChatComponent {
                     })
                     .children(
                         ifjs(menuShown, ChatComponent.messageMenu(message, messages, messageMenuPositionX, messageMenuPositionY)),
-                        ChatComponent.reactionTrigger(message, messages),
                         ifjs(message.attachments.length > 0, create("div")
                             .classes("flex", "align-center", "attachments", "full-width")
                             .children(
                                 message.attachments.map(attachment => ChatComponent.attachment(attachment)),
                             ).build()),
                         create("div")
-                            .classes("flex-v", "message-text")
+                            .classes("flex-v", "message-text", "relative")
                             .children(
                                 create("span")
                                     .text(message.text)
                                     .build(),
                                 ifjs(reactions.length > 0, ChatComponent.reactionDisplay(reactions, message)),
+                                ChatComponent.reactionTrigger(message, messages),
                             ).build(),
                         create("div")
                             .classes("flex-v", "no-gap")
