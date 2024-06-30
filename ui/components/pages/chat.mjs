@@ -14,8 +14,9 @@ import {Hooks, removeMessage} from "../../api/Hooks.mjs";
 import {Time} from "../../tooling/Time.mjs";
 import {Live} from "../../live/Live.mjs";
 import {ChannelTemplates} from "../channel.mjs";
-import {playReactionAnimation, testImage, toast} from "../../actions.mjs";
+import {testImage, toast} from "../../actions.mjs";
 import {Popups} from "../../api/Popups.mjs";
+import {ReactionTemplates} from "../reaction.mjs";
 
 export class ChatComponent {
     static render(params) {
@@ -103,6 +104,7 @@ export class ChatComponent {
                             .classes("background-2", "chat-input", "flex", "align-center")
                             .children(
                                 ChatComponent.attachmentButton(activeChannel, messageText, toBeSentAttachments),
+                                ChatComponent.voiceButton(activeChannel, messageText, toBeSentAttachments),
                                 CommonTemplates.textArea(messageText, "message", null, "Write something nice...", ["flex-grow"], ["full-width-h", "message-input"], () => {
                                     if (!messageText.value || messageText.value.trim() === "" || sending.value) {
                                         return;
@@ -209,11 +211,11 @@ export class ChatComponent {
                         create("div")
                             .classes("flex-v", "message-text", "relative")
                             .children(
-                                create("span")
+                                ifjs(message.text, create("span")
                                     .text(message.text)
-                                    .build(),
-                                ifjs(reactions.length > 0, ChatComponent.reactionDisplay(reactions, message)),
-                                ChatComponent.reactionTrigger(message, messages),
+                                    .build()),
+                                ifjs(reactions.length > 0, ReactionTemplates.reactionDisplay(reactions, message)),
+                                ReactionTemplates.reactionTrigger(message, messages),
                             ).build(),
                         create("div")
                             .classes("flex-v", "no-gap")
@@ -251,145 +253,6 @@ export class ChatComponent {
                     });
                     removeMessage(message.channelId, message.id);
                 })),
-            ).build();
-    }
-
-    static reactionTrigger(message, messages) {
-        const menuShown = signal(false);
-
-        return create("div")
-            .classes("reaction-trigger", "flex")
-            .children(
-                CommonTemplates.buttonWithIcon("add_reaction", "", e => {
-                    e.preventDefault();
-                    menuShown.value = true;
-                    setTimeout(() => {
-                        document.addEventListener("click", (e) => {
-                            if (e.target.closest(".reaction-menu")) {
-                                return;
-                            }
-                            menuShown.value = false;
-                        }, {once: true});
-                    }, 0);
-                }, ["reaction-button"]),
-                ifjs(menuShown, ChatComponent.reactionMenu(message, messages)),
-            ).build();
-    }
-
-    static reactionMenu(message) {
-        const reactions = Store.get("reactions");
-        const groups = Store.get("reactionGroups");
-        const search = signal("");
-        const filteredReactions = computedSignal(search, search => {
-            return reactions.value.filter(reaction => reaction.identifier.includes(search));
-        });
-        const groupedFilteredReactions = computedSignal(filteredReactions, (reactions) => {
-            const out = {};
-            reactions.forEach(reaction => {
-                const group = groups.value.find(group => group.id === reaction.groupId);
-                if (!out[group.id]) {
-                    out[group.id] = [];
-                }
-                out[group.id].push(reaction);
-            });
-            return out;
-        });
-
-        return create("div")
-            .classes("reaction-menu", "card", "flex-v")
-            .children(
-                CommonTemplates.input("text", "reaction_search", "Search reactions", "👀", search, () => {}, false, "off", () => {}, (e) => {
-                    search.value = e.target.value;
-                }),
-                signalMap(groups, create("div")
-                    .classes("flex-v", "reaction-icons"),
-                    group => ChatComponent.reactionGroup(group, groupedFilteredReactions, message)),
-            ).build();
-    }
-
-    static reaction(reaction, message) {
-        return create("div")
-            .classes("reaction-icon")
-            .text(reaction.content)
-            .title(`:${reaction.identifier}:`)
-            .on("click", e => {
-                Live.send({
-                    type: "addReaction",
-                    messageId: message.id,
-                    reactionId: reaction.id,
-                });
-            }).build();
-    }
-
-    static reactionGroup(group, groupedFilteredReactions, message) {
-        const reactions = computedSignal(groupedFilteredReactions, reactions => reactions[group.id] || []);
-        const hasReactions = computedSignal(reactions, reactions => reactions.length > 0);
-
-        return create("div")
-            .classes("flex-v")
-            .children(
-                ifjs(hasReactions, create("h3")
-                    .classes("text-small")
-                    .text(group.display)
-                    .build()),
-                signalMap(reactions, create("div")
-                        .classes("flex", "reaction-icon-grid"),
-                    reaction => ChatComponent.reaction(reaction, message))
-            ).build();
-    }
-
-    static reactionDisplay(reactions, message) {
-        const reactionCounts = {};
-        reactions.forEach(reaction => {
-            if (!reactionCounts[reaction.id]) {
-                reactionCounts[reaction.id] = 0;
-            }
-            reactionCounts[reaction.id]++;
-        });
-        const uniqueReactions = reactions.filter((reaction, index, self) => {
-            return self.findIndex(r => r.id === reaction.id) === index;
-        });
-        const user = Store.get("user");
-
-        return create("div")
-            .classes("flex")
-            .children(
-                uniqueReactions.map(reaction => {
-                    const activeClass = reactions.some(r => r.id === reaction.id && r.userId === user.value.id) ? "active" : "_";
-
-                    const reactionDom = create("div")
-                        .classes("reaction-display", "pill", activeClass)
-                        .text(reaction.content + " " + reactionCounts[reaction.id])
-                        .onclick(e => {
-                            if (activeClass !== "active") {
-                                Live.send({
-                                    type: "addReaction",
-                                    messageId: message.id,
-                                    reactionId: reaction.id,
-                                });
-                                playReactionAnimation(reaction.content, e.clientX, e.clientY);
-                                return;
-                            }
-
-                            Live.send({
-                                type: "removeReaction",
-                                messageId: message.id,
-                                reactionId: reaction.id,
-                            });
-                        })
-                        .build();
-
-                    if (reaction.isNew) {
-                        setTimeout(() => {
-                            const rect = reactionDom.getBoundingClientRect();
-                            const x = rect.left + rect.width / 2;
-                            const y = rect.top + rect.height / 2;
-                            playReactionAnimation(reaction.content, x, y);
-                        }, 100);
-                    }
-
-                    return reactionDom;
-                }),
             ).build();
     }
 
@@ -523,6 +386,63 @@ export class ChatComponent {
             })
             .children(
                 content.build()
+            ).build();
+    }
+
+    static voiceButton(activeChannel, messageText) {
+        const recording = signal(false);
+        const icon = computedSignal(recording, recording => recording ? "mic" : "mic_off");
+        const data = signal(null);
+        const identifierClass = computedSignal(recording, recording => recording ? "recording" : "stopped");
+        data.subscribe(data => {
+            if (!data) {
+                return;
+            }
+
+            // data is a blob, convert to buffer, then to base64
+            const reader = new FileReader();
+            reader.readAsDataURL(data);
+            reader.onloadend = () => {
+                let base64 = reader.result.split(',')[1];
+                if (base64.constructor.name === "Buffer") {
+                    base64 = base64.toString("base64");
+                }
+
+                Live.send({
+                    type: "message",
+                    channelId: activeChannel.value,
+                    attachments: [{
+                        filename: "voice_recording.ogg",
+                        type: "audio/ogg",
+                        data: base64,
+                    }],
+                });
+            };
+            messageText.value = "";
+        });
+        let mediaRecorder;
+
+        return create("div")
+            .classes("voice-button")
+            .children(
+                create("div")
+                    .classes("recording-indicator", identifierClass)
+                    .build(),
+                CommonTemplates.buttonWithIcon(icon, null, async () => {
+                    if (!recording.value) {
+                        recording.value = true;
+                        const stream = await navigator.mediaDevices.getUserMedia({audio: true});
+                        mediaRecorder = new MediaRecorder(stream);
+                        mediaRecorder.ondataavailable = (e) => {
+                            data.value = e.data;
+                        };
+                        mediaRecorder.start();
+                    } else {
+                        recording.value = false;
+                        mediaRecorder.stop();
+                        mediaRecorder = null;
+                    }
+                }, ["icon-button"])
             ).build();
     }
 }
