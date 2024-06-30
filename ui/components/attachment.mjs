@@ -2,6 +2,7 @@ import {CommonTemplates} from "./common.mjs";
 import {computedSignal, create, ifjs, signal, store} from "https://fjs.targoninc.com/f.js";
 import {toast} from "../actions.mjs";
 import {Live} from "../live/Live.mjs";
+import hljs from "https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/es/highlight.min.js";
 
 export class AttachmentTemplates {
     static attachmentButton(activeChannel, messageText, toBeSentAttachments) {
@@ -101,15 +102,63 @@ export class AttachmentTemplates {
                 return AttachmentTemplates.audioAttachment(attachment, url);
             case "application":
                 return AttachmentTemplates.applicationAttachment(attachment, url);
+            case "text":
+                return AttachmentTemplates.textAttachment(attachment, url);
             default:
                 return AttachmentTemplates.fileAttachment(attachment, url);
         }
+    }
+
+    static textAttachment(attachment, url) {
+        const fileContent = signal(null);
+        const id = Math.random().toString(36).substring(7);
+        fetch(url, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            credentials: "include"
+        }).then(async text => {
+            fileContent.value = await text.text();
+            hljs.highlightElement(document.getElementById(id));
+        });
+
+        return create("div")
+            .classes("attachment", "text", "relative")
+            .children(
+                create("pre")
+                    .children(
+                        create("code")
+                            .id(id)
+                            .text(fileContent)
+                            .build()
+                    ).build(),
+                create("div")
+                    .classes("attachment-floating-buttons", "flex")
+                    .children(
+                        CommonTemplates.smallIconButton("content_copy", "Copy", () => {
+                            const content = fileContent.value;
+                            navigator.clipboard.writeText(content);
+                            toast("Copied to clipboard", "success");
+                        }),
+                        CommonTemplates.smallIconButton("download", "Download", () => {
+                            const link = document.createElement('a');
+                            const content = fileContent.value;
+                            const blob = new Blob([content], {type: "text/plain"});
+                            link.href = URL.createObjectURL(blob);
+                            link.download = attachment.filename;
+                            link.click();
+                        }),
+                    ).build(),
+            ).build();
     }
 
     static applicationAttachment(attachment, url) {
         switch (attachment.type.split("/")[1]) {
             case "pdf":
                 return AttachmentTemplates.pdfAttachment(attachment, url);
+            case "json":
+                return AttachmentTemplates.textAttachment(attachment, url);
             default:
                 return AttachmentTemplates.fileAttachment(attachment, url);
         }
