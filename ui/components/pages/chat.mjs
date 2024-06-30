@@ -88,8 +88,8 @@ export class ChatComponent {
                             .classes("flex", "align-center", "full-width")
                             .children(
                                 signalMap(toBeSentAttachments, create("div")
-                                        .classes("flex", "align-center", "attachment-preview", "full-width"),
-                                    attachment => ChatComponent.attachmentPreview(attachment)),
+                                        .classes("flex", "attachment-preview", "full-width"),
+                                    attachment => ChatComponent.attachmentPreview(attachment, toBeSentAttachments)),
                             ).build()),
                         create("div")
                             .classes("background-2", "chat-input", "flex", "align-center")
@@ -196,7 +196,7 @@ export class ChatComponent {
                                 ifjs(menuShown, ChatComponent.messageMenu(message, messages, messageMenuPositionX, messageMenuPositionY)),
                             ).build(),
                         ifjs(message.attachments.length > 0, create("div")
-                            .classes("flex", "align-center", "attachments", "full-width")
+                            .classes("flex", "attachments", "full-width")
                             .children(
                                 message.attachments.map(attachment => ChatComponent.attachment(attachment)),
                             ).build()),
@@ -425,7 +425,7 @@ export class ChatComponent {
     }
 
     static attachmentPreviewContent(attachment) {
-        let tag;
+        let tag, source = `data:${attachment.type};base64,${attachment.data}`;
         switch (attachment.type.split("/")[0]) {
             case "image":
                 tag = "img";
@@ -440,10 +440,21 @@ export class ChatComponent {
                 tag = "div";
                 break;
         }
-        return create(tag)
+        const content = create(tag)
             .classes(`attachment-preview-${attachment.type.split("/")[0]}`)
-            .src(`data:${attachment.type};base64,${attachment.data}`)
-            .build();
+            .src(source);
+
+        if (tag === "audio") {
+            content.attributes("controls", "controls");
+        } else if (tag === "img") {
+            content.attributes("loading", "lazy");
+        } else if (tag === "video") {
+            content.attributes("controls", "controls");
+            content.attributes("type", "video/mp4");
+            content.title("Video previews are not supported yet");
+        }
+
+        return content.build();
     }
 
     static attachment(attachment) {
@@ -465,7 +476,19 @@ export class ChatComponent {
                 break;
         }
         const isFullImage = signal(false);
-        const imageClass = computedSignal(isFullImage, isFull => isFull ? "full-image" : `attachment-${attachment.type.split("/")[0]}`);
+        const imageClass = computedSignal(isFullImage, isFull => isFull && tag === "img" ? "full-image" : `attachment-${attachment.type.split("/")[0]}`);
+
+        const content = create(tag)
+            .classes(imageClass)
+            .src(url);
+
+        if (tag === "audio") {
+            content.attributes("controls", "controls");
+        } else if (tag === "img") {
+            content.attributes("loading", "lazy");
+        } else if (tag === "video") {
+            content.attributes("controls", "controls");
+        }
 
         return create("div")
             .classes("attachment", attachment.type.split("/")[0])
@@ -473,10 +496,7 @@ export class ChatComponent {
                 isFullImage.value = !isFullImage.value;
             })
             .children(
-                create("img")
-                    .classes(imageClass)
-                    .src(url)
-                    .build()
+                content.build()
             ).build();
     }
 }

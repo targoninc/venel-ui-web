@@ -642,9 +642,10 @@
     background: var(--bg-2);
     border-top: var(--input-border-width) solid var(--bg-4);
     gap: calc(var(--gap-v) * 2);
+    align-items: end;
 }
 
-.attachment-preview-image {
+.attachment-preview-image, .attachment-preview-video {
     height: 4em;
     width: auto;
     border-radius: var(--input-border-radius);
@@ -677,6 +678,7 @@
 
 .attachments {
     padding-left: calc(var(--message-padding-left) - 0.25em);
+    align-items: end;
 }
 
 .attachment-image {
@@ -706,9 +708,10 @@
 
 .attachment-video, .attachment-audio {
     max-height: 200px;
-    max-width: 200px;
     height: auto;
     width: auto;
+    border: 1px solid var(--bg-4);
+    border-radius: var(--input-border-radius);
 }
 
 .icon-button {
