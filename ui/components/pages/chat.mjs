@@ -132,7 +132,11 @@ export class ChatComponent {
 
     static sendButton(sending, messages, toBeSentAttachments, activeChannel, messageText) {
         return CommonTemplates.buttonWithSpinner("send", "Send", "send", () => {
-            if (!messageText.value || messageText.value.trim() === "" || sending.value) {
+            if (sending.value) {
+                return;
+            }
+
+            if ((!messageText.value || messageText.value.trim() === "") && toBeSentAttachments.value.length === 0) {
                 return;
             }
 

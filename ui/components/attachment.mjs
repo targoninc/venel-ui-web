@@ -119,7 +119,11 @@ export class AttachmentTemplates {
         }).then(async text => {
             fileContent.value = (await text.text())
                 .replaceAll(/\n/g, '<br/>');
-            hljs.highlightElement(document.getElementById(id));
+            try {
+                hljs.highlightElement(document.getElementById(id));
+            } catch (e) {
+                console.log("Error while highlighting: ", e);
+            }
         });
 
         return create("div")
