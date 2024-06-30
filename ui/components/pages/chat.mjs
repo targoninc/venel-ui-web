@@ -509,6 +509,13 @@ export class ChatComponent {
             content.attributes("loading", "lazy");
         } else if (tag === "video") {
             content.attributes("controls", "controls");
+        } else {
+            return CommonTemplates.buttonWithIcon("download", attachment.filename, () => {
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = attachment.filename;
+                link.click();
+            });
         }
 
         return create("div")
