@@ -723,3 +723,16 @@
 .icon-button:hover {
     background: var(--bg-3);
 }
+
+.attachment-preview-file {
+    height: 4em;
+    width: auto;
+    border-radius: var(--input-border-radius);
+    border: var(--input-border-width) solid var(--bg-4);
+    background: var(--bg-4);
+    color: var(--text-3);
+    font-size: 0.8em;
+    font-weight: bold;
+    padding: var(--gap-v);
+    word-break: break-all;
+}

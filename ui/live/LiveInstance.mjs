@@ -1,6 +1,7 @@
 import {addChannel, addMessage, addReaction, removeMessage, removeReaction} from "../api/Hooks.mjs";
 import {toast} from "../actions.mjs";
 import {Api} from "../api/Api.mjs";
+import {store} from "https://fjs.targoninc.com/f.js";
 
 export class LiveInstance {
     constructor(onStop = () => {}, onStart = () => {}) {
@@ -84,6 +85,10 @@ export class LiveInstance {
                 case "newChannel":
                     addChannel(data.channel);
                     break;
+                case "maxPayloadSize":
+                    this.maxPayloadSizeInMb = data.size;
+                    store().set("maxPayloadSizeInMb", data.size);
+                    break;
             }
         };
     }
@@ -93,6 +98,13 @@ export class LiveInstance {
     }
 
     send(data) {
-        this.server.send(JSON.stringify(data));
+        const toSend = JSON.stringify(data);
+        if (this.maxPayloadSizeInMb) {
+            if (toSend.length > this.maxPayloadSizeInMb * 1024 * 1024) {
+                toast("Payload too large, not sending");
+                return;
+            }
+        }
+        this.server.send(toSend);
     }
 }

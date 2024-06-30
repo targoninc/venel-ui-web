@@ -1,4 +1,12 @@
-import {computedSignal, create, ifjs, signal, signalFromProperty, signalMap} from "https://fjs.targoninc.com/f.js";
+import {
+    computedSignal,
+    create,
+    ifjs,
+    signal,
+    signalFromProperty,
+    signalMap,
+    store
+} from "https://fjs.targoninc.com/f.js";
 import {LayoutTemplates} from "../layout.mjs";
 import {Store} from "../../api/Store.mjs";
 import {CommonTemplates} from "../common.mjs";
@@ -6,7 +14,7 @@ import {Hooks, removeMessage} from "../../api/Hooks.mjs";
 import {Time} from "../../tooling/Time.mjs";
 import {Live} from "../../live/Live.mjs";
 import {ChannelTemplates} from "../channel.mjs";
-import {playReactionAnimation, testImage} from "../../actions.mjs";
+import {playReactionAnimation, testImage, toast} from "../../actions.mjs";
 import {Popups} from "../../api/Popups.mjs";
 
 export class ChatComponent {
@@ -400,6 +408,13 @@ export class ChatComponent {
                         if (base64.constructor.name === "Buffer") {
                             base64 = base64.toString("base64");
                         }
+
+                        const maxPayloadSizeInMb = store().get("maxPayloadSizeInMb");
+                        if (maxPayloadSizeInMb && base64.length > maxPayloadSizeInMb * 1024 * 1024) {
+                            toast("File is too large, must be smaller than " + maxPayloadSizeInMb + "MB", "error");
+                            return;
+                        }
+
                         toBeSentAttachments.value = [...toBeSentAttachments.value, {
                             filename: file.name,
                             type: file.type,
@@ -426,7 +441,8 @@ export class ChatComponent {
 
     static attachmentPreviewContent(attachment) {
         let tag, source = `data:${attachment.type};base64,${attachment.data}`;
-        switch (attachment.type.split("/")[0]) {
+        const baseType = attachment.type.split("/")[0];
+        switch (baseType) {
             case "image":
                 tag = "img";
                 break;
@@ -441,7 +457,7 @@ export class ChatComponent {
                 break;
         }
         const content = create(tag)
-            .classes(`attachment-preview-${attachment.type.split("/")[0]}`)
+            .classes(baseType ? `attachment-preview-${baseType}` : "attachment-preview-file")
             .src(source);
 
         if (tag === "audio") {
@@ -452,6 +468,11 @@ export class ChatComponent {
             content.attributes("controls", "controls");
             content.attributes("type", "video/mp4");
             content.title("Video previews are not supported yet");
+        } else {
+            return create("div")
+                .classes("attachment-preview-file", "align-center")
+                .text(attachment.filename)
+                .build();
         }
 
         return content.build();
