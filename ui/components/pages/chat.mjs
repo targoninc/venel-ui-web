@@ -156,8 +156,6 @@ export class ChatComponent {
         }
         const edited = message.createdAt !== message.updatedAt;
         const timestamp = new Date(message.createdAt).getTime();
-        const offset = new Date().getTimezoneOffset() * 60000;
-        const localTimestamp = timestamp + offset;
         const menuShown = computedSignal(menuShownForMessageId, id => id === message.id);
         const messageMenuPositionX = signal(0);
         const messageMenuPositionY = signal(0);
@@ -182,10 +180,6 @@ export class ChatComponent {
                         }),
                         CommonTemplates.profileCard(message.sender, cardShown),
                     ).build()),
-                create("span")
-                    .classes("message-timestamp", "text-small")
-                    .text(Time.ago(localTimestamp))
-                    .build(),
                 create("div")
                     .classes("message-content", "flex", "space-between", "full-width")
                     .oncontextmenu((e) => {
@@ -202,6 +196,10 @@ export class ChatComponent {
                             .classes("relative")
                             .children(
                                 ifjs(menuShown, ChatComponent.messageMenu(message, messages, messageMenuPositionX, messageMenuPositionY)),
+                                create("span")
+                                    .classes("message-timestamp", "text-small")
+                                    .text(Time.messageTimestamp(timestamp))
+                                    .build(),
                             ).build(),
                         ifjs(message.attachments.length > 0, create("div")
                             .classes("flex", "attachments", "full-width")
@@ -222,7 +220,7 @@ export class ChatComponent {
                             .children(
                                 ifjs(edited, create("span")
                                     .classes("message-note")
-                                    .text("edited " + Time.ago(new Date(message.updatedAt).getTime() + offset))
+                                    .text("edited " + Time.ago(new Date(message.updatedAt).getTime()))
                                     .build()),
                             ).build(),
                     ).build(),

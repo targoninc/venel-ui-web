@@ -93,4 +93,16 @@ export class Time {
         }
         return minutes + ":" + seconds;
     }
+
+    static messageTimestamp(time) {
+        const offset = new Date().getTimezoneOffset() * 60000;
+        const localTimestamp = time - offset;
+        const date = new Date(localTimestamp);
+        const timeAgo = Time.ago(time);
+        if (timeAgo.includes("hour") || timeAgo.includes("minute") || timeAgo.includes("second")) {
+            return date.getHours() + ":" + date.getMinutes();
+        } else {
+            return date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear() + "\n" + date.getHours() + ":" + date.getMinutes();
+        }
+    }
 }

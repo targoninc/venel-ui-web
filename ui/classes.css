@@ -252,12 +252,11 @@
     color: var(--neutral);
     font-size: 0.6em !important;
     padding-left: calc(var(--message-padding-left) + 2em);
-    height: 0;
-    overflow: hidden;
-}
-
-.chat-message:hover .message-timestamp {
-    height: 1em;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: max-content;
+    transform: translateX(-50%) translateY(150%);
 }
 
 .message-note {
