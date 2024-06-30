@@ -117,7 +117,8 @@ export class AttachmentTemplates {
             method: "GET",
             credentials: "include"
         }).then(async text => {
-            fileContent.value = await text.text();
+            fileContent.value = (await text.text())
+                .replaceAll(/\n/g, '<br/>');
             hljs.highlightElement(document.getElementById(id));
         });
 
@@ -129,7 +130,7 @@ export class AttachmentTemplates {
                     .children(
                         create("code")
                             .id(id)
-                            .text(fileContent)
+                            .html(fileContent)
                             .build()
                     ).build(),
                 create("div")
