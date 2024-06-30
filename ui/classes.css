@@ -724,6 +724,11 @@
     background: var(--bg-3);
 }
 
+.attachment.pdf {
+    width: 100%;
+    height: 300px;
+}
+
 .attachment-preview-file {
     height: 4em;
     width: auto;
@@ -749,7 +754,7 @@
 }
 
 .recording-indicator.recording {
-    border: 2px dashed var(--red);
+    border: 2px dashed var(--green);
     animation: rotate 8s infinite linear;
 }
 

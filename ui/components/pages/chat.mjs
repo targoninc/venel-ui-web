@@ -4,8 +4,7 @@ import {
     ifjs,
     signal,
     signalFromProperty,
-    signalMap,
-    store
+    signalMap
 } from "https://fjs.targoninc.com/f.js";
 import {LayoutTemplates} from "../layout.mjs";
 import {Store} from "../../api/Store.mjs";
@@ -14,9 +13,10 @@ import {Hooks, removeMessage} from "../../api/Hooks.mjs";
 import {Time} from "../../tooling/Time.mjs";
 import {Live} from "../../live/Live.mjs";
 import {ChannelTemplates} from "../channel.mjs";
-import {testImage, toast} from "../../actions.mjs";
+import {testImage} from "../../actions.mjs";
 import {Popups} from "../../api/Popups.mjs";
 import {ReactionTemplates} from "../reaction.mjs";
+import {AttachmentTemplates} from "../attachment.mjs";
 
 export class ChatComponent {
     static render(params) {
@@ -98,13 +98,13 @@ export class ChatComponent {
                             .children(
                                 signalMap(toBeSentAttachments, create("div")
                                         .classes("flex", "attachment-preview", "full-width"),
-                                    attachment => ChatComponent.attachmentPreview(attachment, toBeSentAttachments)),
+                                    attachment => AttachmentTemplates.attachmentPreview(attachment, toBeSentAttachments)),
                             ).build()),
                         create("div")
                             .classes("background-2", "chat-input", "flex", "align-center")
                             .children(
-                                ChatComponent.attachmentButton(activeChannel, messageText, toBeSentAttachments),
-                                ChatComponent.voiceButton(activeChannel, messageText, toBeSentAttachments),
+                                AttachmentTemplates.attachmentButton(activeChannel, messageText, toBeSentAttachments),
+                                AttachmentTemplates.voiceButton(activeChannel, messageText, toBeSentAttachments),
                                 CommonTemplates.textArea(messageText, "message", null, "Write something nice...", ["flex-grow"], ["full-width-h", "message-input"], () => {
                                     if (!messageText.value || messageText.value.trim() === "" || sending.value) {
                                         return;
@@ -206,7 +206,7 @@ export class ChatComponent {
                         ifjs(message.attachments.length > 0, create("div")
                             .classes("flex", "attachments", "full-width")
                             .children(
-                                message.attachments.map(attachment => ChatComponent.attachment(attachment)),
+                                message.attachments.map(attachment => AttachmentTemplates.attachment(attachment)),
                             ).build()),
                         create("div")
                             .classes("flex-v", "message-text", "relative")
@@ -253,195 +253,6 @@ export class ChatComponent {
                     });
                     removeMessage(message.channelId, message.id);
                 })),
-            ).build();
-    }
-
-    static attachmentButton(activeChannel, messageText, toBeSentAttachments) {
-        return CommonTemplates.buttonWithIcon("attach_file", "", () => {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.multiple = true;
-            input.onchange = () => {
-                for (const file of input.files) {
-                    const reader = new FileReader();
-                    reader.onload = () => {
-                        let base64 = reader.result.split(',')[1];
-                        if (base64.constructor.name === "Buffer") {
-                            base64 = base64.toString("base64");
-                        }
-
-                        const maxPayloadSizeInMb = store().get("maxPayloadSizeInMb");
-                        if (maxPayloadSizeInMb && base64.length > maxPayloadSizeInMb * 1024 * 1024) {
-                            toast("File is too large, must be smaller than " + maxPayloadSizeInMb + "MB", "error");
-                            return;
-                        }
-
-                        toBeSentAttachments.value = [...toBeSentAttachments.value, {
-                            filename: file.name,
-                            type: file.type,
-                            data: base64,
-                        }];
-                    };
-                    reader.readAsDataURL(file);
-                }
-            };
-            input.click();
-        }, ["icon-button"]);
-    }
-
-    static attachmentPreview(attachment, toBeSentAttachments) {
-        return create("div")
-            .classes("flex-v", "align-center", "relative")
-            .children(
-                ChatComponent.attachmentPreviewContent(attachment),
-                CommonTemplates.smallIconButton("delete", "Delete", () => {
-                    toBeSentAttachments.value = toBeSentAttachments.value.filter(a => a.filename !== attachment.filename);
-                }, ["attachment-remove-button"]),
-            ).build();
-    }
-
-    static attachmentPreviewContent(attachment) {
-        let tag, source = `data:${attachment.type};base64,${attachment.data}`;
-        const baseType = attachment.type.split("/")[0];
-        switch (baseType) {
-            case "image":
-                tag = "img";
-                break;
-            case "video":
-                tag = "video";
-                break;
-            case "audio":
-                tag = "audio";
-                break;
-            default:
-                tag = "div";
-                break;
-        }
-        const content = create(tag)
-            .classes(baseType ? `attachment-preview-${baseType}` : "attachment-preview-file")
-            .src(source);
-
-        if (tag === "audio") {
-            content.attributes("controls", "controls");
-        } else if (tag === "img") {
-            content.attributes("loading", "lazy");
-        } else if (tag === "video") {
-            content.attributes("controls", "controls");
-            content.attributes("type", "video/mp4");
-            content.title("Video previews are not supported yet");
-        } else {
-            return create("div")
-                .classes("attachment-preview-file", "align-center")
-                .text(attachment.filename)
-                .build();
-        }
-
-        return content.build();
-    }
-
-    static attachment(attachment) {
-        const apiUrl = sessionStorage.getItem("apiUrl");
-        const url = apiUrl + `/attachments/${encodeURIComponent(attachment.messageId)}/${encodeURIComponent(attachment.filename)}`;
-        let tag;
-        switch (attachment.type.split("/")[0]) {
-            case "image":
-                tag = "img";
-                break;
-            case "video":
-                tag = "video";
-                break;
-            case "audio":
-                tag = "audio";
-                break;
-            default:
-                tag = "div";
-                break;
-        }
-        const isFullImage = signal(false);
-        const imageClass = computedSignal(isFullImage, isFull => isFull && tag === "img" ? "full-image" : `attachment-${attachment.type.split("/")[0]}`);
-
-        const content = create(tag)
-            .classes(imageClass)
-            .src(url);
-
-        if (tag === "audio") {
-            content.attributes("controls", "controls");
-        } else if (tag === "img") {
-            content.attributes("loading", "lazy");
-        } else if (tag === "video") {
-            content.attributes("controls", "controls");
-        } else {
-            return CommonTemplates.buttonWithIcon("download", attachment.filename, () => {
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = attachment.filename;
-                link.click();
-            });
-        }
-
-        return create("div")
-            .classes("attachment", attachment.type.split("/")[0])
-            .onclick(() => {
-                isFullImage.value = !isFullImage.value;
-            })
-            .children(
-                content.build()
-            ).build();
-    }
-
-    static voiceButton(activeChannel, messageText) {
-        const recording = signal(false);
-        const icon = computedSignal(recording, recording => recording ? "stop" : "mic");
-        const data = signal(null);
-        const identifierClass = computedSignal(recording, rec => rec ? "recording" : "stopped");
-        data.subscribe(data => {
-            if (!data) {
-                return;
-            }
-
-            const reader = new FileReader();
-            reader.readAsDataURL(data);
-            reader.onloadend = () => {
-                let base64 = reader.result.split(',')[1];
-                if (base64.constructor.name === "Buffer") {
-                    base64 = base64.toString("base64");
-                }
-
-                Live.send({
-                    type: "message",
-                    channelId: activeChannel.value,
-                    attachments: [{
-                        filename: "voice_recording.ogg",
-                        type: "audio/ogg",
-                        data: base64,
-                    }],
-                });
-            };
-            messageText.value = "";
-        });
-        let mediaRecorder;
-
-        return create("div")
-            .classes("voice-button", "relative")
-            .children(
-                create("div")
-                    .classes("recording-indicator", identifierClass)
-                    .build(),
-                CommonTemplates.buttonWithIcon(icon, null, async () => {
-                    if (!recording.value) {
-                        recording.value = true;
-                        const stream = await navigator.mediaDevices.getUserMedia({audio: true});
-                        mediaRecorder = new MediaRecorder(stream);
-                        mediaRecorder.ondataavailable = (e) => {
-                            data.value = e.data;
-                        };
-                        mediaRecorder.start();
-                    } else {
-                        recording.value = false;
-                        mediaRecorder.stop();
-                        mediaRecorder = null;
-                    }
-                }, ["icon-button"])
             ).build();
     }
 }
