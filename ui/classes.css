@@ -717,6 +717,7 @@
     background: transparent;
     border: none;
     border-radius: 999px;
+    padding: .4em;
 }
 
 .icon-button:hover {
@@ -734,4 +735,29 @@
     font-weight: bold;
     padding: var(--gap-v);
     word-break: break-all;
+}
+
+.recording-indicator {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 2px solid transparent;
+    border-radius: 999px;
+    pointer-events: none;
+}
+
+.recording-indicator.recording {
+    border: 2px dashed var(--red);
+    animation: rotate 8s infinite linear;
+}
+
+@keyframes rotate {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
 }

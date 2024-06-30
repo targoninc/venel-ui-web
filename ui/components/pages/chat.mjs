@@ -391,15 +391,14 @@ export class ChatComponent {
 
     static voiceButton(activeChannel, messageText) {
         const recording = signal(false);
-        const icon = computedSignal(recording, recording => recording ? "mic" : "mic_off");
+        const icon = computedSignal(recording, recording => recording ? "stop" : "mic");
         const data = signal(null);
-        const identifierClass = computedSignal(recording, recording => recording ? "recording" : "stopped");
+        const identifierClass = computedSignal(recording, rec => rec ? "recording" : "stopped");
         data.subscribe(data => {
             if (!data) {
                 return;
             }
 
-            // data is a blob, convert to buffer, then to base64
             const reader = new FileReader();
             reader.readAsDataURL(data);
             reader.onloadend = () => {
@@ -423,7 +422,7 @@ export class ChatComponent {
         let mediaRecorder;
 
         return create("div")
-            .classes("voice-button")
+            .classes("voice-button", "relative")
             .children(
                 create("div")
                     .classes("recording-indicator", identifierClass)
