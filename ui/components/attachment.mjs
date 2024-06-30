@@ -112,11 +112,9 @@ export class AttachmentTemplates {
     static textAttachment(attachment, url) {
         const fileContent = signal(null);
         const id = Math.random().toString(36).substring(7);
+        const hljsLang = attachment.filename.split(".")[1];
         fetch(url, {
             method: "GET",
-            headers: {
-                "Content-Type": "application/json"
-            },
             credentials: "include"
         }).then(async text => {
             fileContent.value = await text.text();
@@ -127,6 +125,7 @@ export class AttachmentTemplates {
             .classes("attachment", "text", "relative")
             .children(
                 create("pre")
+                    .classes(`language-${hljsLang}`)
                     .children(
                         create("code")
                             .id(id)
@@ -158,6 +157,9 @@ export class AttachmentTemplates {
             case "pdf":
                 return AttachmentTemplates.pdfAttachment(attachment, url);
             case "json":
+            case "xml":
+            case "x-xml":
+            case "x-javascript":
                 return AttachmentTemplates.textAttachment(attachment, url);
             default:
                 return AttachmentTemplates.fileAttachment(attachment, url);
