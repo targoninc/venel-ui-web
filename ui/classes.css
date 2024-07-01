@@ -705,12 +705,18 @@
     background: var(--bg);
 }
 
-.attachment-video, .attachment-audio {
+.attachment.video, .attachment.audio {
     max-height: 200px;
     height: auto;
     width: auto;
     border: 1px solid var(--bg-4);
     border-radius: var(--input-border-radius);
+}
+
+.attachment.video video {
+    max-height: 200px;
+    height: auto;
+    width: auto;
 }
 
 .icon-button {
@@ -790,6 +796,6 @@
     }
 }
 
-.message-text span {
+.message-text span:not(.material-symbols-outlined) {
     line-height: 1.3;
 }

@@ -25,10 +25,11 @@ export class AttachmentTemplates {
                             return;
                         }
 
+                        const type = file.type.trim().length > 0 ? file.type : "file";
                         toBeSentAttachments.value = [...toBeSentAttachments.value, {
                             filename: file.name,
-                            type: file.type,
                             data: base64,
+                            type,
                         }];
                     };
                     reader.readAsDataURL(file);

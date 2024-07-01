@@ -1,4 +1,4 @@
-import {create} from "https://fjs.targoninc.com/f.js";
+import {create, signal} from "https://fjs.targoninc.com/f.js";
 import {LayoutTemplates} from "../layout.mjs";
 import {CommonTemplates} from "../common.mjs";
 
@@ -55,7 +55,11 @@ export class UiTestComponent {
                         console.log(e.target.value);
                     })
                     .build(),
-                CommonTemplates.select(["Option 1", "Option 2", "Option 3"], (e) => {
+                CommonTemplates.select("Select", [
+                    { value: "option1", text: "Option 1" },
+                    { value: "option2", text: "Option 2" },
+                    { value: "option3", text: "Option 3" },
+                ], signal("option1"), (e) => {
                     console.log(e.target.value);
                 }),
                 CommonTemplates.userInList("", "User", "User description", () => {
