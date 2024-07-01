@@ -187,7 +187,7 @@ export class ChatComponent {
                         CommonTemplates.profileCard(message.sender, cardShown),
                     ).build()),
                 create("div")
-                    .classes("message-content", "flex", "space-between", "full-width")
+                    .classes("message-content", "full-width")
                     .oncontextmenu((e) => {
                         e.preventDefault();
                         menuShownForMessageId.value = message.id;

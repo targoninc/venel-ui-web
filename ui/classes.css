@@ -789,3 +789,7 @@
         transform: rotate(360deg);
     }
 }
+
+.message-text span {
+    line-height: 1.3;
+}
