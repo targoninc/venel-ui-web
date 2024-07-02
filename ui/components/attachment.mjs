@@ -182,17 +182,32 @@ export class AttachmentTemplates {
                     .attributes("scrolling", "no")
                     .attributes("frameborder", "0")
                     .attributes("allowfullscreen", "true")
-                    .build()
             ).build();
     }
 
     static fileAttachment(attachment, url) {
-        return CommonTemplates.buttonWithIcon("download", attachment.filename, () => {
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = attachment.filename;
-            link.click();
-        });
+        const mb = (attachment.size / 1024 / 1024).toFixed(2);
+
+        return create("button")
+            .classes("flex-v", "small-gap")
+            .onclick(() => {
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = attachment.filename;
+                link.click();
+            }).children(
+                create("div")
+                    .classes("flex")
+                    .children(
+                        CommonTemplates.icon("download"),
+                        create("span")
+                            .classes("text-small")
+                            .text(attachment.filename)
+                    ),
+                create("span")
+                    .classes("text-tiny")
+                    .text("Download (" + mb + " MB)")
+            ).build();
     }
 
     static imageAttachment(attachment, url) {

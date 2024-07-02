@@ -184,6 +184,9 @@ label {
 
 button {
     cursor: pointer;
+}
+
+button.flex {
     align-items: center;
 }
 
