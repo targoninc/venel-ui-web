@@ -209,6 +209,10 @@
     font-size: 0.8em;
 }
 
+.text-tiny {
+    font-size: 0.6em;
+}
+
 .chat-content {
     height: 100%;
 }
