@@ -3,7 +3,7 @@ import {PopupComponents} from "../components/popup.mjs";
 import {Api} from "./Api.mjs";
 import {Live} from "../live/Live.mjs";
 import {CommonTemplates} from "../components/common.mjs";
-import {signal} from "https://fjs.targoninc.com/f.js";
+import {signal} from "/f.js";
 import {Store} from "./Store.mjs";
 import {removeMessage} from "./Hooks.mjs";
 

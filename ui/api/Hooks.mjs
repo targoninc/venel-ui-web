@@ -1,6 +1,6 @@
 import {Api} from "./Api.mjs";
 import {playSound, testImage, toast} from "../actions.mjs";
-import {signal, store} from "https://fjs.targoninc.com/f.js";
+import {signal, store} from "/f.js";
 import {Live} from "../live/Live.mjs";
 import {Store} from "./Store.mjs";
 import {

@@ -1,5 +1,5 @@
 import {LayoutTemplates} from "../layout.mjs";
-import {computedSignal, create, signal, signalFromProperty, store} from "https://fjs.targoninc.com/f.js";
+import {computedSignal, create, signal, signalFromProperty, store} from "/f.js";
 import {CommonTemplates} from "../common.mjs";
 import {Store} from "../../api/Store.mjs";
 import {Api} from "../../api/Api.mjs";

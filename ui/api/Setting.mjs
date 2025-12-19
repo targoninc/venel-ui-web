@@ -1,6 +1,6 @@
 import {Api} from "./Api.mjs";
 import {toast} from "../actions.mjs";
-import {store} from "https://fjs.targoninc.com/f.js";
+import {store} from "/f.js";
 
 export class Setting {
     static getBoolean(key) {

@@ -1,5 +1,5 @@
 import {CommonTemplates} from "./common.mjs";
-import {computedSignal, create, ifjs, signal, store} from "https://fjs.targoninc.com/f.js";
+import {computedSignal, create, ifjs, signal, store} from "/f.js";
 import {toast} from "../actions.mjs";
 import {Live} from "../live/Live.mjs";
 import hljs from "https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/es/highlight.min.js";

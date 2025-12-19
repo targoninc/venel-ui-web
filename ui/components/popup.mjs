@@ -1,4 +1,4 @@
-import {create, ifjs, signal, signalMap} from "https://fjs.targoninc.com/f.js";
+import {create, ifjs, signal, signalMap} from "/f.js";
 import {CommonTemplates} from "./common.mjs";
 
 export class PopupComponents {

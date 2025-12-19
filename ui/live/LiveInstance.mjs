@@ -1,7 +1,7 @@
 import {addChannel, addMessage, addReaction, removeMessage, removeReaction} from "../api/Hooks.mjs";
 import {toast} from "../actions.mjs";
 import {Api} from "../api/Api.mjs";
-import {store} from "https://fjs.targoninc.com/f.js";
+import {store} from "/f.js";
 
 export class LiveInstance {
     constructor(onStop = () => {}, onStart = () => {}) {

@@ -1,4 +1,4 @@
-import {create} from "https://fjs.targoninc.com/f.js";
+import {create} from "/f.js";
 import {LayoutTemplates} from "../layout.mjs";
 import {Api} from "../../api/Api.mjs";
 import {toast} from "../../actions.mjs";

@@ -5,7 +5,7 @@ import {
     signal,
     signalFromProperty,
     signalMap
-} from "https://fjs.targoninc.com/f.js";
+} from "/f.js";
 import {LayoutTemplates} from "../layout.mjs";
 import {Store} from "../../api/Store.mjs";
 import {CommonTemplates} from "../common.mjs";

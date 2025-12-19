@@ -1,5 +1,5 @@
 import {LayoutTemplates} from "../layout.mjs";
-import {create} from "https://fjs.targoninc.com/f.js";
+import {create} from "/f.js";
 import {CommonTemplates} from "../common.mjs";
 
 export class HomeComponent {

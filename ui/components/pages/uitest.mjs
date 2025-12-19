@@ -1,4 +1,4 @@
-import {create, signal} from "https://fjs.targoninc.com/f.js";
+import {create, signal} from "/f.js";
 import {LayoutTemplates} from "../layout.mjs";
 import {CommonTemplates} from "../common.mjs";
 

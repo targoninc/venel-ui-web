@@ -1,4 +1,4 @@
-import {computedSignal, create, ifjs, signal, signalMap} from "https://fjs.targoninc.com/f.js";
+import {computedSignal, create, ifjs, signal, signalMap} from "/f.js";
 import {CommonTemplates} from "./common.mjs";
 import {Store} from "../api/Store.mjs";
 import {Live} from "../live/Live.mjs";

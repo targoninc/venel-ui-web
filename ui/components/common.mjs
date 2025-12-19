@@ -1,4 +1,4 @@
-import {computedSignal, create, FjsObservable, ifjs} from "https://fjs.targoninc.com/f.js";
+import {computedSignal, create, FjsObservable, ifjs} from "/f.js";
 import {Popups} from "../api/Popups.mjs";
 import {Store} from "../api/Store.mjs";
 import {testImage} from "../actions.mjs";

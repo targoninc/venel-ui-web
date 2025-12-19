@@ -1,4 +1,4 @@
-import {computedSignal, create, signal} from "https://fjs.targoninc.com/f.js";
+import {computedSignal, create, signal} from "/f.js";
 import {CommonTemplates} from "./common.mjs";
 
 export class LayoutTemplates {

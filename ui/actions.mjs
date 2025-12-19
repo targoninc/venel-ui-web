@@ -1,4 +1,4 @@
-import {create} from "https://fjs.targoninc.com/f.js";
+import {create} from "/f.js";
 import {Page} from "./routing/Page.mjs";
 import {Api} from "./api/Api.mjs";
 

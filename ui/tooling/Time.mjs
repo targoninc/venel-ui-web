@@ -1,4 +1,4 @@
-import {signal} from "https://fjs.targoninc.com/f.js";
+import {signal} from "/f.js";
 
 export class Time {
     static localDate(time) {

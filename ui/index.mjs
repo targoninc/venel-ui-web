@@ -5,7 +5,7 @@ import {Api} from "./api/Api.mjs";
 import {Store} from "./api/Store.mjs";
 import {Hooks} from "./api/Hooks.mjs";
 import {Live} from "./live/Live.mjs";
-import {store} from "https://fjs.targoninc.com/f.js";
+import {store} from "/f.js";
 
 Store.create();
 

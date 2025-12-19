@@ -1,4 +1,4 @@
-import {signal, store} from "https://fjs.targoninc.com/f.js";
+import {signal, store} from "/f.js";
 import {LiveInstance} from "./LiveInstance.mjs";
 
 export class Live {
