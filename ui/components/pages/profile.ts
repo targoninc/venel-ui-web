@@ -1,11 +1,11 @@
-import {LayoutTemplates} from "../layout.mjs";
+import {LayoutTemplates} from "../layout.ts";
 import {computedSignal, create, signal, signalFromProperty, store} from "/f.js";
-import {CommonTemplates} from "../common.mjs";
-import {Store} from "../../api/Store.mjs";
-import {Api} from "../../api/Api.mjs";
-import {testImage, toast} from "../../actions.mjs";
-import {Live} from "../../live/Live.mjs";
-import {Popups} from "../../api/Popups.mjs";
+import {CommonTemplates} from "../common.ts";
+import {Store} from "../../api/Store.ts";
+import {Api} from "../../api/Api.ts";
+import {testImage, toast} from "../../actions.ts";
+import {Live} from "../../live/Live.ts";
+import {Popups} from "../../api/Popups.ts";
 
 export class ProfileComponent {
     static render() {

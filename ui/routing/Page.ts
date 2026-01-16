@@ -58,7 +58,7 @@ export class Page {
     }
 
     static componentBasePath = "../components/";
-    static componentExtension = ".mjs";
+    static componentExtension = ".ts";
 
     static pageMap = {
         "chat": {

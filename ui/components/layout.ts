@@ -1,5 +1,5 @@
 import {computedSignal, create, signal} from "/f.js";
-import {CommonTemplates} from "./common.mjs";
+import {CommonTemplates} from "./common.ts";
 
 export class LayoutTemplates {
     static pageFull(content) {

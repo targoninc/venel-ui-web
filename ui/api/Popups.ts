@@ -1,11 +1,11 @@
-import {popup, removePopups, toast} from "../actions.mjs";
-import {PopupComponents} from "../components/popup.mjs";
-import {Api} from "./Api.mjs";
-import {Live} from "../live/Live.mjs";
-import {CommonTemplates} from "../components/common.mjs";
+import {popup, removePopups, toast} from "../actions.ts";
+import {PopupComponents} from "../components/popup.ts";
+import {Api} from "./Api.ts";
+import {Live} from "../live/Live.ts";
+import {CommonTemplates} from "../components/common.ts";
 import {signal} from "/f.js";
-import {Store} from "./Store.mjs";
-import {removeMessage} from "./Hooks.mjs";
+import {Store} from "./Store.ts";
+import {removeMessage} from "./Hooks.ts";
 
 export class Popups {
     static newDm() {

@@ -1,8 +1,8 @@
-import {LayoutTemplates} from "../layout.mjs";
+import {LayoutTemplates} from "../layout.ts";
 import {computedSignal, create, ifjs, signal, signalFromProperty, signalMap} from "/f.js";
-import {CommonTemplates} from "../common.mjs";
-import {Store} from "../../api/Store.mjs";
-import {Api} from "../../api/Api.mjs";
+import {CommonTemplates} from "../common.ts";
+import {Store} from "../../api/Store.ts";
+import {Api} from "../../api/Api.ts";
 import {
     playLoop,
     playSound,
@@ -12,16 +12,16 @@ import {
     toast,
     toggleAllowlist,
     toggleInstanceEnabled
-} from "../../actions.mjs";
-import {PopupComponents} from "../popup.mjs";
-import {Popups} from "../../api/Popups.mjs";
+} from "../../actions.ts";
+import {PopupComponents} from "../popup.ts";
+import {Popups} from "../../api/Popups.ts";
 import {
     currentCallSound,
     currentSound,
     localNotificationsEnabled, setCurrentCallSound, setCurrentSound,
     setLocalNotificationsEnabled, setSoundEnabled, setSystemNotificationsEnabled, soundEnabled,
     systemNotificationsEnabled
-} from "../../api/Setting.mjs";
+} from "../../api/Setting.ts";
 
 export class SettingsComponent {
     static render() {

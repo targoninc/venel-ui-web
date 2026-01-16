@@ -1,6 +1,6 @@
-import {Store} from "../api/Store.mjs";
-import {notify, testImage} from "../actions.mjs";
-import {truncate} from "../tooling/Text.mjs";
+import {Store} from "../api/Store.ts";
+import {notify, testImage} from "../actions.ts";
+import {truncate} from "../tooling/Text.ts";
 
 export class Notifier {
     static sendMessage(channelId, message) {

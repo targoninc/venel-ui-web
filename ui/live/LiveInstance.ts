@@ -1,6 +1,6 @@
-import {addChannel, addMessage, addReaction, removeMessage, removeReaction} from "../api/Hooks.mjs";
-import {toast} from "../actions.mjs";
-import {Api} from "../api/Api.mjs";
+import {addChannel, addMessage, addReaction, removeMessage, removeReaction} from "../api/Hooks.ts";
+import {toast} from "../actions.ts";
+import {Api} from "../api/Api.ts";
 import {store} from "/f.js";
 
 export class LiveInstance {

@@ -1,7 +1,7 @@
 import {create} from "/f.js";
-import {LayoutTemplates} from "../layout.mjs";
-import {Api} from "../../api/Api.mjs";
-import {toast} from "../../actions.mjs";
+import {LayoutTemplates} from "../layout.ts";
+import {Api} from "../../api/Api.ts";
+import {toast} from "../../actions.ts";
 
 export class LogoutComponent {
     static render() {

@@ -1,5 +1,5 @@
-import {Api} from "./Api.mjs";
-import {toast} from "../actions.mjs";
+import {Api} from "./Api.ts";
+import {toast} from "../actions.ts";
 import {store} from "/f.js";
 
 export class Setting {

@@ -6,17 +6,17 @@ import {
     signalFromProperty,
     signalMap
 } from "/f.js";
-import {LayoutTemplates} from "../layout.mjs";
-import {Store} from "../../api/Store.mjs";
-import {CommonTemplates} from "../common.mjs";
-import {Hooks, removeMessage} from "../../api/Hooks.mjs";
-import {Time} from "../../tooling/Time.mjs";
-import {Live} from "../../live/Live.mjs";
-import {ChannelTemplates} from "../channel.mjs";
-import {testImage} from "../../actions.mjs";
-import {Popups} from "../../api/Popups.mjs";
-import {ReactionTemplates} from "../reaction.mjs";
-import {AttachmentTemplates} from "../attachment.mjs";
+import {LayoutTemplates} from "../layout.ts";
+import {Store} from "../../api/Store.ts";
+import {CommonTemplates} from "../common.ts";
+import {Hooks, removeMessage} from "../../api/Hooks.ts";
+import {Time} from "../../tooling/Time.ts";
+import {Live} from "../../live/Live.ts";
+import {ChannelTemplates} from "../channel.ts";
+import {testImage} from "../../actions.ts";
+import {Popups} from "../../api/Popups.ts";
+import {ReactionTemplates} from "../reaction.ts";
+import {AttachmentTemplates} from "../attachment.ts";
 
 export class ChatComponent {
     static render(params) {

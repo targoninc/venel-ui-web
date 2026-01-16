@@ -1,5 +1,5 @@
 import {signal, store} from "/f.js";
-import {LiveInstance} from "./LiveInstance.mjs";
+import {LiveInstance} from "./LiveInstance.ts";
 
 export class Live {
     static startIfNotRunning() {

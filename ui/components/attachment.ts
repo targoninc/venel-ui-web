@@ -1,7 +1,7 @@
-import {CommonTemplates} from "./common.mjs";
+import {CommonTemplates} from "./common.ts";
 import {computedSignal, create, ifjs, signal, store} from "/f.js";
-import {toast} from "../actions.mjs";
-import {Live} from "../live/Live.mjs";
+import {toast} from "../actions.ts";
+import {Live} from "../live/Live.ts";
 import hljs from "https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/es/highlight.min.js";
 
 export class AttachmentTemplates {

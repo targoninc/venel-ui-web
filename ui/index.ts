@@ -1,10 +1,10 @@
-import {Router} from "./routing/Router.mjs";
-import {routes} from "./routing/Routes.mjs";
-import {Page} from "./routing/Page.mjs";
-import {Api} from "./api/Api.mjs";
-import {Store} from "./api/Store.mjs";
-import {Hooks} from "./api/Hooks.mjs";
-import {Live} from "./live/Live.mjs";
+import {Router} from "./routing/Router.ts";
+import {routes} from "./routing/Routes.ts";
+import {Page} from "./routing/Page.ts";
+import {Api} from "./api/Api.ts";
+import {Store} from "./api/Store.ts";
+import {Hooks} from "./api/Hooks.ts";
+import {Live} from "./live/Live.ts";
 import {store} from "/f.js";
 
 Store.create();

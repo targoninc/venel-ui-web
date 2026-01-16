@@ -1,6 +1,6 @@
-import {LayoutTemplates} from "../layout.mjs";
+import {LayoutTemplates} from "../layout.ts";
 import {create} from "/f.js";
-import {CommonTemplates} from "../common.mjs";
+import {CommonTemplates} from "../common.ts";
 
 export class HomeComponent {
     static render() {

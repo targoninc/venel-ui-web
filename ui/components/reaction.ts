@@ -1,8 +1,8 @@
 import {computedSignal, create, ifjs, signal, signalMap} from "/f.js";
-import {CommonTemplates} from "./common.mjs";
-import {Store} from "../api/Store.mjs";
-import {Live} from "../live/Live.mjs";
-import {playReactionAnimation} from "../actions.mjs";
+import {CommonTemplates} from "./common.ts";
+import {Store} from "../api/Store.ts";
+import {Live} from "../live/Live.ts";
+import {playReactionAnimation} from "../actions.ts";
 
 export class ReactionTemplates {
     static reactionTrigger(message, messages) {

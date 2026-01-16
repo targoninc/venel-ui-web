@@ -1,6 +1,6 @@
 import {create} from "/f.js";
-import {Page} from "./routing/Page.mjs";
-import {Api} from "./api/Api.mjs";
+import {Page} from "./routing/Page.ts";
+import {Api} from "./api/Api.ts";
 
 /**
  *

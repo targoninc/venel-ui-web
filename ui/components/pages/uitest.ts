@@ -1,6 +1,6 @@
 import {create, signal} from "/f.js";
-import {LayoutTemplates} from "../layout.mjs";
-import {CommonTemplates} from "../common.mjs";
+import {LayoutTemplates} from "../layout.ts";
+import {CommonTemplates} from "../common.ts";
 
 export class UiTestComponent {
     static render() {

@@ -1,7 +1,7 @@
 import {computedSignal, create, ifjs, signal, signalMap, store} from "/f.js";
-import {Live} from "../live/Live.mjs";
-import {truncate} from "../tooling/Text.mjs";
-import {testImage} from "../actions.mjs";
+import {Live} from "../live/Live.ts";
+import {truncate} from "../tooling/Text.ts";
+import {testImage} from "../actions.ts";
 
 export class ChannelTemplates {
     static dmChannel(channel, messages, activeChannel) {

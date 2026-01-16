@@ -1,7 +1,7 @@
 import {computedSignal, create, FjsObservable, ifjs} from "/f.js";
-import {Popups} from "../api/Popups.mjs";
-import {Store} from "../api/Store.mjs";
-import {testImage} from "../actions.mjs";
+import {Popups} from "../api/Popups.ts";
+import {Store} from "../api/Store.ts";
+import {testImage} from "../actions.ts";
 
 export class CommonTemplates {
     static icon(icon, classes = [], tag = "span") {

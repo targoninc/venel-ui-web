@@ -1,4 +1,4 @@
-import {ApiBase} from "./ApiBase.mjs";
+import {ApiBase} from "./ApiBase.ts";
 
 export class Api extends ApiBase {
     static async logout() {
@@ -73,7 +73,7 @@ export class Api extends ApiBase {
     static async createDirect(targetUserId = null) {
         return await this.post("/api/channels/createDirect", {targetUserId});
     }
-    static async getMessages(channelId = null, offset = null) {
+    static async getMessages(channelId = null, offset: number | null = null) {
         return await this.get("/api/channels/getMessages", {channelId, offset});
     }
     static async getChannels() {
