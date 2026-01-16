@@ -17,7 +17,8 @@
     "@types/express": "^5.0.6",
     "@typescript/native-preview": "^7.0.0-dev.20260116.1",
     "dotenv": "^16.4.5",
-    "express": "^4.19.2"
+    "express": "^4.19.2",
+    "highlight.js": "^11.11.1"
   },
   "devDependencies": {
     "@types/node": "^25.0.9"

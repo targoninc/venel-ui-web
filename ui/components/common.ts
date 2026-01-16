@@ -1,7 +1,7 @@
-import {computedSignal, create, FjsObservable, ifjs} from "/f.js";
 import {Popups} from "../api/Popups.ts";
 import {Store} from "../api/Store.ts";
 import {testImage} from "../actions.ts";
+import {compute, create, when} from "@targoninc/jess";
 
 export class CommonTemplates {
     static icon(icon, classes = [], tag = "span") {
@@ -29,7 +29,7 @@ export class CommonTemplates {
             .onclick(onclick)
             .children(
                 CommonTemplates.icon(icon, iconClasses),
-                ifjs(text, create("span")
+                when(text, create("span")
                     .text(text)
                     .build()),
             ).build();
@@ -41,12 +41,12 @@ export class CommonTemplates {
             .onclick(onclick)
             .id(id)
             .children(
-                icon ? ifjs(loadingState, CommonTemplates.icon(icon), true) : null,
-                ifjs(loadingState, create("span")
+                icon ? when(loadingState, CommonTemplates.icon(icon), true) : null,
+                when(loadingState, create("span")
                     .text(text)
                     .build(), true),
-                ifjs(loadingState, CommonTemplates.spinner()),
-                ifjs(loadingState, create("span")
+                when(loadingState, CommonTemplates.spinner()),
+                when(loadingState, create("span")
                     .text("Loading...")
                     .build()),
             ).build();
@@ -64,11 +64,11 @@ export class CommonTemplates {
                     .children(
                         create("select")
                             .onchange((e) => {
-                                onchange(e.target.value);
+                                onchange(e.target?.value);
                             })
                             .children(
                                 ...options.map(option => {
-                                    const selected = computedSignal(value, value => option.value === value);
+                                    const selected = compute(v => option.value === v, value);
 
                                     return create("option")
                                         .text(option.text)
@@ -103,8 +103,8 @@ export class CommonTemplates {
             return (currentRoute && currentRoute.path === page) ? "active" : "_";
         };
         const user = Store.get('user');
-        const avatar = computedSignal(user, user => user && user.avatar ? user.avatar : testImage);
-        const hasAnyRole = computedSignal(user, user => user && user.roles && user.roles.length > 0);
+        const avatar = compute(u => u && u.avatar ? u.avatar : testImage, user);
+        const hasAnyRole = compute(u => u && u.roles && u.roles.length > 0, user);
 
         return create("nav")
             .classes("flex", "align-center", "full-width", "space-between", "padded", "fixed")
@@ -115,7 +115,7 @@ export class CommonTemplates {
                         CommonTemplates.buttonWithIcon("chat", "Chat", () => window.router.navigate('chat'), [activeIfActive("chat")]),
                         CommonTemplates.buttonWithIcon("person_add", "New DM", () => Popups.newDm()),
                     ).build(),
-                ifjs(hasAnyRole, create("div")
+                when(hasAnyRole, create("div")
                     .classes("flex", "align-center")
                     .children(
                         CommonTemplates.buttonWithIcon("settings", "Settings", () => window.router.navigate('settings'), [activeIfActive("settings")]),
@@ -130,7 +130,7 @@ export class CommonTemplates {
     }
 
     static profileCard(user, shown) {
-        const cardStyle = computedSignal(shown, isShown => isShown ? "flex" : "none");
+        const cardStyle = compute(isShown => isShown ? "flex" : "none", shown);
         shown.subscribe(is => {
             if (is) {
                 setTimeout(() => {
@@ -190,7 +190,7 @@ export class CommonTemplates {
                             .classes("bold")
                             .text(name)
                             .build(),
-                        ifjs(text, create("span")
+                        when(text, create("span")
                             .text(text)
                             .build()),
                     ).build(),
@@ -329,7 +329,7 @@ export class CommonTemplates {
         return create("div")
             .classes("flex-v", "small-gap", ...classes)
             .children(
-                ifjs(label, create("label")
+                when(label, create("label")
                     .for(id)
                     .text(label)
                     .build()),

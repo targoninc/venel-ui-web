@@ -1,4 +1,4 @@
-import {computedSignal, create, ifjs, signal, signalMap} from "/f.js";
+import {computedSignal, create, when, signal, signalMap} from "/f.js";
 import {CommonTemplates} from "./common.ts";
 import {Store} from "../api/Store.ts";
 import {Live} from "../live/Live.ts";
@@ -23,7 +23,7 @@ export class ReactionTemplates {
                         }, {once: true});
                     }, 0);
                 }, ["reaction-button"]),
-                ifjs(menuShown, ReactionTemplates.reactionMenu(message, messages)),
+                when(menuShown, ReactionTemplates.reactionMenu(message, messages)),
             ).build();
     }
 
@@ -79,7 +79,7 @@ export class ReactionTemplates {
         return create("div")
             .classes("flex-v")
             .children(
-                ifjs(hasReactions, create("h3")
+                when(hasReactions, create("h3")
                     .classes("text-small")
                     .text(group.display)
                     .build()),

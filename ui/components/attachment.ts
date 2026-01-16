@@ -1,8 +1,9 @@
 import {CommonTemplates} from "./common.ts";
-import {computedSignal, create, ifjs, signal, store} from "/f.js";
 import {toast} from "../actions.ts";
 import {Live} from "../live/Live.ts";
-import hljs from "https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/es/highlight.min.js";
+import hljs from "highlight.js";
+import {create, signal} from "@targoninc/jess";
+import {store} from "../compat";
 
 export class AttachmentTemplates {
     static attachmentButton(activeChannel, messageText, toBeSentAttachments) {
@@ -314,7 +315,7 @@ export class AttachmentTemplates {
                             }
                         }, ["icon-button"]),
                     ).build(),
-                ifjs(recording, CommonTemplates.buttonWithIcon("stop", "Discard", () => {
+                when(recording, CommonTemplates.buttonWithIcon("stop", "Discard", () => {
                     dontSend.value = true;
                     recording.value = false;
                     mediaRecorder.stop();

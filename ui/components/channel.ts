@@ -1,4 +1,4 @@
-import {computedSignal, create, ifjs, signal, signalMap, store} from "/f.js";
+import {computedSignal, create, when, signal, signalMap, store} from "/f.js";
 import {Live} from "../live/Live.ts";
 import {truncate} from "../tooling/Text.ts";
 import {testImage} from "../actions.ts";
@@ -49,7 +49,7 @@ export class ChannelTemplates {
                 activeChannel.value = channel.id;
             })
             .children(
-                ifjs(editing, create("input")
+                when(editing, create("input")
                     .type("text")
                     .value(channel.name)
                     .onchange((e) => {
@@ -59,7 +59,7 @@ export class ChannelTemplates {
                             name: e.target.value,
                         });
                     }).build()),
-                ifjs(editing, create("span")
+                when(editing, create("span")
                     .text(channel.name)
                     .build(), true),
                 create("span")

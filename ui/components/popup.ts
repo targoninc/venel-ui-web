@@ -1,4 +1,4 @@
-import {create, ifjs, signal, signalMap} from "/f.js";
+import {create, when, signal, signalMap} from "/f.js";
 import {CommonTemplates} from "./common.ts";
 
 export class PopupComponents {
@@ -23,16 +23,16 @@ export class PopupComponents {
                         create("div")
                             .classes("flex", "space-between")
                             .children(
-                                ifjs(title, create("h3").text(title).build()),
+                                when(title, create("h3").text(title).build()),
                                 PopupComponents.closeButton(onclose),
                             ).build(),
                         CommonTemplates.responsiveInput("text", "search", inputLabel, inputLabel, "", onsearch),
-                        ifjs(searchResults, signalMap(searchResults,
+                        when(searchResults, signalMap(searchResults,
                             create("div")
                                 .classes("flex-v"),
                             renderResult
                         )),
-                        ifjs(searchResults, create("div")
+                        when(searchResults, create("div")
                             .classes("no-results")
                             .text("No results found")
                             .build(), true),
@@ -144,7 +144,7 @@ export class PopupComponents {
                         CommonTemplates.input("password", "confirm-password", "Confirm new password", "Confirm new password", confirmPassword, (e) => {
                             confirmPassword.value = e.target.value;
                         }, true, "confirm-password"),
-                        ifjs(errorState, create("p")
+                        when(errorState, create("p")
                             .classes("error")
                             .text(errorState)
                             .build()),

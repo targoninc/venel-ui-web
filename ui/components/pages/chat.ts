@@ -1,11 +1,3 @@
-import {
-    computedSignal,
-    create,
-    ifjs,
-    signal,
-    signalFromProperty,
-    signalMap
-} from "/f.js";
 import {LayoutTemplates} from "../layout.ts";
 import {Store} from "../../api/Store.ts";
 import {CommonTemplates} from "../common.ts";
@@ -62,8 +54,8 @@ export class ChatComponent {
                     .classes("panes", "full-width", "flex-grow", "nav-margin", "no-wrap")
                     .children(
                         LayoutTemplates.resizableFromRight(ChannelTemplates.channelList(displayChannels, messages, activeChannel), inverseRefId, "20%", "10%", "50%"),
-                        ifjs(activeChannel, LayoutTemplates.flexPane(ChatComponent.chat(activeChannel, messages), "300px", "100%", inverseRefId)),
-                        ifjs(activeChannel, LayoutTemplates.flexPane(create("span").text("No channel selected").build(), "300px", "100%", inverseRefId), true)
+                        when(activeChannel, LayoutTemplates.flexPane(ChatComponent.chat(activeChannel, messages), "300px", "100%", inverseRefId)),
+                        when(activeChannel, LayoutTemplates.flexPane(create("span").text("No channel selected").build(), "300px", "100%", inverseRefId), true)
                     ).build()
             ).build();
     }
@@ -93,7 +85,7 @@ export class ChatComponent {
                         signalMap(messages, create("div")
                                 .classes("chat-messages","flex-v", "flex-grow", "no-gap"),
                             message => ChatComponent.message(message, messages, menuShownForMessageId)),
-                        ifjs(hasAttachments, create("div")
+                        when(hasAttachments, create("div")
                             .classes("flex", "align-center", "full-width")
                             .children(
                                 signalMap(toBeSentAttachments, create("div")
@@ -176,7 +168,7 @@ export class ChatComponent {
         return create("div")
             .classes("chat-message", "flex-v", "no-gap")
             .children(
-                ifjs(shouldDisplaySender, create("div")
+                when(shouldDisplaySender, create("div")
                     .classes("flex", "align-center", "relative")
                     .children(
                         CommonTemplates.chatUser(message.sender.avatar ?? testImage, message.sender.displayname ?? message.sender.username, () => {
@@ -201,13 +193,13 @@ export class ChatComponent {
                         create("div")
                             .classes("relative")
                             .children(
-                                ifjs(menuShown, ChatComponent.messageMenu(message, messages, messageMenuPositionX, messageMenuPositionY)),
+                                when(menuShown, ChatComponent.messageMenu(message, messages, messageMenuPositionX, messageMenuPositionY)),
                                 create("span")
                                     .classes("message-timestamp", "text-small")
                                     .text(Time.messageTimestamp(timestamp))
                                     .build(),
                             ).build(),
-                        ifjs(message.attachments.length > 0, create("div")
+                        when(message.attachments.length > 0, create("div")
                             .classes("flex", "attachments", "full-width")
                             .children(
                                 message.attachments.map(attachment => AttachmentTemplates.attachment(attachment)),
@@ -215,16 +207,16 @@ export class ChatComponent {
                         create("div")
                             .classes("flex-v", "message-text", "relative")
                             .children(
-                                ifjs(message.text, create("span")
+                                when(message.text, create("span")
                                     .text(message.text)
                                     .build()),
-                                ifjs(reactions.length > 0, ReactionTemplates.reactionDisplay(reactions, message)),
+                                when(reactions.length > 0, ReactionTemplates.reactionDisplay(reactions, message)),
                                 ReactionTemplates.reactionTrigger(message, messages),
                             ).build(),
                         create("div")
                             .classes("flex-v", "no-gap")
                             .children(
-                                ifjs(edited, create("span")
+                                when(edited, create("span")
                                     .classes("message-note")
                                     .text("edited " + Time.ago(new Date(message.updatedAt).getTime()))
                                     .build()),
@@ -247,10 +239,10 @@ export class ChatComponent {
             .classes("message-menu", "flex-v", menuClass)
             .styles("top", posYR, "left", posXR)
             .children(
-                ifjs(sameUser, CommonTemplates.buttonWithIcon("edit", "Edit", () => {
+                when(sameUser, CommonTemplates.buttonWithIcon("edit", "Edit", () => {
                     Popups.editMessage(message, messages);
                 })),
-                ifjs(canDelete, CommonTemplates.buttonWithIcon("delete", "Delete", () => {
+                when(canDelete, CommonTemplates.buttonWithIcon("delete", "Delete", () => {
                     Live.send({
                         type: "removeMessage",
                         messageId: message.id,

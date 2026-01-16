@@ -1,4 +1,4 @@
-import {create, ifjs, signal} from "/f.js";
+import {create, when, signal} from "/f.js";
 import {LayoutTemplates} from "../layout.ts";
 import {CommonTemplates} from "../common.ts";
 import {Api} from "../../api/Api.ts";
@@ -76,21 +76,21 @@ export class RegisterComponent {
                                 }, true, "username", () => {
                                     document.getElementById("password").focus();
                                 }),
-                                ifjs(usernameError, CommonTemplates.error(usernameError)),
+                                when(usernameError, CommonTemplates.error(usernameError)),
                                 CommonTemplates.input("password", "password", "Password", "Password", password, (e) => {
                                     password.value = e.target.value;
                                 }, true, "current-password", (e) => {
                                     password.value = e.target.value;
                                     document.getElementById("password2").focus();
                                 }),
-                                ifjs(passwordError, CommonTemplates.error(passwordError)),
+                                when(passwordError, CommonTemplates.error(passwordError)),
                                 CommonTemplates.input("password", "password2", "Password", "Password", password2, (e) => {
                                     password2.value = e.target.value;
                                 }, true, "new-password", (e) => {
                                     password2.value = e.target.value;
                                     document.getElementById("register").click();
                                 }),
-                                ifjs(password2Error, CommonTemplates.error(password2Error)),
+                                when(password2Error, CommonTemplates.error(password2Error)),
                                 CommonTemplates.buttonWithSpinner("person_add", "Register", "register", () => {
                                     validate();
                                     if (usernameError.value || passwordError.value || password2Error.value) {

@@ -1,4 +1,4 @@
-import {create, ifjs, signal} from "/f.js";
+import {create, when, signal} from "/f.js";
 import {LayoutTemplates} from "../layout.ts";
 import {CommonTemplates} from "../common.ts";
 import {Api} from "../../api/Api.ts";
@@ -60,7 +60,7 @@ export class LoginComponent {
                                             .text(window.location.hostname)
                                             .build()
                                     ).build(),
-                                ifjs(user, create("div")
+                                when(user, create("div")
                                     .classes("flex-v")
                                     .children(
                                         CommonTemplates.warning("You are already logged in. Logging in will log you out and switch you to the new user."),
@@ -76,14 +76,14 @@ export class LoginComponent {
                                 }, true, "username", () => {
                                     document.getElementById("password").focus();
                                 }),
-                                ifjs(usernameError, CommonTemplates.error(usernameError)),
+                                when(usernameError, CommonTemplates.error(usernameError)),
                                 CommonTemplates.input("password", "password", "Password", "Password", password, (e) => {
                                     password.value = e.target.value;
                                 }, true, "current-password", (e) => {
                                     password.value = e.target.value;
                                     document.getElementById("login").click();
                                 }),
-                                ifjs(passwordError, CommonTemplates.error(passwordError)),
+                                when(passwordError, CommonTemplates.error(passwordError)),
                                 CommonTemplates.buttonWithSpinner("login", "Login", "login", () => {
                                     validate();
                                     if (usernameError.value || passwordError.value) {
@@ -103,10 +103,10 @@ export class LoginComponent {
                                         }
                                     });
                                 }, loading, ["positive"]),
-                                ifjs(actionError, CommonTemplates.error(actionError)),
+                                when(actionError, CommonTemplates.error(actionError)),
                             ).build(),
                     ).build(),
-                ifjs(user, create("div")
+                when(user, create("div")
                     .classes("flex-v")
                     .children(
                         CommonTemplates.pageLink("Register", "register"),

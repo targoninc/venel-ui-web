@@ -1,5 +1,5 @@
 import {LayoutTemplates} from "../layout.ts";
-import {computedSignal, create, ifjs, signal, signalFromProperty, signalMap} from "/f.js";
+import {computedSignal, create, when, signal, signalFromProperty, signalMap} from "/f.js";
 import {CommonTemplates} from "../common.ts";
 import {Store} from "../../api/Store.ts";
 import {Api} from "../../api/Api.ts";
@@ -118,17 +118,17 @@ export class SettingsComponent {
                 create("h2")
                     .text("Bridged Instances")
                     .build(),
-                ifjs(hasViewPermission, create("div")
+                when(hasViewPermission, create("div")
                     .classes("flex-v")
                     .children(
                         SettingsComponent.bridgeInstanceActions(bridgedInstances, permissions),
-                        ifjs(loading, CommonTemplates.spinner()),
+                        when(loading, CommonTemplates.spinner()),
                         signalMap(bridgedInstances,
                             create("div")
                                 .classes("flex-v"),
                             instance => SettingsComponent.bridgeInstance(bridgedInstances, instance, permissions)),
                     ).build()),
-                ifjs(hasViewPermission, create("span")
+                when(hasViewPermission, create("span")
                     .classes("error")
                     .text("You do not have permission to view bridged instances")
                     .build(), true),
@@ -147,7 +147,7 @@ export class SettingsComponent {
                 create("div")
                     .classes("flex")
                     .children(
-                        ifjs(hasAddPermission, CommonTemplates.buttonWithIcon("add_link", "Add Bridged Instance", () => {
+                        when(hasAddPermission, CommonTemplates.buttonWithIcon("add_link", "Add Bridged Instance", () => {
                             popup(SettingsComponent.addBridgedInstancePopup(() => {
                                 removePopups();
                             }, bridgedInstances));
@@ -238,16 +238,16 @@ export class SettingsComponent {
                         create("div")
                             .classes("flex")
                             .children(
-                                ifjs(instance.useAllowlist, CommonTemplates.circleToggle("Only allowed users", "var(--purple)", () => toggleAllowlist(instances, instance))),
-                                ifjs(instance.useAllowlist, CommonTemplates.circleToggle("All users", "var(--green)", () => toggleAllowlist(instances, instance)), true),
-                                ifjs(instance.enabled, CommonTemplates.circleToggle("Enabled", "var(--green)", () => toggleInstanceEnabled(instances, instance))),
-                                ifjs(instance.enabled, CommonTemplates.circleToggle("Disabled", "var(--red)", () => toggleInstanceEnabled(instances, instance)), true),
-                                ifjs(hasRemovePermission, CommonTemplates.buttonWithIcon("delete", "Remove", () => {
+                                when(instance.useAllowlist, CommonTemplates.circleToggle("Only allowed users", "var(--purple)", () => toggleAllowlist(instances, instance))),
+                                when(instance.useAllowlist, CommonTemplates.circleToggle("All users", "var(--green)", () => toggleAllowlist(instances, instance)), true),
+                                when(instance.enabled, CommonTemplates.circleToggle("Enabled", "var(--green)", () => toggleInstanceEnabled(instances, instance))),
+                                when(instance.enabled, CommonTemplates.circleToggle("Disabled", "var(--red)", () => toggleInstanceEnabled(instances, instance)), true),
+                                when(hasRemovePermission, CommonTemplates.buttonWithIcon("delete", "Remove", () => {
                                     Popups.removeInstancePopup(instance, instances);
                                 })),
                             ).build(),
                     ).build(),
-                ifjs(instance.bridgedUsers, LayoutTemplates.collapsible("Allowlist", SettingsComponent.allowlist(instance))),
+                when(instance.bridgedUsers, LayoutTemplates.collapsible("Allowlist", SettingsComponent.allowlist(instance))),
             ).build();
     }
 
@@ -272,17 +272,17 @@ export class SettingsComponent {
                 create("h2")
                     .text("Users")
                     .build(),
-                ifjs(hasViewPermission, create("div")
+                when(hasViewPermission, create("div")
                     .classes("flex-v")
                     .children(
                         SettingsComponent.userActions(users, permissions),
-                        ifjs(loading, CommonTemplates.spinner()),
+                        when(loading, CommonTemplates.spinner()),
                         signalMap(users,
                             create("div")
                                 .classes("flex-v"),
                             user => SettingsComponent.user(users, user, permissions)),
                     ).build()),
-                ifjs(hasViewPermission, create("span")
+                when(hasViewPermission, create("span")
                     .classes("error")
                     .text("You do not have permission to view users")
                     .build(), true),
@@ -315,16 +315,16 @@ export class SettingsComponent {
                         create("div")
                             .classes("flex")
                             .children(
-                                ifjs(hasEditPermission, CommonTemplates.buttonWithIcon("edit", "Edit", () => {})),
-                                ifjs(hasDeletePermission, CommonTemplates.buttonWithIcon("delete", "Delete", () => {
+                                when(hasEditPermission, CommonTemplates.buttonWithIcon("edit", "Edit", () => {})),
+                                when(hasDeletePermission, CommonTemplates.buttonWithIcon("delete", "Delete", () => {
                                     Popups.deleteUserPopup(users, user);
                                 })),
                             ).build(),
                     ).build(),
-                ifjs(user.roles.length > 0, LayoutTemplates.collapsible("Roles", SettingsComponent.userRoles(user))),
-                ifjs(user.roles.length > 0, CommonTemplates.error("No roles"), true),
-                ifjs(user.permissions.length > 0, LayoutTemplates.collapsible("Permissions", SettingsComponent.userPermissions(user))),
-                ifjs(user.permissions.length > 0, CommonTemplates.smallCard("info", "No permissions"), true),
+                when(user.roles.length > 0, LayoutTemplates.collapsible("Roles", SettingsComponent.userRoles(user))),
+                when(user.roles.length > 0, CommonTemplates.error("No roles"), true),
+                when(user.permissions.length > 0, LayoutTemplates.collapsible("Permissions", SettingsComponent.userPermissions(user))),
+                when(user.permissions.length > 0, CommonTemplates.smallCard("info", "No permissions"), true),
             ).build();
     }
 
@@ -454,7 +454,7 @@ export class SettingsComponent {
                                     playingLoop.value = true;
                                     playLoop(callSound.value);
                                 }),
-                                ifjs(playingLoop, CommonTemplates.buttonWithIcon("stop", "Stop playing", () => {
+                                when(playingLoop, CommonTemplates.buttonWithIcon("stop", "Stop playing", () => {
                                     stopPlayingLoop();
                                     playingLoop.value = false;
                                 }))
