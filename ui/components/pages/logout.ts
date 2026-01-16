@@ -1,7 +1,7 @@
-import {create} from "/f.js";
 import {LayoutTemplates} from "../layout.ts";
 import {Api} from "../../api/Api.ts";
 import {toast} from "../../actions.ts";
+import {create} from "@targoninc/jess";
 
 export class LogoutComponent {
     static render() {

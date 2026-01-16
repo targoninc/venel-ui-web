@@ -1,5 +1,4 @@
 import {LayoutTemplates} from "../layout.ts";
-import {computedSignal, create, when, signal, signalFromProperty, signalMap} from "/f.js";
 import {CommonTemplates} from "../common.ts";
 import {Store} from "../../api/Store.ts";
 import {Api} from "../../api/Api.ts";
@@ -22,6 +21,7 @@ import {
     setLocalNotificationsEnabled, setSoundEnabled, setSystemNotificationsEnabled, soundEnabled,
     systemNotificationsEnabled
 } from "../../api/Setting.ts";
+import {compute, create, signal, signalMap, when} from "@targoninc/jess";
 
 export class SettingsComponent {
     static render() {
@@ -30,7 +30,7 @@ export class SettingsComponent {
 
     static content() {
         const user = Store.get('user');
-        const permissions = signalFromProperty(user, 'permissions');
+        const permissions = compute(u => u.permissions, user);
 
         return create("div")
             .classes("panes-v", "full-width", "full-height")
@@ -97,7 +97,7 @@ export class SettingsComponent {
     }
 
     static bridgeInstanceSettings(permissions) {
-        const hasViewPermission = computedSignal(permissions, ps => ps && ps.some(p => p.name === "viewBridgedInstances"));
+        const hasViewPermission = compute(ps => ps && ps.some(p => p.name === "viewBridgedInstances"), permissions);
 
         const bridgedInstances = signal([]);
         const loading = signal(hasViewPermission.value);
@@ -136,7 +136,7 @@ export class SettingsComponent {
     }
 
     static bridgeInstanceActions(bridgedInstances, permissions) {
-        const hasAddPermission = computedSignal(permissions, ps => ps && ps.some(p => p.name === "addBridgedInstance"));
+        const hasAddPermission = compute(ps => ps && ps.some(p => p.name === "addBridgedInstance"), permissions);
 
         return create("div")
             .classes("flex-v")
@@ -163,9 +163,9 @@ export class SettingsComponent {
             enabled: true,
             allowList: [],
         });
-        const url = signalFromProperty(instanceInfo, 'url');
-        const useAllowlist = signalFromProperty(instanceInfo, 'useAllowlist');
-        const enabled = signalFromProperty(instanceInfo, 'enabled');
+        const url = compute(i => i.url, instanceInfo);
+        const useAllowlist = compute(i => i.useAllowlist, instanceInfo);
+        const enabled = compute(i => i.enabled, instanceInfo);
 
         return create("div")
             .classes("flex-v", "card")
@@ -223,7 +223,7 @@ export class SettingsComponent {
     }
 
     static bridgeInstance(instances, instance, permissions) {
-        const hasRemovePermission = computedSignal(permissions, ps => ps && ps.some(p => p.name === "removeBridgedInstance"));
+        const hasRemovePermission = compute(ps => ps && ps.some(p => p.name === "removeBridgedInstance"), permissions);
 
         return create("div")
             .classes("flex-v")
@@ -252,7 +252,7 @@ export class SettingsComponent {
     }
 
     static usersSettings(permissions) {
-        const hasViewPermission = computedSignal(permissions, ps => ps && ps.some(p => p.name === "viewUsers"));
+        const hasViewPermission = compute(ps => ps && ps.some(p => p.name === "viewUsers"), permissions);
         const users = signal([]);
         const loading = signal(hasViewPermission.value);
         if (hasViewPermission.value) {
@@ -302,8 +302,8 @@ export class SettingsComponent {
     }
 
     static user(users, user, permissions) {
-        const hasEditPermission = computedSignal(permissions, ps => ps && ps.some(p => p.name === "editUser"));
-        const hasDeletePermission = computedSignal(permissions, ps => ps && ps.some(p => p.name === "deleteUser"));
+        const hasEditPermission = compute(ps => ps && ps.some(p => p.name === "editUser"), permissions);
+        const hasDeletePermission = compute(ps => ps && ps.some(p => p.name === "deleteUser"), permissions);
 
         return create("div")
             .classes("flex-v")
@@ -389,23 +389,23 @@ export class SettingsComponent {
 
     static settings() {
         const notifs_on = signal(localNotificationsEnabled());
-        const notifs_color = computedSignal(notifs_on, on => on ? "var(--green)" : "var(--red)");
+        const notifs_color = compute(on => on ? "var(--green)" : "var(--red)", notifs_on);
         notifs_on.subscribe(v => {
             setLocalNotificationsEnabled(v ? "true" : "false");
         });
         const system_notifs_on = signal(systemNotificationsEnabled());
-        const system_notifs_color = computedSignal(system_notifs_on, on => on ? "var(--green)" : "var(--red)");
+        const system_notifs_color = compute(on => on ? "var(--green)" : "var(--red)", system_notifs_on);
         system_notifs_on.subscribe(v => {
             setSystemNotificationsEnabled(v);
         });
-        const notifText = computedSignal(notifs_on, on => on ? "Disable local notifications (in-window popups)" : "Enable local notifications (in-window popups)");
-        const systemNotifText = computedSignal(system_notifs_on, on => on ? "Disable system notifications" : "Enable system notifications");
+        const notifText = compute(on => on ? "Disable local notifications (in-window popups)" : "Enable local notifications (in-window popups)", notifs_on);
+        const systemNotifText = compute(on => on ? "Disable system notifications" : "Enable system notifications", system_notifs_on);
         const sound_on = signal(soundEnabled());
         sound_on.subscribe(v => {
             setSoundEnabled(v);
         });
-        const sound_color = computedSignal(sound_on, on => on ? "var(--green)" : "var(--red)");
-        const soundText = computedSignal(sound_on, on => on ? "Disable sound" : "Enable sound");
+        const sound_color = compute(on => on ? "var(--green)" : "var(--red)", sound_on);
+        const soundText = compute(on => on ? "Disable sound" : "Enable sound", sound_on);
         const sound = signal(currentSound());
         sound.subscribe(v => {
             setCurrentSound(v);

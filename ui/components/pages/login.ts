@@ -1,9 +1,9 @@
-import {create, when, signal} from "/f.js";
 import {LayoutTemplates} from "../layout.ts";
 import {CommonTemplates} from "../common.ts";
 import {Api} from "../../api/Api.ts";
 import {Store} from "../../api/Store.ts";
 import {toast} from "../../actions.ts";
+import {create, signal, when} from "@targoninc/jess";
 
 export class LoginComponent {
     static render() {
@@ -74,14 +74,14 @@ export class LoginComponent {
                                 CommonTemplates.input("text", "username", "Username", "Username", username, (e) => {
                                     username.value = e.target.value;
                                 }, true, "username", () => {
-                                    document.getElementById("password").focus();
+                                    document.getElementById("password")?.focus();
                                 }),
                                 when(usernameError, CommonTemplates.error(usernameError)),
                                 CommonTemplates.input("password", "password", "Password", "Password", password, (e) => {
                                     password.value = e.target.value;
                                 }, true, "current-password", (e) => {
                                     password.value = e.target.value;
-                                    document.getElementById("login").click();
+                                    document.getElementById("login")?.click();
                                 }),
                                 when(passwordError, CommonTemplates.error(passwordError)),
                                 CommonTemplates.buttonWithSpinner("login", "Login", "login", () => {

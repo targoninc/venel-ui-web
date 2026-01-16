@@ -1,4 +1,4 @@
-import {create} from "/f.js";
+import {create} from "@targoninc/jess";
 
 export class Page {
     static container = document.body;

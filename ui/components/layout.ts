@@ -1,5 +1,5 @@
-import {computedSignal, create, signal} from "/f.js";
 import {CommonTemplates} from "./common.ts";
+import {compute, create, signal, StringOrSignal} from "@targoninc/jess";
 
 export class LayoutTemplates {
     static pageFull(content) {
@@ -10,7 +10,7 @@ export class LayoutTemplates {
             ).build();
     }
 
-    static contentContainer(classes = [], content) {
+    static contentContainer(classes: StringOrSignal[] = [], content) {
         return create("div")
             .classes("content-container", ...classes)
             .children(content)
@@ -113,8 +113,8 @@ export class LayoutTemplates {
     static collapsible(text, content) {
         const uniqueId = Math.random().toString(36).substring(7);
         const toggled = signal(false);
-        const iconClass = computedSignal(toggled, on => on ? "rot90" : "rot0");
-        const gapClass = computedSignal(toggled, v => v ? "gap" : "no-gap");
+        const iconClass = compute(on => on ? "rot90" : "rot0", toggled);
+        const gapClass = compute(v => v ? "gap" : "no-gap", toggled);
         let contentElement;
         const setMaxHeight = () => {
             if (toggled.value) {

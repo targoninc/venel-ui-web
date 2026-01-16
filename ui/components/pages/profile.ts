@@ -1,11 +1,12 @@
 import {LayoutTemplates} from "../layout.ts";
-import {computedSignal, create, signal, signalFromProperty, store} from "/f.js";
 import {CommonTemplates} from "../common.ts";
 import {Store} from "../../api/Store.ts";
 import {Api} from "../../api/Api.ts";
 import {testImage, toast} from "../../actions.ts";
 import {Live} from "../../live/Live.ts";
 import {Popups} from "../../api/Popups.ts";
+import {compute, create, signal} from "@targoninc/jess";
+import {store} from "../../compat";
 
 export class ProfileComponent {
     static render() {
@@ -106,8 +107,8 @@ export class ProfileComponent {
     }
 
     static avatarSection(user) {
-        const realAvatar = signalFromProperty(user, "avatar");
-        const avatar = computedSignal(realAvatar, av => av ?? testImage);
+        const realAvatar = compute(u => u.avatar, user);
+        const avatar = compute(av => av ?? testImage, realAvatar);
         const buttonText = signal("Upload avatar");
 
         return create("div")

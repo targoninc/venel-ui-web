@@ -1,6 +1,6 @@
-import {create} from "/f.js";
 import {Page} from "./routing/Page.ts";
 import {Api} from "./api/Api.ts";
+import {create} from "@targoninc/jess";
 
 /**
  *

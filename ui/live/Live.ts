@@ -1,5 +1,6 @@
-import {signal, store} from "/f.js";
 import {LiveInstance} from "./LiveInstance.ts";
+import {store} from "../compat";
+import {signal} from "@targoninc/jess";
 
 export class Live {
     static startIfNotRunning() {

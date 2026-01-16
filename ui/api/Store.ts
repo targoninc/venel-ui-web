@@ -1,7 +1,8 @@
-import {signal, store} from "/f.js";
 import {currentCallSound, currentSound, setCurrentCallSound, setCurrentSound} from "./Setting.ts";
 import {Api} from "./Api.ts";
 import {toast} from "../actions.ts";
+import {store} from "../compat";
+import {signal} from "@targoninc/jess";
 
 export class Store {
     static clear() {

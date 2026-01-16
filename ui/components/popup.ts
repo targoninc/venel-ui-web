@@ -1,5 +1,5 @@
-import {create, when, signal, signalMap} from "/f.js";
 import {CommonTemplates} from "./common.ts";
+import {create, signal, signalMap, when} from "@targoninc/jess";
 
 export class PopupComponents {
     static popup(content, classes = []) {

@@ -1,13 +1,14 @@
-import {computedSignal, create, when, signal, signalMap, store} from "/f.js";
 import {Live} from "../live/Live.ts";
 import {truncate} from "../tooling/Text.ts";
 import {testImage} from "../actions.ts";
+import {compute, create, InputType, signal, signalMap, when} from "@targoninc/jess";
+import {store} from "../compat";
 
 export class ChannelTemplates {
     static dmChannel(channel, messages, activeChannel) {
-        const activeClass = computedSignal(activeChannel, id => {
+        const activeClass = compute(id => {
             return id === channel.id ? "active" : "_";
-        });
+        }, activeChannel);
         let lastMemberAvatar = channel.members.at(-1)?.avatar;
         if (channel.type === "dm" && channel.members.length > 1) {
             lastMemberAvatar = channel.members.find(member => member.id !== store().get("user").value.id)?.avatar ?? testImage;
@@ -40,7 +41,7 @@ export class ChannelTemplates {
     }
 
     static groupChannel(channel, messages, activeChannel) {
-        const activeClass = computedSignal(activeChannel, (id) => id === channel.id ? "active" : "_");
+        const activeClass = compute(activeChannel, (id) => id === channel.id ? "active" : "_");
         const editing = signal(false);
 
         return create("div")
@@ -50,7 +51,7 @@ export class ChannelTemplates {
             })
             .children(
                 when(editing, create("input")
-                    .type("text")
+                    .type(InputType.text)
                     .value(channel.name)
                     .onchange((e) => {
                         Live.send({

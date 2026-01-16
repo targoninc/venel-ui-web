@@ -1,15 +1,15 @@
 import {Popups} from "../api/Popups.ts";
 import {Store} from "../api/Store.ts";
 import {testImage} from "../actions.ts";
-import {compute, create, when} from "@targoninc/jess";
+import {compute, create, isSignal, StringOrSignal, when} from "@targoninc/jess";
 
 export class CommonTemplates {
-    static icon(icon, classes = [], tag = "span") {
+    static icon(icon, classes: StringOrSignal[] = [], tag = "span") {
         if (!icon) {
             icon = testImage;
         }
 
-        if ((icon.constructor === String && (icon.includes(".") || icon.startsWith("data:image"))) || (icon.constructor === FjsObservable && icon.value &&
+        if ((icon.constructor === String && (icon.includes(".") || icon.startsWith("data:image"))) || (isSignal(icon) &&
             (icon.value.includes(".") || icon.value.startsWith("data:image")))) {
             return create("img")
                 .classes("icon", ...classes)
@@ -23,7 +23,7 @@ export class CommonTemplates {
             .build();
     }
 
-    static buttonWithIcon(icon, text, onclick, classes = [], iconClasses = []) {
+    static buttonWithIcon(icon, text, onclick, classes: StringOrSignal[] = [], iconClasses: StringOrSignal[] = []) {
         return create("button")
             .classes("flex", ...classes)
             .onclick(onclick)
@@ -35,7 +35,7 @@ export class CommonTemplates {
             ).build();
     }
 
-    static buttonWithSpinner(icon, text, id, onclick, loadingState, classes = []) {
+    static buttonWithSpinner(icon, text, id, onclick, loadingState, classes: StringOrSignal[] = []) {
         return create("button")
             .classes("flex", ...classes)
             .onclick(onclick)
@@ -162,7 +162,7 @@ export class CommonTemplates {
             ).build();
     }
 
-    static circleToggle(text, color = "var(--blue)", onclick = () => {}) {
+    static circleToggle(text, color: StringOrSignal = "var(--blue)", onclick = () => {}) {
         return create("div")
             .classes("flex", "align-center", "circle-toggle")
             .onclick(onclick)
@@ -315,7 +315,7 @@ export class CommonTemplates {
             ).build();
     }
 
-    static textArea(value, id, label = null, placeholder = null, classes = [], subClasses = [], onenter = () => {}) {
+    static textArea(value, id, label = null, placeholder: StringOrSignal | null = null, classes = [], subClasses = [], onenter = () => {}) {
         const resize = (area) => {
             area.style.height = "auto";
             if (area.scrollHeight > 100) {
@@ -413,7 +413,7 @@ export class CommonTemplates {
             ).build();
     }
 
-    static smallIconButton(icon, title, onclick, classes = []) {
+    static smallIconButton(icon, title, onclick, classes: StringOrSignal[] = []) {
         return create("div")
             .classes("small-icon-button", "flex", "align-center", ...classes)
             .onclick(onclick)

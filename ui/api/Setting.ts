@@ -1,6 +1,6 @@
 import {Api} from "./Api.ts";
 import {toast} from "../actions.ts";
-import {store} from "/f.js";
+import {store} from "../compat";
 
 export class Setting {
     static getBoolean(key) {

@@ -5,7 +5,7 @@ import {Api} from "./api/Api.ts";
 import {Store} from "./api/Store.ts";
 import {Hooks} from "./api/Hooks.ts";
 import {Live} from "./live/Live.ts";
-import {store} from "/f.js";
+import {store} from "./compat";
 
 Store.create();
 

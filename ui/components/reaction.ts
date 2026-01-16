@@ -1,8 +1,8 @@
-import {computedSignal, create, when, signal, signalMap} from "/f.js";
 import {CommonTemplates} from "./common.ts";
 import {Store} from "../api/Store.ts";
 import {Live} from "../live/Live.ts";
 import {playReactionAnimation} from "../actions.ts";
+import {compute, create, signal, signalMap, when} from "@targoninc/jess";
 
 export class ReactionTemplates {
     static reactionTrigger(message, messages) {
@@ -31,10 +31,10 @@ export class ReactionTemplates {
         const reactions = Store.get("reactions");
         const groups = Store.get("reactionGroups");
         const search = signal("");
-        const filteredReactions = computedSignal(search, search => {
-            return reactions.value.filter(reaction => reaction.identifier.includes(search));
-        });
-        const groupedFilteredReactions = computedSignal(filteredReactions, (reactions) => {
+        const filteredReactions = compute(s => {
+            return reactions.value.filter(reaction => reaction.identifier.includes(s));
+        }, search);
+        const groupedFilteredReactions = compute((reactions) => {
             const out = {};
             reactions.forEach(reaction => {
                 const group = groups.value.find(group => group.id === reaction.groupId);
@@ -44,7 +44,7 @@ export class ReactionTemplates {
                 out[group.id].push(reaction);
             });
             return out;
-        });
+        }, filteredReactions);
 
         return create("div")
             .classes("reaction-menu", "card", "flex-v")
@@ -73,8 +73,8 @@ export class ReactionTemplates {
     }
 
     static reactionGroup(group, groupedFilteredReactions, message) {
-        const reactions = computedSignal(groupedFilteredReactions, reactions => reactions[group.id] || []);
-        const hasReactions = computedSignal(reactions, reactions => reactions.length > 0);
+        const reactions = compute(groupedFilteredReactions, reactions => reactions[group.id] || []);
+        const hasReactions = compute(reactions, reactions => reactions.length > 0);
 
         return create("div")
             .classes("flex-v")

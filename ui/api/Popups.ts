@@ -3,9 +3,9 @@ import {PopupComponents} from "../components/popup.ts";
 import {Api} from "./Api.ts";
 import {Live} from "../live/Live.ts";
 import {CommonTemplates} from "../components/common.ts";
-import {signal} from "/f.js";
 import {Store} from "./Store.ts";
 import {removeMessage} from "./Hooks.ts";
+import {signal} from "@targoninc/jess";
 
 export class Popups {
     static newDm() {

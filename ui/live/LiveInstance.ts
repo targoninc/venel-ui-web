@@ -1,7 +1,7 @@
 import {addChannel, addMessage, addReaction, removeMessage, removeReaction} from "../api/Hooks.ts";
 import {toast} from "../actions.ts";
 import {Api} from "../api/Api.ts";
-import {store} from "/f.js";
+import {store} from "../compat";
 
 export class LiveInstance {
     constructor(onStop = () => {}, onStart = () => {}) {

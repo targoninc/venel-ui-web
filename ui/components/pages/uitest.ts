@@ -1,6 +1,6 @@
-import {create, signal} from "/f.js";
 import {LayoutTemplates} from "../layout.ts";
 import {CommonTemplates} from "../common.ts";
+import {create, signal} from "@targoninc/jess";
 
 export class UiTestComponent {
     static render() {
