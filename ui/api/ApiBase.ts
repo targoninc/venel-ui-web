@@ -2,6 +2,7 @@ export class ApiBase {
     static usualHeaders = {
         'Content-Type': 'application/json'
     };
+
     static get apiBaseUrl() {
         const apiUrl = sessionStorage.getItem("apiUrl");
         if (apiUrl) {
