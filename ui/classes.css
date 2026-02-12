@@ -16,7 +16,6 @@
 
 .flex, .flex-v, .panes, .panes-v {
     display: flex;
-    flex-wrap: wrap;
     gap: var(--gap-h);
 }
 

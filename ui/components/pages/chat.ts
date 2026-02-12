@@ -13,10 +13,6 @@ import {VirtualList} from "../../tooling/VirtualList.ts";
 import {create, signal, compute, signalMap, when} from "@targoninc/jess";
 import {target} from "../../index";
 
-function signalFromProperty(source, prop) {
-    return compute(v => v ? v[prop] : null, source);
-}
-
 export class ChatComponent {
     static render(params) {
         return LayoutTemplates.pageFull(ChatComponent.content(params));
@@ -242,8 +238,8 @@ export class ChatComponent {
         const posXR = compute(x => x + "px", posX);
         const posYR = compute(y => y + "px", posY);
         const user = Store.get("user");
-        const permissions = signalFromProperty(user, "permissions");
-        const sameUser = compute(u => u.id === message.sender.id, user);
+        const permissions = compute((u: any) => u.permissions, user);
+        const sameUser = compute((u: any) => u.id === message.sender.id, user);
         const hasDeletePermission = compute(p => p.some(perm => perm.name === "deleteMessage"), permissions);
         const canDelete = compute(isSame => isSame || hasDeletePermission.value, sameUser);
         const menuClass = compute(can => (can || sameUser.value) ? "_" : "no-content", canDelete);

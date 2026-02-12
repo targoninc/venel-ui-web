@@ -121,7 +121,7 @@ export class CommonTemplates {
                         //CommonTemplates.buttonWithIcon("explore", "Explore", () => window.router.navigate('explore'), [activeIfActive("explore")]),
                     ).build(),
                 create("div")
-                    .classes("actions-footer", "flex-v", "align-center", "no-gap", "full-width")
+                    .classes("actions-footer", "flex", "align-center", "no-gap", "full-width")
                     .children(
                         CommonTemplates.buttonWithIcon("settings", "Settings", () => router.navigate('settings'), [activeIfActive("settings")]),
                         CommonTemplates.buttonWithIcon(avatar, "Profile", () => router.navigate('profile'), [activeIfActive("profile")], ["small-avatar"]),

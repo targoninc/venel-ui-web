@@ -2,7 +2,7 @@ import {CommonTemplates} from "./common.ts";
 import {toast} from "../actions.ts";
 import {Live} from "../live/Live.ts";
 import hljs from "highlight.js";
-import {compute, create, signal} from "@targoninc/jess";
+import {compute, create, signal, when} from "@targoninc/jess";
 import {store} from "../compat";
 
 export class AttachmentTemplates {

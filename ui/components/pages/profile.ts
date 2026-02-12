@@ -5,8 +5,9 @@ import {Api} from "../../api/Api.ts";
 import {testImage, toast} from "../../actions.ts";
 import {Live} from "../../live/Live.ts";
 import {Popups} from "../../api/Popups.ts";
-import {compute, create, signal} from "@targoninc/jess";
+import {compute, create, Signal, signal} from "@targoninc/jess";
 import {store} from "../../compat";
+import {User} from "../../models/models";
 
 export class ProfileComponent {
     static render() {
@@ -36,10 +37,10 @@ export class ProfileComponent {
             ).build();
     }
 
-    static basicInfoSection(user) {
-        const username = signalFromProperty(user, "username");
-        const displayname = signalFromProperty(user, "displayname");
-        const description = signalFromProperty(user, "description");
+    static basicInfoSection(user: Signal<User>) {
+        const username = compute(u => u.username, user);
+        const displayname = compute(u => u.displayname, user);
+        const description = compute(u => u.description, user);
         const updateUser = () => {
             Api.updateUser(username.value, displayname.value, description.value).then((res) => {
                 if (res.status !== 200) {
@@ -90,7 +91,7 @@ export class ProfileComponent {
         input.onchange = () => {
             const reader = new FileReader();
             reader.onload = () => {
-                const base64 = reader.result.toString();
+                const base64 = reader.result?.toString();
                 avatar.value = base64;
                 Live.send({
                     type: "updateAvatar",

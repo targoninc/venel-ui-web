@@ -60,8 +60,8 @@ export class SettingsComponent {
     }
 
     static yourInfo(user) {
-        const roles = signalFromProperty(user, 'roles');
-        const permissions = signalFromProperty(user, 'permissions');
+        const roles = compute(u => u.roles, user);
+        const permissions = compute(u => u.permissions, user);
 
         return create("div")
             .classes("flex-v", "card")
