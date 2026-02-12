@@ -6,6 +6,9 @@ import {Store} from "./api/Store.ts";
 import {Hooks} from "./api/Hooks.ts";
 import {Live} from "./live/Live.ts";
 import {store} from "./compat";
+import "./reset.css";
+import "./base.css";
+import "./classes.css";
 
 Store.create();
 
