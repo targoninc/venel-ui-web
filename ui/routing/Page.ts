@@ -1,4 +1,12 @@
 import {create} from "@targoninc/jess";
+import {ChatComponent} from "../components/pages/chat.ts";
+import {HomeComponent} from "../components/pages/home.ts";
+import {LoginComponent} from "../components/pages/login.ts";
+import {RegisterComponent} from "../components/pages/register.ts";
+import {LogoutComponent} from "../components/pages/logout.ts";
+import {UiTestComponent} from "../components/pages/uitest.ts";
+import {ProfileComponent} from "../components/pages/profile.ts";
+import {SettingsComponent} from "../components/pages/settings.ts";
 
 export class Page {
     static container = document.body;
@@ -45,53 +53,25 @@ export class Page {
 
     static load(page, params, router) {
         Page.empty();
-        const pageData = Page.pageMap[page];
-        if (!pageData) {
+        const pageComponent = Page.pageMap[page];
+        if (!pageComponent) {
             console.error(`Page ${page} not found`);
 
             return;
         }
-        import(this.componentBasePath + "pages/" + pageData.path + this.componentExtension).then((module) => {
-            const component = module[pageData.component].render(params, router);
-            Page.container.appendChild(component);
-        });
+
+        const component = pageComponent.render(params, router);
+        Page.container.appendChild(component);
     }
 
-    static componentBasePath = "../components/";
-    static componentExtension = ".ts";
-
     static pageMap = {
-        "chat": {
-            path: "chat",
-            component: "ChatComponent"
-        },
-        "home": {
-            path: "home",
-            component: "HomeComponent"
-        },
-        "login": {
-            path: "login",
-            component: "LoginComponent"
-        },
-        "register": {
-            path: "register",
-            component: "RegisterComponent"
-        },
-        "logout": {
-            path: "logout",
-            component: "LogoutComponent"
-        },
-        "uitest": {
-            path: "uitest",
-            component: "UiTestComponent"
-        },
-        "profile": {
-            path: "profile",
-            component: "ProfileComponent"
-        },
-        "settings": {
-            path: "settings",
-            component: "SettingsComponent"
-        }
+        "chat": ChatComponent,
+        "home": HomeComponent,
+        "login": LoginComponent,
+        "register": RegisterComponent,
+        "logout": LogoutComponent,
+        "uitest": UiTestComponent,
+        "profile": ProfileComponent,
+        "settings": SettingsComponent
     };
 }

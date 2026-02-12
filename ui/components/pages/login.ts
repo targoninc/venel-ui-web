@@ -17,9 +17,9 @@ export class LoginComponent {
     static content() {
         const user = Store.get('user');
         const username = signal("");
-        const usernameError = signal(null);
+        const usernameError = signal<string | null>(null);
         const password = signal("");
-        const passwordError = signal(null);
+        const passwordError = signal<string | null>(null);
         const validate = () => {
             if (username.value.length === 0) {
                 usernameError.value = "Username cannot be empty.";
