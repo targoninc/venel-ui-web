@@ -2,7 +2,7 @@ import {CommonTemplates} from "./common.ts";
 import {toast} from "../actions.ts";
 import {Live} from "../live/Live.ts";
 import hljs from "highlight.js";
-import {create, signal} from "@targoninc/jess";
+import {compute, create, signal} from "@targoninc/jess";
 import {store} from "../compat";
 
 export class AttachmentTemplates {
@@ -214,7 +214,7 @@ export class AttachmentTemplates {
 
     static imageAttachment(attachment, url) {
         const isFullImage = signal(false);
-        const imageClass = computedSignal(isFullImage, isFull => isFull ? "full-image" : `attachment-${attachment.type.split("/")[0]}`);
+        const imageClass = compute(isFull => isFull ? "full-image" : `attachment-${attachment.type.split("/")[0]}`, isFullImage);
 
         return create("div")
             .classes("attachment", attachment.type.split("/")[0])
@@ -255,10 +255,10 @@ export class AttachmentTemplates {
 
     static voiceButton(activeChannel, messageText) {
         const recording = signal(false);
-        const icon = computedSignal(recording, recording => recording ? "send" : "mic");
+        const icon = compute(recording => recording ? "send" : "mic", recording);
         const data = signal(null);
         const dontSend = signal(false);
-        const identifierClass = computedSignal(recording, rec => rec ? "recording" : "stopped");
+        const identifierClass = compute(rec => rec ? "recording" : "stopped", recording);
         data.subscribe(data => {
             if (!data) {
                 return;

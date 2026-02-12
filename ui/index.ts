@@ -9,10 +9,11 @@ import {store} from "./compat";
 import "./reset.css";
 import "./base.css";
 import "./classes.css";
+import {setRouter} from "./routing/RouterInstance.ts";
 
 Store.create();
 
-window.router = new Router(routes, async (route, params) => {
+const router = new Router(routes, async (route, params) => {
     console.log(`Route changed to ${route.path} with params:`, params);
     document.title = `Venel - ${route.title}`;
 
@@ -23,10 +24,17 @@ window.router = new Router(routes, async (route, params) => {
     } else {
         store().setSignalValue('user', null);
         if (route.noUser) {
-            window.router.navigate(route.noUser);
+            router.navigate(route.noUser);
             return;
         }
         Live.stop();
     }
-    Page.load(route.path, params, window.router);
+    Page.load(route.path, params, router);
 });
+
+setRouter(router);
+router.init();
+
+export function target(event: Event) {
+    return event.target as HTMLElement;
+}

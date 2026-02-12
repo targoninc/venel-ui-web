@@ -6,6 +6,7 @@ import {CommonTemplates} from "../components/common.ts";
 import {Store} from "./Store.ts";
 import {removeMessage} from "./Hooks.ts";
 import {signal} from "@targoninc/jess";
+import {router} from "../routing/RouterInstance.ts";
 
 export class Popups {
     static newDm() {
@@ -50,7 +51,12 @@ export class Popups {
                         channelId: res.data.channelId,
                     });
                     removePopups();
-                    window.router.navigate(`/chat/${res.data.id}`);
+                    if (Store.get('channels').value.find(c => c.id === res.data.id)) {
+                        router.navigate(`/chat/${res.data.id}`);
+                    } else {
+                        // Force a full reload for now, I'm lazy
+                        window.location.href = `/chat/${res.data.id}`;
+                    }
                 });
             });
         }, "New DM", "Search for users"));
@@ -144,7 +150,7 @@ export class Popups {
                     return;
                 }
                 toast("User deleted", "success");
-                window.router.navigate("/logout");
+                router.navigate("/logout");
             });
         }, () => {
             removePopups();

@@ -1,12 +1,15 @@
 export class Router {
-    currentRoute = null;
+    public currentRoute = null;
+    private routes;
+    protected preRouteChange = null;
+    protected postRouteChange = null;
+    protected onNoRouteFound = () => {};
 
     constructor(routes, preRouteChange = null, postRouteChange = null, onNoRouteFound = () => {}) {
         this.routes = routes;
         this.preRouteChange = preRouteChange;
         this.postRouteChange = postRouteChange;
         this.onNoRouteFound = onNoRouteFound;
-        this.init();
     }
 
     init() {

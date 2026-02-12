@@ -9,6 +9,13 @@ import {testImage} from "../../actions.ts";
 import {Popups} from "../../api/Popups.ts";
 import {ReactionTemplates} from "../reaction.ts";
 import {AttachmentTemplates} from "../attachment.ts";
+import {VirtualList} from "../../tooling/VirtualList.ts";
+import {create, signal, compute, signalMap, when} from "@targoninc/jess";
+import {target} from "../../index";
+
+function signalFromProperty(source, prop) {
+    return compute(v => v ? v[prop] : null, source);
+}
 
 export class ChatComponent {
     static render(params) {
@@ -63,18 +70,18 @@ export class ChatComponent {
     static chat(activeChannel, allMessages) {
         const sending = signal(false);
         const messageText = signal("");
-        const messages = computedSignal(allMessages, (messages) => {
+        const messages = compute((messages) => {
             const out = messages[activeChannel.value] || [];
             return out.sort((a, b) => {
                 return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
             });
-        });
+        }, allMessages);
         const menuShownForMessageId = signal(null);
         const toBeSentAttachments = signal([]);
-        const hasAttachments = computedSignal(toBeSentAttachments, attachments => {
+        const hasAttachments = compute(attachments => {
             console.log(attachments);
             return attachments.length > 0;
-        });
+        }, toBeSentAttachments);
 
         return create("div")
             .classes("flex-v", "full-height")
@@ -82,9 +89,15 @@ export class ChatComponent {
                 create("div")
                     .classes("chat-content", "flex-v", "no-gap")
                     .children(
-                        signalMap(messages, create("div")
-                                .classes("chat-messages","flex-v", "flex-grow", "no-gap"),
-                            message => ChatComponent.message(message, messages, menuShownForMessageId)),
+                        VirtualList.render(messages,
+                            message => ChatComponent.message(message, messages, menuShownForMessageId),
+                            {
+                                itemHeight: 80, // Estimate
+                                scanCount: 10,
+                                classes: ["chat-messages", "flex-v", "flex-grow", "no-gap"],
+                                styles: []
+                            }
+                        ),
                         when(hasAttachments, create("div")
                             .classes("flex", "align-center", "full-width")
                             .children(
@@ -154,7 +167,7 @@ export class ChatComponent {
         }
         const edited = message.createdAt !== message.updatedAt;
         const timestamp = new Date(message.createdAt).getTime();
-        const menuShown = computedSignal(menuShownForMessageId, id => id === message.id);
+        const menuShown = compute(id => id === message.id, menuShownForMessageId);
         const messageMenuPositionX = signal(0);
         const messageMenuPositionY = signal(0);
         const cardShown = signal(false);
@@ -183,8 +196,8 @@ export class ChatComponent {
                     .oncontextmenu((e) => {
                         e.preventDefault();
                         menuShownForMessageId.value = message.id;
-                        messageMenuPositionX.value = e.clientX - e.target.getBoundingClientRect().left;
-                        messageMenuPositionY.value = e.clientY - e.target.getBoundingClientRect().top;
+                        messageMenuPositionX.value = e.clientX - target(e).getBoundingClientRect().left;
+                        messageMenuPositionY.value = e.clientY - target(e).getBoundingClientRect().top;
                         document.addEventListener("click", () => {
                             menuShownForMessageId.value = null;
                         }, {once: true});
@@ -226,14 +239,14 @@ export class ChatComponent {
     }
 
     static messageMenu(message, messages, posX, posY) {
-        const posXR = computedSignal(posX, x => x + "px");
-        const posYR = computedSignal(posY, y => y + "px");
+        const posXR = compute(x => x + "px", posX);
+        const posYR = compute(y => y + "px", posY);
         const user = Store.get("user");
         const permissions = signalFromProperty(user, "permissions");
-        const sameUser = computedSignal(user, u => u.id === message.sender.id);
-        const hasDeletePermission = computedSignal(permissions, p => p.some(perm => perm.name === "deleteMessage"));
-        const canDelete = computedSignal(sameUser, isSame => isSame || hasDeletePermission.value);
-        const menuClass = computedSignal(canDelete, can => (can || sameUser.value) ? "_" : "no-content");
+        const sameUser = compute(u => u.id === message.sender.id, user);
+        const hasDeletePermission = compute(p => p.some(perm => perm.name === "deleteMessage"), permissions);
+        const canDelete = compute(isSame => isSame || hasDeletePermission.value, sameUser);
+        const menuClass = compute(can => (can || sameUser.value) ? "_" : "no-content", canDelete);
 
         return create("div")
             .classes("message-menu", "flex-v", menuClass)

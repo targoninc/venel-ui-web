@@ -1,6 +1,7 @@
 import {Store} from "../api/Store.ts";
 import {notify, testImage} from "../actions.ts";
 import {truncate} from "../tooling/Text.ts";
+import {router} from "../routing/RouterInstance.ts";
 
 export class Notifier {
     static sendMessage(channelId, message) {
@@ -17,7 +18,7 @@ export class Notifier {
             truncate(message.text, 150),
             () => {
                 if (channelId !== Store.get('currentChannelId')) {
-                    window.router.navigate(`/chat/${channelId}`);
+                    router.navigate(`/chat/${channelId}`);
                 }
             });
     }

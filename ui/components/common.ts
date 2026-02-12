@@ -2,6 +2,7 @@ import {Popups} from "../api/Popups.ts";
 import {Store} from "../api/Store.ts";
 import {testImage} from "../actions.ts";
 import {compute, create, isSignal, StringOrSignal, when} from "@targoninc/jess";
+import {router} from "../routing/RouterInstance.ts";
 
 export class CommonTemplates {
     static icon(icon, classes: StringOrSignal[] = [], tag = "span") {
@@ -98,9 +99,12 @@ export class CommonTemplates {
     }
 
     static actions() {
-        const currentRoute = window.router.currentRoute;
-        const activeIfActive = page => {
-            return (currentRoute && currentRoute.path === page) ? "active" : "_";
+        const currentRoute = router.currentRoute;
+        const activeIfActive = (route: string) => {
+            if (currentRoute) {
+                return currentRoute.path === route ? "active" : "_";
+            }
+            return "_";
         };
         const user = Store.get('user');
         const avatar = compute(u => u && u.avatar ? u.avatar : testImage, user);
@@ -112,20 +116,16 @@ export class CommonTemplates {
                 create("div")
                     .classes("flex", "align-center")
                     .children(
-                        CommonTemplates.buttonWithIcon("chat", "Chat", () => window.router.navigate('chat'), [activeIfActive("chat")]),
-                        CommonTemplates.buttonWithIcon("person_add", "New DM", () => Popups.newDm()),
+                        CommonTemplates.buttonWithIcon("chat", "Chat", () => router.navigate('chat'), [activeIfActive("chat")]),
+                        //CommonTemplates.buttonWithIcon("group", "Friends", () => window.router.navigate('friends'), [activeIfActive("friends")]),
+                        //CommonTemplates.buttonWithIcon("explore", "Explore", () => window.router.navigate('explore'), [activeIfActive("explore")]),
                     ).build(),
-                when(hasAnyRole, create("div")
-                    .classes("flex", "align-center")
-                    .children(
-                        CommonTemplates.buttonWithIcon("settings", "Settings", () => window.router.navigate('settings'), [activeIfActive("settings")]),
-                    ).build()),
                 create("div")
-                    .classes("flex", "align-center")
+                    .classes("actions-footer", "flex-v", "align-center", "no-gap", "full-width")
                     .children(
-                        CommonTemplates.buttonWithIcon(avatar, "Profile", () => window.router.navigate('profile'), [activeIfActive("profile")], ["small-avatar"]),
-                        CommonTemplates.pageLink("Logout", "logout")
-                    ).build(),
+                        CommonTemplates.buttonWithIcon("settings", "Settings", () => router.navigate('settings'), [activeIfActive("settings")]),
+                        CommonTemplates.buttonWithIcon(avatar, "Profile", () => router.navigate('profile'), [activeIfActive("profile")], ["small-avatar"]),
+                    ).build()
             ).build();
     }
 
@@ -315,7 +315,7 @@ export class CommonTemplates {
             ).build();
     }
 
-    static textArea(value, id, label = null, placeholder: StringOrSignal | null = null, classes = [], subClasses = [], onenter = () => {}) {
+    static textArea(value, id, label = null, placeholder: StringOrSignal | null = null, classes: StringOrSignal[] = [], subClasses = [], onenter = () => {}) {
         const resize = (area) => {
             area.style.height = "auto";
             if (area.scrollHeight > 100) {

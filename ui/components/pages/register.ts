@@ -3,6 +3,7 @@ import {CommonTemplates} from "../common.ts";
 import {Api} from "../../api/Api.ts";
 import {toast} from "../../actions.ts";
 import {create, signal, when} from "@targoninc/jess";
+import {router} from "../../routing/RouterInstance.ts";
 
 export class RegisterComponent {
     static render() {
@@ -101,10 +102,14 @@ export class RegisterComponent {
                                     Api.register(username.value, password.value).then((res) => {
                                         loading.value = false;
                                         if (res.status === 200) {
-                                            toast("Registration successful", "success");
-                                            window.router.navigate("chat");
+                                            toast("Registered successfully", "success");
+                                            router.navigate("chat");
                                         } else {
-                                            toast("Registration failed: " + res.data.error, "error");
+                                            if (res.data.error.includes("username")) {
+                                                usernameError.value = res.data.error;
+                                            } else {
+                                                toast("Registration failed: " + res.data.error, "error");
+                                            }
                                         }
                                     }).catch(() => {
                                         loading.value = false;

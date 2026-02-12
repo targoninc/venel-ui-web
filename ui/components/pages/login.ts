@@ -4,6 +4,7 @@ import {Api} from "../../api/Api.ts";
 import {Store} from "../../api/Store.ts";
 import {toast} from "../../actions.ts";
 import {create, signal, when} from "@targoninc/jess";
+import {router} from "../../routing/RouterInstance.ts";
 
 export class LoginComponent {
     static render() {
@@ -93,13 +94,11 @@ export class LoginComponent {
                                     loading.value = true;
                                     Api.authorize(username.value, password.value).then((res) => {
                                         loading.value = false;
-                                        if (res.status !== 200) {
-                                            actionError.value = res.data.error;
-                                            toast("Login failed: " + res.data.error, "error");
+                                        if (res.status === 200) {
+                                            toast("Logged in successfully", "success");
+                                            router.navigate("chat");
                                         } else {
-                                            actionError.value = null;
-                                            toast("Login successful", "success");
-                                            window.router.navigate("chat");
+                                            toast("Failed to log in: " + res.data.error, "error");
                                         }
                                     });
                                 }, loading, ["positive"]),
