@@ -1,8 +1,9 @@
 import {Popups} from "../api/Popups.ts";
 import {Store} from "../api/Store.ts";
 import {testImage} from "../actions.ts";
-import {compute, create, isSignal, StringOrSignal, when} from "@targoninc/jess";
+import {compute, create, HtmlPropertyValue, InputType, isSignal, Signal, StringOrSignal, when} from "@targoninc/jess";
 import {router} from "../routing/RouterInstance.ts";
+import {User} from "../models/models";
 
 export class CommonTemplates {
     static icon(icon, classes: StringOrSignal[] = [], tag = "span") {
@@ -129,8 +130,8 @@ export class CommonTemplates {
             ).build();
     }
 
-    static profileCard(user, shown) {
-        const cardStyle = compute(isShown => isShown ? "flex" : "none", shown);
+    static profileCard(user: User, shown: Signal<boolean>) {
+        const cardStyle = compute((isShown): string => isShown ? "flex" : "none", shown);
         shown.subscribe(is => {
             if (is) {
                 setTimeout(() => {
@@ -162,7 +163,8 @@ export class CommonTemplates {
             ).build();
     }
 
-    static circleToggle(text, color: StringOrSignal = "var(--blue)", onclick = () => {}) {
+    static circleToggle(text, color: StringOrSignal = "var(--blue)", onclick = () => {
+    }) {
         return create("div")
             .classes("flex", "align-center", "circle-toggle")
             .onclick(onclick)
@@ -223,7 +225,11 @@ export class CommonTemplates {
             ).build();
     }
 
-    static input(type, id, label, placeholder, value, onchange, required = true, autocomplete = "off", onkeydown = () => {}, ontype = () => {}) {
+    static input<T>(type: InputType, id: StringOrSignal, label: StringOrSignal, placeholder: StringOrSignal,
+                    value: HtmlPropertyValue, onchange: (val: T) => void, required = true,
+                    autocomplete = "off", onkeydown = (e: KeyboardEvent) => {
+        }, ontype = (e: KeyboardEvent) => {
+        }) {
         return create("div")
             .classes("flex-v", "small-gap")
             .children(
@@ -236,6 +242,7 @@ export class CommonTemplates {
                     .id(id)
                     .placeholder(placeholder)
                     .value(value)
+                    .required(required)
                     .onchange(onchange)
                     .onkeydown((e) => {
                         if (e.key === "Enter") {
@@ -249,7 +256,8 @@ export class CommonTemplates {
             ).build();
     }
 
-    static responsiveInput(type, id, label, placeholder, value, oninput, required = true, autocomplete = "off", onkeydown = () => {}) {
+    static responsiveInput(type, id, label, placeholder, value, oninput, required = true, autocomplete = "off", onkeydown = () => {
+    }) {
         return create("div")
             .classes("flex-v", "small-gap")
             .children(
@@ -315,7 +323,8 @@ export class CommonTemplates {
             ).build();
     }
 
-    static textArea(value, id, label = null, placeholder: StringOrSignal | null = null, classes: StringOrSignal[] = [], subClasses = [], onenter = () => {}) {
+    static textArea(value, id, label = null, placeholder: StringOrSignal | null = null, classes: StringOrSignal[] = [], subClasses = [], onenter = () => {
+    }) {
         const resize = (area) => {
             area.style.height = "auto";
             if (area.scrollHeight > 100) {
@@ -387,7 +396,9 @@ export class CommonTemplates {
             ).build();
     }
 
-    static chatUser(avatar, name, onclick, onlonghover = () => {}, onhoverout = () => {}) {
+    static chatUser(avatar, name, onclick, onlonghover = () => {
+    }, onhoverout = () => {
+    }) {
         let timeout = null;
 
         return create("div")

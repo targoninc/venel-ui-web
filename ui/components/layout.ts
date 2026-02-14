@@ -1,5 +1,5 @@
 import {CommonTemplates} from "./common.ts";
-import {compute, create, signal, StringOrSignal} from "@targoninc/jess";
+import {AnyElement, compute, create, signal, StringOrSignal} from "@targoninc/jess";
 
 export class LayoutTemplates {
     static pageFull(content) {
@@ -45,7 +45,7 @@ export class LayoutTemplates {
             .build();
     }
 
-    static resizableFromRight(content, inverseRefId = null, defaultWidth = "50%", minWidth = "300px", maxWidth = "100%") {
+    static resizableFromRight(content: AnyElement, inverseRefId: string | null = null, defaultWidth = "50%", minWidth = "300px", maxWidth = "100%") {
         const uniqueId = Math.random().toString(36).substring(7);
 
         return create("div")
@@ -69,7 +69,7 @@ export class LayoutTemplates {
      * @param inverseRefId
      * @returns {*}
      */
-    static resizeIndicator(refId, type = "v", minSize, maxSize, inverseRefId = null) {
+    static resizeIndicator(refId: string, type = "v", minSize: string, maxSize: string, inverseRefId: string | null = null) {
         const propertyToSet = type === "v" ? "width" : "height";
         const clientProperty = type === "v" ? "clientX" : "clientY";
         const minSizeAsNumber = parseInt(minSize.replaceAll("%", ""));

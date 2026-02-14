@@ -38,10 +38,10 @@ export class ProfileComponent {
     }
 
     static basicInfoSection(user: Signal<User>) {
-        const username = compute(u => u.username, user);
-        const displayname = compute(u => u.displayname, user);
-        const description = compute(u => u.description, user);
-        const updateUser = () => {
+        const username = compute((u: User) => u.username, user);
+        const displayname = compute((u: User) => u.displayname, user);
+        const description = compute((u: User) => u.description, user);
+        const updateUser = (): void => {
             Api.updateUser(username.value, displayname.value, description.value).then((res) => {
                 if (res.status !== 200) {
                     toast("Failed to update user info: " + res.data.error, "error");
@@ -84,15 +84,17 @@ export class ProfileComponent {
             ).build();
     }
 
-    static uploadAvatar(avatar) {
+    static uploadAvatar(avatar: Signal<string>) {
         const input = document.createElement('input');
         input.type = 'file';
         input.accept = 'image/*';
-        input.onchange = () => {
+        input.onchange = (): void => {
             const reader = new FileReader();
-            reader.onload = () => {
+            reader.onload = (): void => {
                 const base64 = reader.result?.toString();
-                avatar.value = base64;
+                if (base64) {
+                    avatar.value = base64;
+                }
                 Live.send({
                     type: "updateAvatar",
                     avatar: base64
@@ -102,14 +104,19 @@ export class ProfileComponent {
                     avatar: base64
                 };
             };
-            reader.readAsDataURL(input.files[0]);
+            reader.readAsDataURL(input.files?.[0] || new File([], ''));
         };
         input.click();
     }
 
-    static avatarSection(user) {
-        const realAvatar = compute(u => u.avatar, user);
-        const avatar = compute(av => av ?? testImage, realAvatar);
+    static avatarSection(user: Signal<User>) {
+        const realAvatar = compute((u: User) => u.avatar, user);
+        const avatar = compute((av: Buffer | null) => {
+            if (av instanceof Buffer) {
+                return av.toString('base64');
+            }
+            return testImage;
+        }, realAvatar);
         const buttonText = signal("Upload avatar");
 
         return create("div")
@@ -145,13 +152,13 @@ export class ProfileComponent {
             ).build();
     }
 
-    static accountSection(user) {
+    static accountSection(user: Signal<User>) {
         return LayoutTemplates.collapsible("Account",
             create("div")
                 .classes("flex-v")
                 .children(
                     CommonTemplates.buttonWithIcon("password", "Change password", () => {
-                        Popups.updatePassword(user);
+                        Popups.updatePassword();
                     }, ["sensitive"]),
                     CommonTemplates.buttonWithIcon("delete", "Delete account", () => {
                         Popups.deleteAccount(user);

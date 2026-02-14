@@ -3,15 +3,14 @@ import {PopupComponents} from "../components/popup.ts";
 import {Api} from "./Api.ts";
 import {Live} from "../live/Live.ts";
 import {CommonTemplates} from "../components/common.ts";
-import {Store} from "./Store.ts";
 import {removeMessage} from "./Hooks.ts";
 import {signal} from "@targoninc/jess";
 import {router} from "../routing/RouterInstance.ts";
+import {channels} from "./Store";
 
 export class Popups {
     static newDm() {
         const userSearchResults = signal([]);
-        const channels = Store.get("channels");
 
         popup(PopupComponents.searchPopup(() => {
             removePopups();
@@ -51,7 +50,7 @@ export class Popups {
                         channelId: res.data.channelId,
                     });
                     removePopups();
-                    if (Store.get('channels').value.find(c => c.id === res.data.id)) {
+                    if (channels.value.find(c => c.id === res.data.id)) {
                         router.navigate(`/chat/${res.data.id}`);
                     } else {
                         // Force a full reload for now, I'm lazy

@@ -1,6 +1,8 @@
 import {Page} from "./routing/Page.ts";
 import {Api} from "./api/Api.ts";
 import {create} from "@targoninc/jess";
+import {target} from "./index";
+import {playingLoops} from "./api/Store";
 
 /**
  *
@@ -69,7 +71,7 @@ export function popup(popup, classes = []) {
 
     setTimeout(() => {
         document.addEventListener("click", (event) => {
-            if (!container.contains(event.target)) {
+            if (!container.contains(target(event))) {
                 container.remove();
             }
         }, {once: true});
@@ -120,21 +122,20 @@ export function toggleInstanceEnabled(instances, instance) {
     });
 }
 
-export function playSound(name) {
+export function playSound(name: string) {
     const audio = new Audio(`/sounds/${name}`);
-    audio.play();
+    audio.play().then();
 }
 
-export function playLoop(name) {
-    if (!window.playingLoops) {
-        window.playingLoops = [];
-    }
-
+export function playLoop(name: string) {
     stopPlayingLoop();
     const audio = new Audio(`/loops/${name}`);
     audio.loop = true;
-    audio.play();
-    window.playingLoops.push(audio);
+    audio.play().then();
+    playingLoops.value = [
+        ...playingLoops.value,
+        audio
+    ];
 
     return () => {
         audio.pause();
@@ -143,15 +144,13 @@ export function playLoop(name) {
 }
 
 export function stopPlayingLoop() {
-    if (window.playingLoops) {
-        window.playingLoops.forEach(audio => {
-            audio.pause();
-            audio.remove();
-        });
-    }
+    playingLoops.value.forEach(audio => {
+        audio.pause();
+        audio.remove();
+    });
 }
 
-export function playReactionAnimation(content, x, y, count = 12) {
+export function playReactionAnimation(content: string, x: number, y: number, count = 12) {
     const directions = ["top", "top-right", "right", "bottom-right", "bottom", "bottom-left", "left", "top-left"];
 
     for (let i = 0; i < count; i++) {

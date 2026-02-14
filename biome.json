@@ -1,0 +1,24 @@
+{
+  "$schema": "https://biomejs.dev/schemas/1.9.2/schema.json",
+  "organizeImports": {
+    "enabled": true
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "style": {
+        "noImplicitAny": {
+          "level": "error"
+        }
+      }
+    }
+  },
+  "javascript": {
+    "parser": {
+      "allowSuperOutsideMethod": true
+    }
+  },
+  "typescript": {
+    "enabled": true
+  }
+}

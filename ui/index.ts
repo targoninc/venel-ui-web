@@ -36,5 +36,5 @@ setRouter(router);
 router.init();
 
 export function target(event: Event) {
-    return event.target as HTMLElement;
+    return event.target as HTMLInputElement;
 }

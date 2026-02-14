@@ -45,6 +45,7 @@ export interface Channel {
     'name': string | null;
     'type': string;
     'updatedAt': Date;
+    members: User[];
 }
 
 export interface ImageAttachment {

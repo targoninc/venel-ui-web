@@ -15,7 +15,7 @@ app.get('/apiurl', (req, res) => {
     res.send(process.env.API_URL ?? 'http://localhost:3001');
 });
 
-app.get('*', (req, res) => {
+app.get('/{*splat}', (req, res) => {
     res.sendFile(__dirname + '/ui/index.html');
 });
 

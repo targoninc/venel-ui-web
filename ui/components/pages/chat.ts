@@ -1,5 +1,5 @@
 import {LayoutTemplates} from "../layout.ts";
-import {Store} from "../../api/Store.ts";
+import {channels, currentChannelId, messages, Store} from "../../api/Store.ts";
 import {CommonTemplates} from "../common.ts";
 import {Hooks, removeMessage} from "../../api/Hooks.ts";
 import {Time} from "../../tooling/Time.ts";
@@ -19,10 +19,8 @@ export class ChatComponent {
     }
 
     static content(params) {
-        const channels = Store.get("channels");
         const pathChannelId = params.channelId ? parseInt(params.channelId) : null;
-        const activeChannel = signal(pathChannelId || Store.get("currentChannelId") || channels[0]?.id || null);
-        const messages = Store.get("messages");
+        const activeChannel = signal(pathChannelId || currentChannelId.value || channels[0]?.id || null);
         channels.subscribe(newChannels => {
             if (!newChannels.some(channel => channel.id === activeChannel.value)) {
                 activeChannel.value = newChannels[0]?.id || null;
@@ -56,7 +54,10 @@ export class ChatComponent {
                 create("div")
                     .classes("panes", "full-width", "flex-grow", "nav-margin", "no-wrap")
                     .children(
-                        LayoutTemplates.resizableFromRight(ChannelTemplates.channelList(displayChannels, messages, activeChannel), inverseRefId, "20%", "10%", "50%"),
+                        LayoutTemplates.resizableFromRight(
+                            ChannelTemplates.channelList(displayChannels, messages, activeChannel), inverseRefId,
+                            "20%", "10%", "50%"
+                        ),
                         when(activeChannel, LayoutTemplates.flexPane(ChatComponent.chat(activeChannel, messages), "300px", "100%", inverseRefId)),
                         when(activeChannel, LayoutTemplates.flexPane(create("span").text("No channel selected").build(), "300px", "100%", inverseRefId), true)
                     ).build()
