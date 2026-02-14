@@ -1,9 +1,10 @@
 import {CommonTemplates} from "./common.ts";
 import {Live} from "../live/Live.ts";
 import {playReactionAnimation} from "../actions.ts";
-import {compute, create, InputType, signal, signalMap, when} from "@targoninc/jess";
+import {compute, create, InputType, Signal, signal, signalMap, when} from "@targoninc/jess";
 import {target} from "../index";
 import {currentUser, reactionGroups, reactions} from "../api/Store";
+import {Message, Reaction, ReactionGroup} from "../models/models";
 
 export class ReactionTemplates {
     static reactionTrigger(message, messages) {
@@ -74,9 +75,9 @@ export class ReactionTemplates {
             }).build();
     }
 
-    static reactionGroup(group, groupedFilteredReactions, message) {
-        const reactions = compute(groupedFilteredReactions, reactions => reactions[group.id] || []);
-        const hasReactions = compute(reactions, reactions => reactions.length > 0);
+    static reactionGroup(group: ReactionGroup, groupedFilteredReactions: Signal<Record<string, Reaction[]>>, message: Message) {
+        const reactions = compute(reactions => reactions[group.id] || [], groupedFilteredReactions);
+        const hasReactions = compute(reacts => reacts.length > 0, reactions);
 
         return create("div")
             .classes("flex-v")
