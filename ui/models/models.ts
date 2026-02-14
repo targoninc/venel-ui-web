@@ -55,6 +55,7 @@ export interface Message {
     'updatedAt': Date;
     sender: User;
     reactions: MessageReaction[];
+    attachments: Attachment[];
 }
 
 export interface Permission {

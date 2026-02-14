@@ -7,7 +7,7 @@ import {removeMessage} from "./Hooks.ts";
 import {Signal, signal} from "@targoninc/jess";
 import {router} from "../routing/RouterInstance.ts";
 import {channels} from "./Store";
-import {User} from "../models/models";
+import {Message, User} from "../models/models";
 
 export class Popups {
     static newDm() {
@@ -111,8 +111,8 @@ export class Popups {
         }, "Delete account", "Yes", "No", "delete", "close"));
     }
 
-    static editMessage(message, messages) {
-        popup(PopupComponents.simpleTextEditPopup("Edit message", message.text, (text) => {
+    static editMessage(message: Message, messages: Signal<Message[]>) {
+        popup(PopupComponents.simpleTextEditPopup("Edit message", message.text, (text: string) => {
             if (text.trim().length === 0) {
                 Live.send({
                     type: "removeMessage",

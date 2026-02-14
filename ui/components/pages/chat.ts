@@ -78,7 +78,7 @@ export class ChatComponent {
                 return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
             });
         }, messages, activeChannel);
-        const menuShownForMessageId = signal(null);
+        const menuShownForMessageId = signal<Id | null>(null);
         const toBeSentAttachments = signal([]);
         const hasAttachments = compute(attachments => {
             console.log(attachments);
@@ -160,7 +160,7 @@ export class ChatComponent {
         }, sending, ["rounded-max", "double"]);
     }
 
-    static message(message, messages, menuShownForMessageId) {
+    static message(message: Message, messages: Signal<Message[]>, menuShownForMessageId: Signal<Id | null>) {
         const messageIndex = messages.value.indexOf(message);
         const previousMessage = messages.value[messageIndex - 1];
         let shouldDisplaySender = true;
@@ -176,7 +176,7 @@ export class ChatComponent {
         const reacts = message.reactions.map(reaction => {
             return {
                 ...reaction,
-                content: reactions.value.find(r => r.id === reaction.id)?.content,
+                content: reactions.value.find(r => r.id === reaction.reactionId)?.content,
             };
         });
 
@@ -217,7 +217,7 @@ export class ChatComponent {
                         when(message.attachments.length > 0, create("div")
                             .classes("flex", "attachments", "full-width")
                             .children(
-                                message.attachments.map(attachment => AttachmentTemplates.attachment(attachment)),
+                                ...message.attachments.map(attachment => AttachmentTemplates.attachment(attachment)),
                             ).build()),
                         create("div")
                             .classes("flex-v", "message-text", "relative")
@@ -240,7 +240,7 @@ export class ChatComponent {
             ).build();
     }
 
-    static messageMenu(message: Message, messages: Message[], posX: Signal<number>, posY: Signal<number>) {
+    static messageMenu(message: Message, messages: Signal<Message[]>, posX: Signal<number>, posY: Signal<number>) {
         const posXR = compute(x => x + "px", posX);
         const posYR = compute(y => y + "px", posY);
         const permissions = compute((u: any) => u.permissions, currentUser);

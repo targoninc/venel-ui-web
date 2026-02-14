@@ -11,18 +11,21 @@ export class VirtualList {
      *     scanCount: number, // Buffer count
      * }
      */
-    static render(itemsSignal: Signal<any[]>, renderItem: (item: any, index: number) => AnyElement, options = {
-        itemHeight: 50,
-        scanCount: 10,
-        classes: [] as string[],
-        styles: []
-    }) {
+    static render(itemsSignal: Signal<any[]>, renderItem: (item: any, index: number) => AnyElement, options: {
+        itemHeight?: number,
+        scanCount?: number,
+        classes?: string[],
+        styles?: string[]
+    } = {}) {
+        const itemHeight = options.itemHeight ?? 50;
+        const scanCount = options.scanCount ?? 10;
+
         const scrollTop = signal(0);
         const containerHeight = signal(500); // Default, will update
 
         const container = create("div")
-            .classes("virtual-list-container", "full-height", "full-width")
-            .styles("overflow-y", "auto", "display", "flex", "flex-direction", "column", "position", "relative")
+            .classes("virtual-list-container", "full-height", "full-width", ...(options.classes || []))
+            .styles("overflow-y", "auto", "display", "flex", "flex-direction", "column", "position", "relative", ...(options.styles || []))
             .on("scroll", (e) => {
                 scrollTop.value = target(e).scrollTop;
             })
@@ -38,76 +41,61 @@ export class VirtualList {
         });
         resizeObserver.observe(container);
 
-        const visibleRange = compute((top) => {
+        const visibleRange = compute((top, height) => {
             return {
-                start: Math.floor(top / options.itemHeight),
-                end: Math.ceil((top + containerHeight.value) / options.itemHeight)
+                start: Math.floor(top / itemHeight),
+                end: Math.ceil((top + height) / itemHeight)
             };
-        }, scrollTop);
+        }, scrollTop, containerHeight);
 
         const totalHeight = compute((items) => {
-            return items.length * options.itemHeight;
+            return items.length * itemHeight;
         }, itemsSignal);
 
         const renderData = compute((range) => {
             const items = itemsSignal.value;
-            const start = Math.max(0, range.start - options.scanCount);
-            const end = Math.min(items.length, range.end + options.scanCount);
+            const start = Math.max(0, range.start - scanCount);
+            const end = Math.min(items.length, range.end + scanCount);
             const visibleItems = items.slice(start, end);
             return {items: visibleItems, start, end};
         }, visibleRange);
 
-        // The content wrapper maintains the total height and positions items absolutely or via padding
-        // Since @targoninc/jess signalMap handles diffing, we can map over visible items
-
         // We'll use a single filler element to set the scrollable height
         const filler = create("div")
-            .styles("width", "1px", "opacity", "0", "pointer-events", "none")
+            .styles("width", "100%", "opacity", "0", "pointer-events", "none", "position", "absolute", "top", "0", "left", "0")
             .build();
 
         // Update filler height
-        const updateFiller = () => {
-            filler.style.height = `${totalHeight.value}px`;
-        };
-        // We need to subscribe manually or use an effect if available, or just compute
-        // assuming compute subscribes
-        // Using `compute` to create a derived signal that side-effects (updates filler style) is one way,
-        // or just subscribe to totalHeight.
         totalHeight.subscribe((h) => {
             filler.style.height = `${h}px`;
         });
-        // Initial set
-        filler.style.height = `${totalHeight.value}px`;
 
         // The list container
         const listItemsContainer = create("div")
             .classes("virtual-list-items")
             .styles("position", "absolute", "top", "0", "left", "0", "width", "100%", "display", "flex", "flex-direction", "column");
 
-        // Render visible items
-        // We need a signal for the array of visible items
         const visibleItemsArray = compute((data) => data.items, renderData);
 
         // Update top padding or transform of the listItemsContainer to position it correctly
-        const listContainerTransform = compute((data) => {
-            const offsetY = data.start * options.itemHeight;
+        renderData.subscribe((data) => {
+            const offsetY = data.start * itemHeight;
             listItemsContainer._node.style.transform = `translateY(${offsetY}px)`;
-            return offsetY;
-        }, renderData);
-
-        // We need to pass the list contents
-        // signalMap expects a signal of array.
-        const itemsRendered = signalMap(visibleItemsArray,
-            listItemsContainer,
-            renderItem
-        );
+        });
 
         container.appendChild(filler);
-        container.appendChild(itemsRendered); // signalMap returns the wrapper element (listItemsContainer populated)
-        // Wait, signalMap returns the wrapper element?
-        // In chat.ts:
-        // .children(signalMap(...))
-        // So yes.
+        container.appendChild(create("div")
+            .children(
+                signalMap(visibleItemsArray,
+                    listItemsContainer,
+                    renderItem
+                )
+            ).build());
+
+        // Initial set
+        const initialOffsetY = renderData.value.start * itemHeight;
+        listItemsContainer._node.style.transform = `translateY(${initialOffsetY}px)`;
+        filler.style.height = `${totalHeight.value}px`;
 
         return container;
     }
