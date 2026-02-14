@@ -118,7 +118,7 @@ export class CommonTemplates {
                         //CommonTemplates.buttonWithIcon("group", "Friends", () => window.router.navigate('friends'), [activeIfActive("friends")]),
                     ).build(),
                 create("div")
-                    .classes("actions-footer", "flex", "align-center", "no-gap", "full-width")
+                    .classes("flex", "align-center")
                     .children(
                         CommonTemplates.buttonWithIcon("settings", "Settings", () => router.navigate('settings'), [activeIfActive("settings")]),
                         CommonTemplates.buttonWithIcon(avatar, "Profile", () => router.navigate('profile'), [activeIfActive("profile")], ["small-avatar"]),
