@@ -7,6 +7,7 @@ import {Popups} from "../../api/Popups.ts";
 import {compute, create, InputType, Signal, signal} from "@targoninc/jess";
 import {User} from "../../models/models";
 import {currentUser} from "../../api/Store";
+import {target} from "../../index";
 
 export class ProfileComponent {
     static render() {
@@ -35,9 +36,9 @@ export class ProfileComponent {
     }
 
     static basicInfoSection(user: Signal<User | null>) {
-        const username = compute((u) => u?.username, user);
-        const displayname = compute((u) => u?.displayname, user);
-        const description = compute((u) => u?.description, user);
+        const username = compute((u) => u?.username ?? "", user);
+        const displayname = compute((u) => u?.displayname ?? "", user);
+        const description = compute((u) => u?.description ?? "", user);
         const updateUser = (): void => {
             Api.updateUser(username.value, displayname.value, description.value).then((res) => {
                 if (res.status !== 200) {
@@ -65,15 +66,15 @@ export class ProfileComponent {
                             .classes("flex-v")
                             .children(
                                 CommonTemplates.input(InputType.text, "username", "Username", "New username", username, (e) => {
-                                    username.value = e.target.value;
+                                    username.value = target(e).value;
                                     updateUser();
                                 }, true),
                                 CommonTemplates.input(InputType.text, "displayname", "Display name", "New display name", displayname, (e) => {
-                                    displayname.value = e.target.value;
+                                    displayname.value = target(e).value;
                                     updateUser();
                                 }, true),
                                 CommonTemplates.input(InputType.text, "description", "Description", "New description", description, (e) => {
-                                    description.value = e.target.value;
+                                    description.value = target(e).value;
                                     updateUser();
                                 }, true),
                             ).build(),
@@ -96,8 +97,8 @@ export class ProfileComponent {
                     type: "updateAvatar",
                     avatar: base64
                 });
-                Store.get('user').value = {
-                    ...Store.get('user').value,
+                currentUser.value = {
+                    ...currentUser.value,
                     avatar: base64
                 };
             };
@@ -109,7 +110,7 @@ export class ProfileComponent {
     static avatarSection(user: Signal<User | null>) {
         const realAvatar = compute((u: User) => u.avatar, user);
         const avatar = compute((av: Buffer | null) => {
-            if (av instanceof Buffer) {
+            if (av?.constructor.name === "Buffer") {
                 return av.toString('base64');
             }
             return testImage;
@@ -141,8 +142,8 @@ export class ProfileComponent {
                         type: "updateAvatar",
                         avatar: null
                     });
-                    Store.get('user').value = {
-                        ...Store.get('user').value,
+                    currentUser.value = {
+                        ...currentUser.value,
                         avatar: null
                     };
                 }, ["negative"])
