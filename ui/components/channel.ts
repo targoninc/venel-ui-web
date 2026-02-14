@@ -7,12 +7,13 @@ import {Channel, Message} from "../models/models";
 import {target} from "../index";
 
 export class ChannelTemplates {
-    static dmChannel(channel: Channel, messages: Signal<Message[]>, activeChannel: Signal<number | null>) {
+    static dmChannel(channel: Channel, messages: Signal<Record<string, Message[]>>, activeChannel: Signal<number | null>) {
         const activeClass = compute((id): string => id === channel.id ? "active" : "_", activeChannel);
         let lastMemberAvatar = channel.members.at(-1)?.avatar;
         if (channel.type === "dm" && channel.members.length > 1) {
             lastMemberAvatar = channel.members.find(member => member.id !== store().get("user").value.id)?.avatar ?? testImage;
         }
+        const lastMessage = compute((msgs): Message | undefined => msgs[channel.id]?.at(-1), messages);
 
         return create("div")
             .classes("channel", "flex", "no-wrap", "full-width", activeClass)
@@ -23,7 +24,7 @@ export class ChannelTemplates {
             .children(
                 create("img")
                     .classes("channel-avatar")
-                    .src(channel.avatar ?? lastMemberAvatar ?? testImage)
+                    .src(lastMemberAvatar ?? testImage)
                     .build(),
                 create("div")
                     .classes("flex-v", "no-gap")
@@ -34,13 +35,13 @@ export class ChannelTemplates {
                             .build(),
                         create("span")
                             .classes("text-small", "one-line")
-                            .text(truncate(messages.value[channel.id]?.at(-1)?.text || "No messages", 100))
+                            .text(compute(last => truncate(last?.text || "No messages", 100), lastMessage))
                             .build(),
                     ).build(),
             ).build();
     }
 
-    static groupChannel(channel: Channel, messages: Signal<Message[]>, activeChannel: Signal<number | null>) {
+    static groupChannel(channel: Channel, activeChannel: Signal<number | null>) {
         const activeClass = compute<string, [number | null]>((id) => id === channel.id ? "active" : "_", activeChannel);
         const editing = signal(false);
 
@@ -70,13 +71,13 @@ export class ChannelTemplates {
             ).build();
     }
 
-    static channelList(channels: Signal<Channel[]>, messages: Signal<Message[]>, activeChannel: Signal<number | null>) {
+    static channelList(channels: Signal<Channel[]>, messages: Signal<Record<string, Message[]>>, activeChannel: Signal<number | null>) {
         return signalMap(channels,
             create("div")
                 .classes("flex-v", "no-gap", "full-width", "full-height")
             , channel => {
                 if (channel.type === "gr") {
-                    return ChannelTemplates.groupChannel(channel, messages, activeChannel);
+                    return ChannelTemplates.groupChannel(channel, activeChannel);
                 } else {
                     return ChannelTemplates.dmChannel(channel, messages, activeChannel);
                 }

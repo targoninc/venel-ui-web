@@ -1,9 +1,9 @@
-import {Popups} from "../api/Popups.ts";
 import {Store} from "../api/Store.ts";
 import {testImage} from "../actions.ts";
 import {compute, create, HtmlPropertyValue, InputType, isSignal, Signal, StringOrSignal, when} from "@targoninc/jess";
 import {router} from "../routing/RouterInstance.ts";
 import {User} from "../models/models";
+import {target} from "../index";
 
 export class CommonTemplates {
     static icon(icon, classes: StringOrSignal[] = [], tag = "span") {
@@ -323,9 +323,10 @@ export class CommonTemplates {
             ).build();
     }
 
-    static textArea(value, id, label = null, placeholder: StringOrSignal | null = null, classes: StringOrSignal[] = [], subClasses = [], onenter = () => {
-    }) {
-        const resize = (area) => {
+    static textArea(value: Signal<string>, id: StringOrSignal, label: StringOrSignal | null = null,
+                    placeholder: StringOrSignal | null = null, classes: StringOrSignal[] = [],
+                    subClasses: string[] = [], onenter = (e: Event) => {}) {
+        const resize = (area: HTMLInputElement) => {
             area.style.height = "auto";
             if (area.scrollHeight > 100) {
                 area.style.overflowY = "scroll";
@@ -354,26 +355,26 @@ export class CommonTemplates {
                             onenter(e);
                         } else {
                             if (subClasses.includes("message-input")) {
-                                resize(e.target);
+                                resize(target(e));
                             }
                         }
                     })
                     .oninput((e) => {
-                        value.value = e.target.value;
+                        value.value = target(e).value;
                         if (subClasses.includes("message-input")) {
-                            resize(e.target);
+                            resize(target(e));
                         }
                     })
                     .build()
             ).build();
     }
 
-    static checkbox(id, label, value, onchange) {
+    static checkbox(id: StringOrSignal, label: StringOrSignal, value: HtmlPropertyValue, onchange: (val: boolean) => void) {
         return create("div")
             .classes("flex", "small-gap")
             .children(
                 create("input")
-                    .type("checkbox")
+                    .type(InputType.checkbox)
                     .id(id)
                     .checked(value)
                     .onchange(onchange)
@@ -385,7 +386,7 @@ export class CommonTemplates {
             ).build();
     }
 
-    static smallCard(icon, text) {
+    static smallCard(icon: string, text: string) {
         return create("div")
             .classes("small-card", "flex", "align-center")
             .children(
@@ -396,8 +397,8 @@ export class CommonTemplates {
             ).build();
     }
 
-    static chatUser(avatar, name, onclick, onlonghover = () => {
-    }, onhoverout = () => {
+    static chatUser(avatar: string, name: string, onclick: Function, onlonghover = (e: MouseEvent) => {
+    }, onhoverout = (e: MouseEvent) => {
     }) {
         let timeout = null;
 

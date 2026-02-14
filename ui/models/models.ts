@@ -68,6 +68,7 @@ export interface Message {
     'senderId': Id | null;
     'text': string | null;
     'updatedAt': Date;
+    sender: User;
 }
 
 export interface Permission {

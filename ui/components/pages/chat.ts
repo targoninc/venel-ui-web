@@ -1,5 +1,5 @@
 import {LayoutTemplates} from "../layout.ts";
-import {channels, currentChannelId, messages, Store} from "../../api/Store.ts";
+import {channels, currentChannelId, currentUser, messages, reactions} from "../../api/Store.ts";
 import {CommonTemplates} from "../common.ts";
 import {Hooks, removeMessage} from "../../api/Hooks.ts";
 import {Time} from "../../tooling/Time.ts";
@@ -10,8 +10,9 @@ import {Popups} from "../../api/Popups.ts";
 import {ReactionTemplates} from "../reaction.ts";
 import {AttachmentTemplates} from "../attachment.ts";
 import {VirtualList} from "../../tooling/VirtualList.ts";
-import {create, signal, compute, signalMap, when} from "@targoninc/jess";
+import {create, signal, compute, signalMap, when, Signal} from "@targoninc/jess";
 import {target} from "../../index";
+import {Message} from "../../models/models";
 
 export class ChatComponent {
     static render(params) {
@@ -42,7 +43,7 @@ export class ChatComponent {
         channels.subscribe(updateChannels);
 
         activeChannel.subscribe(channel => {
-            Store.set("currentChannelId", channel);
+            currentChannelId.value = channel;
             Hooks.runActiveChannel(channel);
         });
         const inverseRefId = Math.random().toString(36).substring(7);
@@ -58,21 +59,21 @@ export class ChatComponent {
                             ChannelTemplates.channelList(displayChannels, messages, activeChannel), inverseRefId,
                             "20%", "10%", "50%"
                         ),
-                        when(activeChannel, LayoutTemplates.flexPane(ChatComponent.chat(activeChannel, messages), "300px", "100%", inverseRefId)),
+                        when(activeChannel, LayoutTemplates.flexPane(ChatComponent.chat(activeChannel), "300px", "100%", inverseRefId)),
                         when(activeChannel, LayoutTemplates.flexPane(create("span").text("No channel selected").build(), "300px", "100%", inverseRefId), true)
                     ).build()
             ).build();
     }
 
-    static chat(activeChannel, allMessages) {
+    static chat(activeChannel) {
         const sending = signal(false);
         const messageText = signal("");
-        const messages = compute((messages) => {
-            const out = messages[activeChannel.value] || [];
+        const displayedMsgs = compute((msgs) => {
+            const out = msgs[activeChannel.value] || [];
             return out.sort((a, b) => {
                 return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
             });
-        }, allMessages);
+        }, messages);
         const menuShownForMessageId = signal(null);
         const toBeSentAttachments = signal([]);
         const hasAttachments = compute(attachments => {
@@ -86,8 +87,8 @@ export class ChatComponent {
                 create("div")
                     .classes("chat-content", "flex-v", "no-gap")
                     .children(
-                        VirtualList.render(messages,
-                            message => ChatComponent.message(message, messages, menuShownForMessageId),
+                        VirtualList.render(displayedMsgs,
+                            message => ChatComponent.message(message, displayedMsgs, menuShownForMessageId),
                             {
                                 itemHeight: 80, // Estimate
                                 scanCount: 10,
@@ -106,7 +107,7 @@ export class ChatComponent {
                             .classes("background-2", "chat-input", "flex", "align-center")
                             .children(
                                 AttachmentTemplates.attachmentButton(activeChannel, messageText, toBeSentAttachments),
-                                AttachmentTemplates.voiceButton(activeChannel, messageText, toBeSentAttachments),
+                                AttachmentTemplates.voiceButton(activeChannel, messageText),
                                 CommonTemplates.textArea(messageText, "message", null, "Write something nice...", ["flex-grow"], ["full-width-h", "message-input"], () => {
                                     if (!messageText.value || messageText.value.trim() === "" || sending.value) {
                                         return;
@@ -125,7 +126,7 @@ export class ChatComponent {
                                 }),
                                 create("div")
                                     .children(
-                                        ChatComponent.sendButton(sending, messages, toBeSentAttachments, activeChannel, messageText),
+                                        ChatComponent.sendButton(sending, displayedMsgs, toBeSentAttachments, activeChannel, messageText),
                                     ).build()
                             ).build(),
                     ).build(),
@@ -168,10 +169,10 @@ export class ChatComponent {
         const messageMenuPositionX = signal(0);
         const messageMenuPositionY = signal(0);
         const cardShown = signal(false);
-        const reactions = message.reactions.map(reaction => {
+        const reacts = message.reactions.map(reaction => {
             return {
                 ...reaction,
-                content: Store.get("reactions").value.find(r => r.id === reaction.id).content,
+                content: reactions.value.find(r => r.id === reaction.id)?.content,
             };
         });
 
@@ -220,7 +221,7 @@ export class ChatComponent {
                                 when(message.text, create("span")
                                     .text(message.text)
                                     .build()),
-                                when(reactions.length > 0, ReactionTemplates.reactionDisplay(reactions, message)),
+                                when(reacts.length > 0, ReactionTemplates.reactionDisplay(reacts, message)),
                                 ReactionTemplates.reactionTrigger(message, messages),
                             ).build(),
                         create("div")
@@ -235,15 +236,14 @@ export class ChatComponent {
             ).build();
     }
 
-    static messageMenu(message, messages, posX, posY) {
+    static messageMenu(message: Message, messages: Message[], posX: Signal<number>, posY: Signal<number>) {
         const posXR = compute(x => x + "px", posX);
         const posYR = compute(y => y + "px", posY);
-        const user = Store.get("user");
-        const permissions = compute((u: any) => u.permissions, user);
-        const sameUser = compute((u: any) => u.id === message.sender.id, user);
+        const permissions = compute((u: any) => u.permissions, currentUser);
+        const sameUser = compute((u: any) => u.id === message.sender.id, currentUser);
         const hasDeletePermission = compute(p => p.some(perm => perm.name === "deleteMessage"), permissions);
         const canDelete = compute(isSame => isSame || hasDeletePermission.value, sameUser);
-        const menuClass = compute(can => (can || sameUser.value) ? "_" : "no-content", canDelete);
+        const menuClass = compute((can): string => (can || sameUser.value) ? "_" : "no-content", canDelete);
 
         return create("div")
             .classes("message-menu", "flex-v", menuClass)

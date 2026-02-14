@@ -1,15 +1,22 @@
-export class Router {
-    public currentRoute = null;
-    private routes;
-    protected preRouteChange = null;
-    protected postRouteChange = null;
-    protected onNoRouteFound = () => {};
+import { signal } from "@targoninc/jess";
+import {router} from "./RouterInstance";
 
-    constructor(routes, preRouteChange = null, postRouteChange = null, onNoRouteFound = () => {}) {
+export class Router {
+    public currentRoute = signal<Route|null>(null);
+    public currentParams = signal<{
+        [key: string]: string;
+    }>({});
+    routes: any[];
+    protected preRouteChange: Function = () => {};
+    protected postRouteChange: Function = () => {};
+    protected onNoRouteFound: Function = () => {};
+
+    constructor(routes: Route[], preRouteChange: Function = () => {}, postRouteChange: Function = () => {}, onNoRouteFound: Function = () => {}) {
         this.routes = routes;
         this.preRouteChange = preRouteChange;
         this.postRouteChange = postRouteChange;
         this.onNoRouteFound = onNoRouteFound;
+        this.init();
     }
 
     init() {
@@ -17,40 +24,41 @@ export class Router {
         this.handleRouteChange().then();
     }
 
-    loadCurrentRoute() {
-        this.handleRouteChange().then();
-    }
-
     async handleRouteChange() {
-        const path = window.location.pathname.substring(1);
-        const route = this.routes.find(r => {
-            return path.startsWith(r.path) || (r.aliases && r.aliases.some(a => {
-                if (a === "" || a === "/") {
-                    return path === a;
-                }
-
-                return path.startsWith(a);
-            }));
-        });
-        this.currentRoute = route;
+        let path = window.location.pathname.substring(1);
+        if (path === "") {
+            path = "/";
+        }
+        const page = path.split("/").filter(p => p !== "")[0] ?? "/";
+        let route = this.routes.find(r => page === r.path || (r.aliases && r.aliases.some((a: string) => path === a)));
+        if (!route) {
+            route = this.routes.find(r => page.startsWith(r.path) || (r.aliases && r.aliases.some((a: string) => path.startsWith(a))));
+        }
+        this.currentRoute.value = route;
         if (route) {
+            document.title = route.title;
             const params = this.getParams(path, route);
+            this.currentParams.value = params;
             this.preRouteChange && await this.preRouteChange(route, params);
             route.handler && await route.handler(route, params);
             this.postRouteChange && await this.postRouteChange(route,params);
         } else {
+            document.title = "Page not found";
             this.onNoRouteFound && await this.onNoRouteFound();
+            this.currentParams.value = {};
         }
     }
 
-    getParams(fullPath, route) {
+    getParams(fullPath: string, route: any) {
         const path = fullPath.split("/").filter(p => p !== "");
-        const params = {};
+        const params: {
+            [key: string]: string;
+        } = {};
         for (let i = 0; i < path.length; i++) {
             params["path_" + i] = path[i];
         }
         const urlParams = new URLSearchParams(window.location.search);
-        for (let [key, value] of urlParams.entries()) {
+        for (const [key, value] of urlParams.entries()) {
             params[key] = value;
         }
         if (route.params) {
@@ -61,15 +69,35 @@ export class Router {
         return params;
     }
 
-    async navigate(path) {
+    async navigate(path: string) {
         if (!path.startsWith("/")) {
             path = "/" + path;
         }
-        history.pushState({}, "", path);
+        history.pushState({}, "", window.location.origin + path);
         await this.handleRouteChange();
     }
 
     reload() {
         this.handleRouteChange().then();
     }
+}
+
+export function navigate(path: string, params: string[] = []) {
+    if (params.length > 0) {
+        path += "?" + params.join("&");
+    }
+    router.navigate(path).then();
+}
+
+export function reload() {
+    router.reload();
+}
+
+export interface Route {
+    path: string;
+    title?: string;
+    params?: string[];
+    aliases?: string[];
+    noUser?: string;
+    handler?: Function;
 }

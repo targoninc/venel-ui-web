@@ -1,8 +1,8 @@
 import {CommonTemplates} from "./common.ts";
-import {AnyElement, compute, create, signal, StringOrSignal} from "@targoninc/jess";
+import {AnyElement, AnyNode, compute, create, signal, StringOrSignal} from "@targoninc/jess";
 
 export class LayoutTemplates {
-    static pageFull(content) {
+    static pageFull(content: AnyNode) {
         return create("div")
             .classes("full-height")
             .children(
@@ -10,21 +10,21 @@ export class LayoutTemplates {
             ).build();
     }
 
-    static contentContainer(classes: StringOrSignal[] = [], content) {
+    static contentContainer(classes: StringOrSignal[] = [], content: AnyNode) {
         return create("div")
             .classes("content-container", ...classes)
             .children(content)
             .build();
     }
 
-    static centeredContent(content) {
+    static centeredContent(content: AnyNode) {
         return create("div")
             .classes("centered-content")
             .children(content)
             .build();
     }
 
-    static pane(content, defaultWidth = "50%", minWidth = "300px", maxWidth = "100%") {
+    static pane(content: AnyNode, defaultWidth = "50%", minWidth = "300px", maxWidth = "100%") {
         return create("div")
             .classes("pane")
             .styles("width", defaultWidth)
@@ -34,7 +34,7 @@ export class LayoutTemplates {
             .build();
     }
 
-    static flexPane(content, minWidth = "300px", maxWidth = "100%", id = null) {
+    static flexPane(content: AnyNode, minWidth = "300px", maxWidth = "100%", id: string | null = null) {
         return create("div")
             .classes("flex-pane")
             .styles("min-width", minWidth)
@@ -80,6 +80,9 @@ export class LayoutTemplates {
             .onmousedown(e => {
                 const startPos = e[clientProperty];
                 const pane = document.getElementById(refId);
+                if (!pane) {
+                    return;
+                }
                 const inversePane = inverseRefId ? document.getElementById(inverseRefId) : null;
                 const startSize = pane.getBoundingClientRect()[propertyToSet];
                 document.body.style.userSelect = "none";
@@ -87,7 +90,7 @@ export class LayoutTemplates {
                 const onMouseMove = e => {
                     e.preventDefault();
                     const newSize = startSize + (e[clientProperty] - startPos);
-                    const parentSize = pane.parentElement.getBoundingClientRect()[propertyToSet];
+                    const parentSize = pane.parentElement?.getBoundingClientRect()[propertyToSet] ?? 1;
                     const newPercent = newSize / parentSize * 100;
                     if (newPercent < minSizeAsNumber || newPercent > maxSizeAsNumber) {
                         return;
@@ -110,12 +113,12 @@ export class LayoutTemplates {
             .build();
     }
 
-    static collapsible(text, content) {
+    static collapsible(text: string, content: AnyElement) {
         const uniqueId = Math.random().toString(36).substring(7);
         const toggled = signal(false);
-        const iconClass = compute(on => on ? "rot90" : "rot0", toggled);
-        const gapClass = compute(v => v ? "gap" : "no-gap", toggled);
-        let contentElement;
+        const iconClass = compute((on): string => on ? "rot90" : "rot0", toggled);
+        const gapClass = compute((v): string => v ? "gap" : "no-gap", toggled);
+        let contentElement: AnyElement;
         const setMaxHeight = () => {
             if (toggled.value) {
                 contentElement.style.maxHeight = contentElement.scrollHeight + 'px';
