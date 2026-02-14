@@ -1,13 +1,13 @@
 import {Api} from "./Api.ts";
 import {toast} from "../actions.ts";
-import {store} from "../compat";
+import {currentUser} from "./Store";
 
 export class Setting {
-    static getBoolean(key) {
+    static getBoolean(key: string) {
         return sessionStorage.getItem(key) === "true";
     }
 
-    static getString(key) {
+    static getString(key: string) {
         return sessionStorage.getItem(key);
     }
 
@@ -17,15 +17,13 @@ export class Setting {
             if (res.status !== 200) {
                 toast("Failed to update setting: " + res.data.error, "error");
             } else {
-                const user = store().getSignalValue("user");
-                const newUser = {
-                    ...user,
+                currentUser.value = {
+                    ...currentUser.value,
                     settings: {
-                        ...user,
+                        ...currentUser.value?.settings,
                         [key]: value,
                     },
                 };
-                store().setSignalValue("user", newUser);
             }
         });
     }

@@ -1,9 +1,9 @@
-import {Store} from "../api/Store.ts";
 import {testImage} from "../actions.ts";
 import {compute, create, HtmlPropertyValue, InputType, isSignal, Signal, StringOrSignal, when} from "@targoninc/jess";
 import {router} from "../routing/RouterInstance.ts";
 import {User} from "../models/models";
 import {target} from "../index";
+import {currentUser} from "../api/Store";
 
 export class CommonTemplates {
     static icon(icon, classes: StringOrSignal[] = [], tag = "span") {
@@ -66,7 +66,7 @@ export class CommonTemplates {
                     .children(
                         create("select")
                             .onchange((e) => {
-                                onchange(e.target?.value);
+                                onchange(target(e).value);
                             })
                             .children(
                                 ...options.map(option => {
@@ -102,14 +102,13 @@ export class CommonTemplates {
     static actions() {
         const currentRoute = router.currentRoute;
         const activeIfActive = (route: string) => {
-            if (currentRoute) {
-                return currentRoute.path === route ? "active" : "_";
+            if (currentRoute.value) {
+                return currentRoute.value.path === route ? "active" : "_";
             }
             return "_";
         };
-        const user = Store.get('user');
-        const avatar = compute(u => u && u.avatar ? u.avatar : testImage, user);
-        const hasAnyRole = compute(u => u && u.roles && u.roles.length > 0, user);
+        const avatar = compute(u => u && u.avatar ? u.avatar : testImage, currentUser);
+        const hasAnyRole = compute(u => u && u.roles && u.roles.length > 0, currentUser);
 
         return create("nav")
             .classes("flex", "align-center", "full-width", "space-between", "padded", "fixed")
@@ -225,8 +224,8 @@ export class CommonTemplates {
             ).build();
     }
 
-    static input<T>(type: InputType, id: StringOrSignal, label: StringOrSignal, placeholder: StringOrSignal,
-                    value: HtmlPropertyValue, onchange: (val: T) => void, required = true,
+    static input(type: InputType, id: StringOrSignal, label: StringOrSignal, placeholder: StringOrSignal,
+                    value: HtmlPropertyValue, onchange: (e: KeyboardEvent) => void, required = true,
                     autocomplete = "off", onkeydown = (e: KeyboardEvent) => {
         }, ontype = (e: KeyboardEvent) => {
         }) {
@@ -256,8 +255,10 @@ export class CommonTemplates {
             ).build();
     }
 
-    static responsiveInput(type, id, label, placeholder, value, oninput, required = true, autocomplete = "off", onkeydown = () => {
-    }) {
+    static responsiveInput(type: InputType, id: HtmlPropertyValue, label: HtmlPropertyValue,
+                           placeholder: HtmlPropertyValue, value: HtmlPropertyValue, oninput: Function,
+                           required = true, autocomplete = "off", onkeydown = (e: KeyboardEvent) => {
+        }) {
         return create("div")
             .classes("flex-v", "small-gap")
             .children(
@@ -271,6 +272,7 @@ export class CommonTemplates {
                     .placeholder(placeholder)
                     .value(value)
                     .oninput(oninput)
+                    .required(required)
                     .onkeydown((e) => {
                         if (e.key === "Enter") {
                             e.preventDefault();
@@ -282,14 +284,14 @@ export class CommonTemplates {
             ).build();
     }
 
-    static error(message) {
+    static error(message: StringOrSignal) {
         return create("span")
             .classes("error")
             .text(message)
             .build();
     }
 
-    static pageLink(text, target, classes = []) {
+    static pageLink(text: StringOrSignal, target: string, classes: StringOrSignal[] = []) {
         const isExternal = target.startsWith("http");
         return create("a")
             .href(target)
@@ -298,9 +300,9 @@ export class CommonTemplates {
                 const middleClick = e.button === 1;
                 if (!isExternal && !middleClick) {
                     e.preventDefault();
-                    window.router.navigate(target);
+                    router.navigate(target);
                 } else {
-                    window.open(e.target.href, "_blank");
+                    window.open((e.target as HTMLAnchorElement).href, "_blank");
                 }
             })
             .classes("page-link", "flex", "align-center", ...classes)
@@ -325,7 +327,8 @@ export class CommonTemplates {
 
     static textArea(value: Signal<string>, id: StringOrSignal, label: StringOrSignal | null = null,
                     placeholder: StringOrSignal | null = null, classes: StringOrSignal[] = [],
-                    subClasses: string[] = [], onenter = (e: Event) => {}) {
+                    subClasses: string[] = [], onenter = (e: Event) => {
+        }) {
         const resize = (area: HTMLInputElement) => {
             area.style.height = "auto";
             if (area.scrollHeight > 100) {

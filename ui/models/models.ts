@@ -18,28 +18,12 @@ export interface AudioAttachment {
     'messageId': Id | null;
 }
 
-export interface BridgedUser {
-    'createdAt': Date;
-    'instanceId': Id;
-    'userId': Id;
-}
-
-export interface BridgeInstance {
-    'enabled': boolean;
-    'id': Id;
-    'url': string;
-    'useAllowlist': boolean;
-}
-
 export interface ChannelMember {
     'channelId': Id;
     'userId': Id;
 }
 
 export interface Channel {
-    'bridged': boolean;
-    'bridgedChannelId': Id | null;
-    'bridgeInstanceId': Id | null;
     'createdAt': Date;
     'id': Id;
     'name': string | null;
@@ -58,6 +42,7 @@ export interface MessageReaction {
     'messageId': Id;
     'reactionId': Id;
     'userId': Id;
+    isNew?: boolean;
 }
 
 export interface Message {
@@ -69,6 +54,7 @@ export interface Message {
     'text': string | null;
     'updatedAt': Date;
     sender: User;
+    reactions: MessageReaction[];
 }
 
 export interface Permission {
@@ -120,6 +106,9 @@ export interface User {
     'registrationIp': string | null;
     'updatedAt': Date;
     'username': string;
+    settings: Record<string, any>;
+    roles: Role[];
+    permissions: Permission[];
 }
 
 export interface UserSetting {

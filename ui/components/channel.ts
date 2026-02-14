@@ -2,16 +2,16 @@ import {Live} from "../live/Live.ts";
 import {truncate} from "../tooling/Text.ts";
 import {testImage} from "../actions.ts";
 import {compute, create, InputType, Signal, signal, signalMap, when} from "@targoninc/jess";
-import {store} from "../compat";
 import {Channel, Message} from "../models/models";
 import {target} from "../index";
+import {currentUser} from "../api/Store";
 
 export class ChannelTemplates {
     static dmChannel(channel: Channel, messages: Signal<Record<string, Message[]>>, activeChannel: Signal<number | null>) {
         const activeClass = compute((id): string => id === channel.id ? "active" : "_", activeChannel);
         let lastMemberAvatar = channel.members.at(-1)?.avatar;
         if (channel.type === "dm" && channel.members.length > 1) {
-            lastMemberAvatar = channel.members.find(member => member.id !== store().get("user").value.id)?.avatar ?? testImage;
+            lastMemberAvatar = channel.members.find(member => member.id !== currentUser.value?.id)?.avatar ?? testImage;
         }
         const lastMessage = compute((msgs): Message | undefined => msgs[channel.id]?.at(-1), messages);
 

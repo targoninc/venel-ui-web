@@ -1,9 +1,15 @@
 import {addChannel, addMessage, addReaction, removeMessage, removeReaction} from "../api/Hooks.ts";
 import {toast} from "../actions.ts";
 import {Api} from "../api/Api.ts";
-import {store} from "../compat";
+import {maxPayloadSizeInMb} from "../api/Store";
 
 export class LiveInstance {
+    private readonly onStop: () => void;
+    private readonly onStart: () => void;
+    private server: WebSocket | null;
+    private interval: NodeJS.Timeout | null;
+    private maxPayloadSizeInMb: number | null;
+
     constructor(onStop = () => {}, onStart = () => {}) {
         this.onStop = onStop;
         this.onStart = onStart;
@@ -28,7 +34,7 @@ export class LiveInstance {
         }
 
         this.interval = setInterval(() => {
-            if (this.server.readyState !== WebSocket.OPEN) {
+            if (this.server?.readyState !== WebSocket.OPEN) {
                 return;
             }
             this.server.send(JSON.stringify({type: "ping"}));
@@ -87,17 +93,17 @@ export class LiveInstance {
                     break;
                 case "maxPayloadSize":
                     this.maxPayloadSizeInMb = data.size;
-                    store().set("maxPayloadSizeInMb", data.size);
+                    maxPayloadSizeInMb.value = data.size;
                     break;
             }
         };
     }
 
     stop() {
-        this.server.close();
+        this.server?.close();
     }
 
-    send(data) {
+    send(data: any) {
         const toSend = JSON.stringify(data);
         if (this.maxPayloadSizeInMb) {
             if (toSend.length > this.maxPayloadSizeInMb * 1024 * 1024) {
@@ -105,6 +111,6 @@ export class LiveInstance {
                 return;
             }
         }
-        this.server.send(toSend);
+        this.server?.send(toSend);
     }
 }

@@ -1,10 +1,11 @@
 import {LayoutTemplates} from "../layout.ts";
 import {CommonTemplates} from "../common.ts";
 import {Api} from "../../api/Api.ts";
-import {Store} from "../../api/Store.ts";
 import {toast} from "../../actions.ts";
-import {create, signal, when} from "@targoninc/jess";
+import {create, InputType, signal, when} from "@targoninc/jess";
 import {router} from "../../routing/RouterInstance.ts";
+import {currentUser} from "../../api/Store";
+import {target} from "../../index";
 
 export class LoginComponent {
     static render() {
@@ -16,7 +17,6 @@ export class LoginComponent {
     }
 
     static content() {
-        const user = Store.get('user');
         const username = signal("");
         const usernameError = signal<string | null>(null);
         const password = signal("");
@@ -61,7 +61,7 @@ export class LoginComponent {
                                             .text(window.location.hostname)
                                             .build()
                                     ).build(),
-                                when(user, create("div")
+                                when(currentUser, create("div")
                                     .classes("flex-v")
                                     .children(
                                         CommonTemplates.warning("You are already logged in. Logging in will log you out and switch you to the new user."),
@@ -72,16 +72,16 @@ export class LoginComponent {
                         create("div")
                             .classes("flex-v")
                             .children(
-                                CommonTemplates.input("text", "username", "Username", "Username", username, (e) => {
-                                    username.value = e.target.value;
+                                CommonTemplates.input(InputType.text, "username", "Username", "Username", username, (e) => {
+                                    username.value = target(e).value;
                                 }, true, "username", () => {
                                     document.getElementById("password")?.focus();
                                 }),
                                 when(usernameError, CommonTemplates.error(usernameError)),
-                                CommonTemplates.input("password", "password", "Password", "Password", password, (e) => {
-                                    password.value = e.target.value;
+                                CommonTemplates.input(InputType.password, "password", "Password", "Password", password, (e) => {
+                                    password.value = target(e).value;
                                 }, true, "current-password", (e) => {
-                                    password.value = e.target.value;
+                                    password.value = target(e).value;
                                     document.getElementById("login")?.click();
                                 }),
                                 when(passwordError, CommonTemplates.error(passwordError)),
@@ -105,7 +105,7 @@ export class LoginComponent {
                                 when(actionError, CommonTemplates.error(actionError)),
                             ).build(),
                     ).build(),
-                when(user, create("div")
+                when(currentUser, create("div")
                     .classes("flex-v")
                     .children(
                         CommonTemplates.pageLink("Register", "register"),

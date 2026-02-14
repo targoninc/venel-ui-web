@@ -3,6 +3,7 @@ import {currentCallSound, currentSound, setCurrentCallSound, setCurrentSound} fr
 import {Api} from "./Api.ts";
 import {toast} from "../actions.ts";
 import {Channel, Message, Reaction, ReactionGroup, User} from "../models/models.ts";
+import {LiveInstance} from "../live/LiveInstance";
 
 export const currentUser = signal<User | null>(null);
 export const currentChannelId = signal(0);
@@ -14,6 +15,8 @@ export const channels = signal<Channel[]>([]);
 export const activeChannel = signal<Channel | null>(null);
 export const maxPayloadSizeInMb = signal(5);
 export const playingLoops = signal<HTMLAudioElement[]>([]);
+export const live = signal(false);
+export const liveInstance = signal<LiveInstance | null>(null);
 
 if (!currentSound()) {
     setCurrentSound("bloom.mp3");

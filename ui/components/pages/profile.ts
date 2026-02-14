@@ -1,13 +1,12 @@
 import {LayoutTemplates} from "../layout.ts";
 import {CommonTemplates} from "../common.ts";
-import {Store} from "../../api/Store.ts";
 import {Api} from "../../api/Api.ts";
 import {testImage, toast} from "../../actions.ts";
 import {Live} from "../../live/Live.ts";
 import {Popups} from "../../api/Popups.ts";
-import {compute, create, Signal, signal} from "@targoninc/jess";
-import {store} from "../../compat";
+import {compute, create, InputType, Signal, signal} from "@targoninc/jess";
 import {User} from "../../models/models";
+import {currentUser} from "../../api/Store";
 
 export class ProfileComponent {
     static render() {
@@ -15,8 +14,6 @@ export class ProfileComponent {
     }
 
     static content() {
-        const user = Store.get('user');
-
         return create("div")
             .classes("panes-v", "full-width", "full-height")
             .children(
@@ -28,19 +25,19 @@ export class ProfileComponent {
                             create("div")
                                 .classes("flex-v")
                                 .children(
-                                    ProfileComponent.avatarSection(user),
-                                    ProfileComponent.basicInfoSection(user),
-                                    ProfileComponent.accountSection(user),
+                                    ProfileComponent.avatarSection(currentUser),
+                                    ProfileComponent.basicInfoSection(currentUser),
+                                    ProfileComponent.accountSection(currentUser),
                                 ).build()
                         ), "100%", "500px", "100%")
                     ).build()
             ).build();
     }
 
-    static basicInfoSection(user: Signal<User>) {
-        const username = compute((u: User) => u.username, user);
-        const displayname = compute((u: User) => u.displayname, user);
-        const description = compute((u: User) => u.description, user);
+    static basicInfoSection(user: Signal<User | null>) {
+        const username = compute((u) => u?.username, user);
+        const displayname = compute((u) => u?.displayname, user);
+        const description = compute((u) => u?.description, user);
         const updateUser = (): void => {
             Api.updateUser(username.value, displayname.value, description.value).then((res) => {
                 if (res.status !== 200) {
@@ -53,7 +50,7 @@ export class ProfileComponent {
                         toast("Failed to get user info: " + res.data.error, "error");
                         return;
                     }
-                    store().setSignalValue('user', res.data.user);
+                    currentUser.value = res.data.user;
                 });
             });
         };
@@ -67,15 +64,15 @@ export class ProfileComponent {
                         create("div")
                             .classes("flex-v")
                             .children(
-                                CommonTemplates.input("text", "username", "Username", "New username", username, (e) => {
+                                CommonTemplates.input(InputType.text, "username", "Username", "New username", username, (e) => {
                                     username.value = e.target.value;
                                     updateUser();
                                 }, true),
-                                CommonTemplates.input("text", "displayname", "Display name", "New display name", displayname, (e) => {
+                                CommonTemplates.input(InputType.text, "displayname", "Display name", "New display name", displayname, (e) => {
                                     displayname.value = e.target.value;
                                     updateUser();
                                 }, true),
-                                CommonTemplates.input("text", "description", "Description", "New description", description, (e) => {
+                                CommonTemplates.input(InputType.text, "description", "Description", "New description", description, (e) => {
                                     description.value = e.target.value;
                                     updateUser();
                                 }, true),
@@ -109,7 +106,7 @@ export class ProfileComponent {
         input.click();
     }
 
-    static avatarSection(user: Signal<User>) {
+    static avatarSection(user: Signal<User | null>) {
         const realAvatar = compute((u: User) => u.avatar, user);
         const avatar = compute((av: Buffer | null) => {
             if (av instanceof Buffer) {
@@ -152,7 +149,7 @@ export class ProfileComponent {
             ).build();
     }
 
-    static accountSection(user: Signal<User>) {
+    static accountSection(user: Signal<User | null>) {
         return LayoutTemplates.collapsible("Account",
             create("div")
                 .classes("flex-v")

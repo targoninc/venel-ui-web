@@ -3,7 +3,7 @@ import {toast} from "../actions.ts";
 import {Live} from "../live/Live.ts";
 import hljs from "highlight.js";
 import {compute, create, signal, when} from "@targoninc/jess";
-import {store} from "../compat";
+import {maxPayloadSizeInMb} from "../api/Store";
 
 export class AttachmentTemplates {
     static attachmentButton(activeChannel, messageText, toBeSentAttachments) {
@@ -15,14 +15,14 @@ export class AttachmentTemplates {
                 for (const file of input.files) {
                     const reader = new FileReader();
                     reader.onload = () => {
-                        let base64 = reader.result.split(',')[1];
+                        let base64 = reader.result?.split(',')[1];
                         if (base64.constructor.name === "Buffer") {
                             base64 = base64.toString("base64");
                         }
 
-                        const maxPayloadSizeInMb = store().get("maxPayloadSizeInMb");
-                        if (maxPayloadSizeInMb && base64.length > maxPayloadSizeInMb * 1024 * 1024) {
-                            toast("File is too large, must be smaller than " + maxPayloadSizeInMb + "MB", "error");
+                        const maxPayloadSizeMb = maxPayloadSizeInMb.value;
+                        if (maxPayloadSizeMb && base64.length > maxPayloadSizeMb * 1024 * 1024) {
+                            toast("File is too large, must be smaller than " + maxPayloadSizeMb + "MB", "error");
                             return;
                         }
 
@@ -267,7 +267,7 @@ export class AttachmentTemplates {
             const reader = new FileReader();
             reader.readAsDataURL(data);
             reader.onloadend = () => {
-                let base64 = reader.result.split(',')[1];
+                let base64 = reader.result?.split(',')[1];
                 if (base64.constructor.name === "Buffer") {
                     base64 = base64.toString("base64");
                 }

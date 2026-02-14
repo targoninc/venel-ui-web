@@ -1,6 +1,5 @@
 import {LiveInstance} from "./LiveInstance.ts";
-import {store} from "../compat";
-import {signal} from "@targoninc/jess";
+import {live, liveInstance} from "../api/Store";
 
 export class Live {
     static startIfNotRunning() {
@@ -12,35 +11,28 @@ export class Live {
     }
 
     static running() {
-        if (!store().get('live')) {
-            return false;
-        }
-
-        return store().getSignalValue('live') === true;
+        return live.value;
     }
 
     static start() {
-        store().set('live', signal(false));
-
-        const liveInstance = new LiveInstance(() => {
-            store().setSignalValue('live', false);
+        live.value = false;
+        liveInstance.value = new LiveInstance(() => {
+            live.value = false;
         }, () => {
-            store().setSignalValue('live', true);
+            live.value = true;
         });
-        store().set('live_instance', liveInstance);
     }
 
     static stop() {
-        const liveInstance = store().get('live_instance');
-        liveInstance?.stop();
-        store().set('live_instance', null);
-        if (store().get('live')) {
-            store().setSignalValue('live', false);
+        const li = liveInstance.value;
+        li?.stop();
+        liveInstance.value = null;
+        if (Live.running()) {
+            live.value = false;
         }
     }
 
-    static send(data) {
-        const liveInstance = store().get('live_instance');
-        liveInstance?.send(data);
+    static send(data: Record<string, any>) {
+        liveInstance.value?.send(data);
     }
 }

@@ -61,43 +61,6 @@ export class Popups {
         }, "New DM", "Search for users"));
     }
 
-    static newBridgedUser(instance, allowList) {
-        const userSearchResults = signal([]);
-
-        popup(PopupComponents.searchPopup(() => {
-            removePopups();
-        }, (e) => {
-            const query = e.target.value;
-            if (query.length < 3) {
-                userSearchResults.value = [];
-                return;
-            }
-
-            Api.search(query).then((res) => {
-                if (res.status !== 200) {
-                    toast("Failed to search for users: " + res.data.error, "error");
-                    return;
-                }
-                userSearchResults.value = res.data.filter(user => {
-                    return !allowList.value.some(bridgedUser => bridgedUser.id === user.id);
-                });
-            })
-        }, () => {}, userSearchResults, (result) => {
-            return CommonTemplates.addUserButton(result.username, () => {
-                Api.addBridgedUser(result.id, instance.id).then((res) => {
-                    if (res.status !== 200) {
-                        toast("Failed to add user: " + res.data.error, "error");
-                        removePopups();
-                        return;
-                    }
-                    toast("User added", "success");
-                    allowList.value = [...allowList.value, result];
-                    removePopups();
-                });
-            });
-        }, "Add bridged user", "Search for users"));
-    }
-
     static deleteUserPopup(users, user) {
         popup(PopupComponents.confirmPopup("Are you sure you want to delete this user?", () => {
             Api.deleteUser(user.id).then((res) => {
@@ -113,15 +76,6 @@ export class Popups {
         }, () => {
             removePopups();
         }, "Delete user", "Yes", "No", "delete", "close"));
-    }
-
-    static removeBridgedUserPopup(user, instance, onRemove) {
-        popup(PopupComponents.confirmPopup(`Are you sure you want to remove ${user.username} from bridged users on ${instance.url}?`, () => {
-            onRemove();
-            removePopups();
-        }, () => {
-            removePopups();
-        }, "Remove user", "Yes", "No", "delete", "close"));
     }
 
     static updatePassword() {
@@ -154,21 +108,6 @@ export class Popups {
         }, () => {
             removePopups();
         }, "Delete account", "Yes", "No", "delete", "close"));
-    }
-
-    static removeInstancePopup(instance, instances) {
-        popup(PopupComponents.confirmPopup(`Are you sure you want to remove ${instance.url} from bridged instances?`, () => {
-            Api.removeInstance(instance.id).then(res => {
-                if (res.status === 200) {
-                    toast("Bridged instance removed", "success");
-                    instances.value = instances.value.filter(i => i.id !== instance.id);
-                } else {
-                    toast("Failed to remove bridged instance: " + res.data.error, "error");
-                }
-            });
-        }, () => {
-            removePopups();
-        }, "Remove instance", "Yes", "No", "delete", "close"));
     }
 
     static editMessage(message, messages) {

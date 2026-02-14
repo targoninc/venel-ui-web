@@ -1,6 +1,5 @@
 import {LayoutTemplates} from "../layout.ts";
 import {CommonTemplates} from "../common.ts";
-import {Store} from "../../api/Store.ts";
 import {Api} from "../../api/Api.ts";
 import {
     playLoop,
@@ -22,6 +21,7 @@ import {
     systemNotificationsEnabled
 } from "../../api/Setting.ts";
 import {compute, create, signal, signalMap, when} from "@targoninc/jess";
+import {currentUser} from "../../api/Store";
 
 export class SettingsComponent {
     static render() {
@@ -29,8 +29,7 @@ export class SettingsComponent {
     }
 
     static content() {
-        const user = Store.get('user');
-        const permissions = compute(u => u.permissions, user);
+        const permissions = compute(u => u?.permissions, currentUser);
 
         return create("div")
             .classes("panes-v", "full-width", "full-height")
@@ -50,24 +49,23 @@ export class SettingsComponent {
                                     create("h1")
                                         .text("Administration")
                                         .build(),
-                                    SettingsComponent.yourInfo(user),
+                                    SettingsComponent.yourInfo(),
                                     SettingsComponent.usersSettings(permissions),
-                                    SettingsComponent.bridgeInstanceSettings(permissions)
                                 ).build()
                         ), "100%", "500px", "100%")
                     ).build()
             ).build();
     }
 
-    static yourInfo(user) {
-        const roles = compute(u => u.roles, user);
-        const permissions = compute(u => u.permissions, user);
+    static yourInfo() {
+        const roles = compute(u => u?.roles, currentUser);
+        const permissions = compute(u => u?.permissions, currentUser);
 
         return create("div")
             .classes("flex-v", "card")
             .children(
                 create("h2")
-                    .text("Your Access as @" + user.value.username)
+                    .text("Your Access as @" + currentUser.value?.username)
                     .build(),
                 LayoutTemplates.collapsible("Roles", signalMap(roles,
                     create("div")
@@ -94,161 +92,6 @@ export class SettingsComponent {
             .text(permission.name)
             .title(permission.description)
             .build();
-    }
-
-    static bridgeInstanceSettings(permissions) {
-        const hasViewPermission = compute(ps => ps && ps.some(p => p.name === "viewBridgedInstances"), permissions);
-
-        const bridgedInstances = signal([]);
-        const loading = signal(hasViewPermission.value);
-        if (hasViewPermission.value) {
-            Api.getInstances().then(res => {
-                loading.value = false;
-                if (res.status === 200) {
-                    bridgedInstances.value = res.data;
-                } else {
-                    toast("Failed to fetch bridged instances: " + res.data.error, "error");
-                }
-            });
-        }
-
-        return create("div")
-            .classes("flex-v", "card")
-            .children(
-                create("h2")
-                    .text("Bridged Instances")
-                    .build(),
-                when(hasViewPermission, create("div")
-                    .classes("flex-v")
-                    .children(
-                        SettingsComponent.bridgeInstanceActions(bridgedInstances, permissions),
-                        when(loading, CommonTemplates.spinner()),
-                        signalMap(bridgedInstances,
-                            create("div")
-                                .classes("flex-v"),
-                            instance => SettingsComponent.bridgeInstance(bridgedInstances, instance, permissions)),
-                    ).build()),
-                when(hasViewPermission, create("span")
-                    .classes("error")
-                    .text("You do not have permission to view bridged instances")
-                    .build(), true),
-            ).build();
-    }
-
-    static bridgeInstanceActions(bridgedInstances, permissions) {
-        const hasAddPermission = compute(ps => ps && ps.some(p => p.name === "addBridgedInstance"), permissions);
-
-        return create("div")
-            .classes("flex-v")
-            .children(
-                create("p")
-                    .text("Bridged instances allow you to connect to other instances of Venel.")
-                    .build(),
-                create("div")
-                    .classes("flex")
-                    .children(
-                        when(hasAddPermission, CommonTemplates.buttonWithIcon("add_link", "Add Bridged Instance", () => {
-                            popup(SettingsComponent.addBridgedInstancePopup(() => {
-                                removePopups();
-                            }, bridgedInstances));
-                        })),
-                    ).build(),
-            ).build();
-    }
-
-    static addBridgedInstancePopup(onclose, bridgedInstances) {
-        const instanceInfo = signal({
-            url: "",
-            useAllowlist: false,
-            enabled: true,
-            allowList: [],
-        });
-        const url = compute(i => i.url, instanceInfo);
-        const useAllowlist = compute(i => i.useAllowlist, instanceInfo);
-        const enabled = compute(i => i.enabled, instanceInfo);
-
-        return create("div")
-            .classes("flex-v", "card")
-            .children(
-                create("div")
-                    .classes("flex", "space-between")
-                    .children(
-                        create("h3").text("Add instance").build(),
-                        PopupComponents.closeButton(onclose),
-                    ).build(),
-                create("div")
-                    .classes("flex-v")
-                    .children(
-                        CommonTemplates.input("url", "url", "URL", "URL of the instance", url, (e) => {
-                            instanceInfo.value = {
-                                ...instanceInfo.value,
-                                url: e.target.value
-                            };
-                        }, true),
-                        CommonTemplates.checkbox("useAllowlist", "Use Allowlist", useAllowlist, (e) => {
-                            instanceInfo.value = {
-                                ...instanceInfo.value,
-                                useAllowlist: e.target.checked
-                            };
-                        }),
-                        CommonTemplates.checkbox("enabled", "Enabled", enabled, (e) => {
-                            instanceInfo.value = {
-                                ...instanceInfo.value,
-                                enabled: e.target.checked
-                            };
-                        }),
-                    ).build(),
-                create("div")
-                    .classes("flex", "space-between")
-                    .children(
-                        CommonTemplates.buttonWithIcon("close", "Cancel" , onclose),
-                        CommonTemplates.buttonWithIcon("add_link", "Add", () => {
-                            if (!url.value) {
-                                toast("URL is required", "error");
-                                return;
-                            }
-
-                            Api.addInstance(url.value, useAllowlist.value, enabled.value).then(res => {
-                                if (res.status === 200) {
-                                    toast("Bridged instance added", "success");
-                                    bridgedInstances.value = [...bridgedInstances.value, res.data];
-                                    onclose();
-                                } else {
-                                    toast("Failed to add bridged instance: " + res.data.error, "error");
-                                }
-                            });
-                        }),
-                    ).build(),
-            ).build();
-    }
-
-    static bridgeInstance(instances, instance, permissions) {
-        const hasRemovePermission = compute(ps => ps && ps.some(p => p.name === "removeBridgedInstance"), permissions);
-
-        return create("div")
-            .classes("flex-v")
-            .children(
-                create("div")
-                    .classes("flex", "space-between")
-                    .children(
-                        create("span")
-                            .classes("instance")
-                            .text(instance.url)
-                            .build(),
-                        create("div")
-                            .classes("flex")
-                            .children(
-                                when(instance.useAllowlist, CommonTemplates.circleToggle("Only allowed users", "var(--purple)", () => toggleAllowlist(instances, instance))),
-                                when(instance.useAllowlist, CommonTemplates.circleToggle("All users", "var(--green)", () => toggleAllowlist(instances, instance)), true),
-                                when(instance.enabled, CommonTemplates.circleToggle("Enabled", "var(--green)", () => toggleInstanceEnabled(instances, instance))),
-                                when(instance.enabled, CommonTemplates.circleToggle("Disabled", "var(--red)", () => toggleInstanceEnabled(instances, instance)), true),
-                                when(hasRemovePermission, CommonTemplates.buttonWithIcon("delete", "Remove", () => {
-                                    Popups.removeInstancePopup(instance, instances);
-                                })),
-                            ).build(),
-                    ).build(),
-                when(instance.bridgedUsers, LayoutTemplates.collapsible("Allowlist", SettingsComponent.allowlist(instance))),
-            ).build();
     }
 
     static usersSettings(permissions) {
@@ -341,49 +184,6 @@ export class SettingsComponent {
             .classes("flex")
             .children(
                 user.permissions.map(permission => SettingsComponent.permission(permission)),
-            ).build();
-    }
-
-    static allowlist(instance) {
-        const allowList = signal(instance.bridgedUsers);
-
-        return create("div")
-            .classes("flex-v")
-            .children(
-                SettingsComponent.allowListActions(instance, allowList),
-                create("div")
-                    .classes("flex-v")
-                    .children(
-                        signalMap(allowList,
-                            create("div")
-                                .classes("flex-v"),
-                            user => CommonTemplates.userInList(user.avatar, user.displayname, user.username, () => {
-                                Popups.removeBridgedUserPopup(user, instance, () => {
-                                    Api.removeBridgedUser(user.id, instance.id).then(res => {
-                                        if (res.status === 200) {
-                                            allowList.value = allowList.value.filter(u => u.id !== user.id);
-                                            toast("User removed", "success");
-                                        } else {
-                                            toast("Failed to remove user: " + res.data.error, "error");
-                                        }
-                                    });
-                                });
-                            })),
-                    ).build(),
-            ).build();
-    }
-
-    static allowListActions(instance, allowList) {
-        return create("div")
-            .classes("flex-v")
-            .children(
-                create("div")
-                    .classes("flex")
-                    .children(
-                        CommonTemplates.buttonWithIcon("add", "Add User", () => {
-                            Popups.newBridgedUser(instance, allowList);
-                        }),
-                    ).build(),
             ).build();
     }
 

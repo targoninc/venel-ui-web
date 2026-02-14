@@ -122,7 +122,10 @@ export function toggleInstanceEnabled(instances, instance) {
     });
 }
 
-export function playSound(name: string) {
+export function playSound(name: string | null) {
+    if (!name) {
+        return;
+    }
     const audio = new Audio(`/sounds/${name}`);
     audio.play().then();
 }

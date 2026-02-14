@@ -1,7 +1,6 @@
 import {Api} from "./Api.ts";
 import {playSound, testImage, toast} from "../actions.ts";
 import {Live} from "../live/Live.ts";
-import {Store} from "./Store.ts";
 import {
     currentSound,
     localNotificationsEnabled,
@@ -10,44 +9,40 @@ import {
     systemNotificationsEnabled
 } from "./Setting.ts";
 import {Notifier} from "../live/Notifier.ts";
-import {signal} from "@targoninc/jess";
-import {store} from "../compat";
+import {channels, currentUser, messages} from "./Store";
+import {Channel, Id, Message, User} from "../models/models";
 
 export class Hooks {
-    static runUser(user) {
+    static runUser(user: User) {
         if (!user) {
             return;
-        }
-
-        if (!store().get('channels')) {
-            store().set('channels', signal([]));
         }
 
         Setting.initializeLocalStoreFromUser(user);
 
         Api.getChannels().then((res) => {
             if (res.status === 200) {
-                store().setSignalValue('channels', res.data);
+                channels.value = res.data;
                 for (const channel of res.data) {
                     Hooks.runActiveChannel(channel.id);
                 }
             } else {
                 toast("Failed to fetch channels: " + res.data.error, "negative");
-                store().setSignalValue('channels', []);
+                channels.value = [];
             }
         });
 
         Live.startIfNotRunning();
     }
 
-    static runActiveChannel(channel) {
-        if (!channel) {
+    static runActiveChannel(channelId: Id) {
+        if (!channelId) {
             return;
         }
 
-        Api.getMessages(channel, 0).then((res) => {
+        Api.getMessages(channelId, 0).then((res) => {
             if (res.status === 200) {
-                setMessages(channel, res.data);
+                setMessages(channelId, res.data);
             } else {
                 toast("Failed to fetch messages: " + res.data.error, "negative");
             }
@@ -55,36 +50,33 @@ export class Hooks {
     }
 }
 
-export function setMessages(channel, messages) {
-    if (!store().get('messages')) {
-        store().set('messages', signal({}));
-    }
-
-    const ex = store().get('messages').value;
-    setChannel(ex, channel);
-    store().setSignalValue('messages', {...ex, [channel]: messages.sort((a, b) => a.id - b.id)});
+export function setMessages(channelId: Id, msgs: Message[]) {
+    const ex = messages.value;
+    setChannel(ex, channelId);
+    messages.value = {
+        ...ex,
+        [channelId]: msgs.sort((a, b) => a.id - b.id)
+    };
 }
 
-export function addMessage(channel, message) {
-    if (!store().get('messages')) {
-        store().set('messages', signal({}));
-    }
+export function addMessage(channelId: Id, message: Message) {
+    const ex = messages.value;
+    setChannel(ex, channelId);
 
-    const ex = store().get('messages').value;
-    setChannel(ex, channel);
-
-    if (ex[channel].find((m) => m.id === message.id)) {
+    if (ex[channelId].find((m) => m.id === message.id)) {
         return;
     }
-    store().setSignalValue('messages', {...ex, [channel]: [...ex[channel], message]});
+    messages.value = {
+        ...ex,
+        [channelId]: [...ex[channelId], message]
+    };
 
-    const user = Store.get('user');
-    if (message.sender.id === user.value.id) {
+    if (message.sender.id === currentUser.value?.id) {
         return;
     }
 
     if (localNotificationsEnabled()) {
-        Notifier.sendMessage(channel, message);
+        Notifier.sendMessage(channelId, message);
     }
     if (systemNotificationsEnabled()) {
         new Notification(`New message from ${message.sender.displayname ?? message.sender.username}`, {
@@ -97,14 +89,13 @@ export function addMessage(channel, message) {
     }
 }
 
-export function removeMessage(channel, messageId) {
-    if (!store().get('messages')) {
-        store().set('messages', signal({}));
-    }
-
-    const ex = store().get('messages').value;
-    setChannel(ex, channel);
-    store().setSignalValue('messages', {...ex, [channel]: ex[channel].filter((message) => message.id !== messageId)});
+export function removeMessage(channelId: Id, messageId: Id) {
+    const ex = messages.value;
+    setChannel(ex, channelId);
+    messages.value = {
+        ...ex,
+        [channelId]: ex[channelId].filter((message) => message.id !== messageId)
+    };
 }
 
 export function setChannel(ex, channel) {
@@ -113,37 +104,19 @@ export function setChannel(ex, channel) {
     }
 }
 
-export function addChannel(channel) {
-    if (!store().get('channels')) {
-        store().set('channels', signal([]));
-    }
-
-    if (store().get('channels').value.some((c) => c.id === channel.id)) {
+export function addChannel(channel: Channel) {
+    if (channels.value.some((c) => c.id === channel.id)) {
         return;
     }
 
-    store().setSignalValue('channels', [channel, ...store().get('channels').value]);
+    channels.value = [
+        channel,
+        ...channels.value
+    ];
 }
 
-export function removeChannel(channel) {
-    if (!store().get('channels')) {
-        store().set('channels', signal([]));
-    }
-
-    store().setSignalValue('channels', store().get('channels').value.filter((c) => c !== channel));
-}
-
-export function setActiveChannel(channel) {
-    store().set('activeChannel', signal(channel));
-    Hooks.runActiveChannel(channel);
-}
-
-export function addReaction(messageId, reactionId, userId) {
-    if (!store().get('messages')) {
-        store().set('messages', signal({}));
-    }
-
-    const ex = store().get('messages').value;
+export function addReaction(messageId: number, reactionId: number, userId: number) {
+    const ex = messages.value;
     for (const channel in ex) {
         const message = ex[channel].find((m) => m.id === messageId);
         if (message) {
@@ -151,30 +124,31 @@ export function addReaction(messageId, reactionId, userId) {
                 r.isNew = false;
                 return r;
             });
-            message.reactions.push({ id: reactionId, userId, isNew: userId === Store.get('user').value.id });
-            store().setSignalValue('messages', ex);
+            message.reactions.push({
+                reactionId,
+                messageId,
+                userId,
+                isNew: userId === currentUser.value?.id
+            });
+            messages.value = ex;
             return;
         }
     }
 }
 
-export function removeReaction(messageId, reactionId, userId) {
-    if (!store().get('messages')) {
-        store().set('messages', signal({}));
-    }
-
-    const ex = store().get('messages').value;
+export function removeReaction(messageId: number, reactionId: number, userId: number) {
+    const ex = messages.value;
     for (const channel in ex) {
         const message = ex[channel].find((m) => m.id === messageId);
         if (message) {
             message.reactions = message.reactions.filter((r) => {
-                return !(r.id === reactionId && r.userId === userId);
+                return !(r.reactionId === reactionId && r.userId === userId);
             });
             message.reactions = message.reactions.map(r => {
                 r.isNew = false;
                 return r;
             });
-            store().setSignalValue('messages', ex);
+            messages.value = ex;
             return;
         }
     }
