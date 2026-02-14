@@ -2,8 +2,9 @@ import {LayoutTemplates} from "../layout.ts";
 import {CommonTemplates} from "../common.ts";
 import {Api} from "../../api/Api.ts";
 import {toast} from "../../actions.ts";
-import {create, signal, when} from "@targoninc/jess";
+import {create, InputType, signal, when} from "@targoninc/jess";
 import {router} from "../../routing/RouterInstance.ts";
+import {target} from "../../index";
 
 export class RegisterComponent {
     static render() {
@@ -16,11 +17,11 @@ export class RegisterComponent {
 
     static content() {
         const username = signal("");
-        const usernameError = signal(null);
+        const usernameError = signal<string | null>(null);
         const password = signal("");
-        const passwordError = signal(null);
+        const passwordError = signal<string | null>(null);
         const password2 = signal("");
-        const password2Error = signal(null);
+        const password2Error = signal<string | null>(null);
         const validate = () => {
             if (username.value.length === 0) {
                 usernameError.value = "Username cannot be empty.";
@@ -72,23 +73,23 @@ export class RegisterComponent {
                         create("div")
                             .classes("flex-v")
                             .children(
-                                CommonTemplates.input("text", "username", "Username", "Username", username, (e) => {
-                                    username.value = e.target.value;
+                                CommonTemplates.input(InputType.text, "username", "Username", "Username", username, (e) => {
+                                    username.value = target(e).value;
                                 }, true, "username", () => {
                                     document.getElementById("password")?.focus();
                                 }),
                                 when(usernameError, CommonTemplates.error(usernameError)),
-                                CommonTemplates.input("password", "password", "Password", "Password", password, (e) => {
-                                    password.value = e.target.value;
+                                CommonTemplates.input(InputType.password, "password", "Password", "Password", password, (e) => {
+                                    password.value = target(e).value;
                                 }, true, "current-password", (e) => {
-                                    password.value = e.target.value;
+                                    password.value = target(e).value;
                                     document.getElementById("password2")?.focus();
                                 }),
                                 when(passwordError, CommonTemplates.error(passwordError)),
-                                CommonTemplates.input("password", "password2", "Password", "Password", password2, (e) => {
-                                    password2.value = e.target.value;
+                                CommonTemplates.input(InputType.password, "password2", "Password", "Password", password2, (e) => {
+                                    password2.value = target(e).value;
                                 }, true, "new-password", (e) => {
-                                    password2.value = e.target.value;
+                                    password2.value = target(e).value;
                                     document.getElementById("register")?.click();
                                 }),
                                 when(password2Error, CommonTemplates.error(password2Error)),

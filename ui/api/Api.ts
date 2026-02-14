@@ -10,7 +10,7 @@ export class Api extends ApiBase {
         return await this.post("/api/auth/authorize", {username, password});
     }
 
-    static async register(username = null, password = null) {
+    static async register(username: string, password: string) {
         return await this.post("/api/auth/register", {username, password});
     }
 

@@ -283,10 +283,10 @@ export class CommonTemplates {
             ).build();
     }
 
-    static error(message: StringOrSignal) {
+    static error(message: Signal<string | null>) {
         return create("span")
             .classes("error")
-            .text(message)
+            .text(message as HtmlPropertyValue)
             .build();
     }
 
