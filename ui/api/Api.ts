@@ -33,7 +33,7 @@ export class Api extends ApiBase {
         return await this.post("/api/auth/updateAvatar", {avatar});
     }
 
-    static async deleteUser(userId = null) {
+    static async deleteUser(userId: number) {
         return await this.delete("/api/auth/deleteUser", {userId});
     }
 

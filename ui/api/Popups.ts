@@ -4,9 +4,10 @@ import {Api} from "./Api.ts";
 import {Live} from "../live/Live.ts";
 import {CommonTemplates} from "../components/common.ts";
 import {removeMessage} from "./Hooks.ts";
-import {signal} from "@targoninc/jess";
+import {Signal, signal} from "@targoninc/jess";
 import {router} from "../routing/RouterInstance.ts";
 import {channels} from "./Store";
+import {User} from "../models/models";
 
 export class Popups {
     static newDm() {
@@ -61,7 +62,7 @@ export class Popups {
         }, "New DM", "Search for users"));
     }
 
-    static deleteUserPopup(users, user) {
+    static deleteUserPopup(users: Signal<User[]>, user: User) {
         popup(PopupComponents.confirmPopup("Are you sure you want to delete this user?", () => {
             Api.deleteUser(user.id).then((res) => {
                 if (res.status !== 200) {

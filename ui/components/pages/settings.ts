@@ -20,8 +20,9 @@ import {
     setLocalNotificationsEnabled, setSoundEnabled, setSystemNotificationsEnabled, soundEnabled,
     systemNotificationsEnabled
 } from "../../api/Setting.ts";
-import {compute, create, signal, signalMap, when} from "@targoninc/jess";
+import {compute, create, Signal, signal, signalMap, when} from "@targoninc/jess";
 import {currentUser} from "../../api/Store";
+import {Permission, Role, User} from "../../models/models";
 
 export class SettingsComponent {
     static render() {
@@ -29,8 +30,6 @@ export class SettingsComponent {
     }
 
     static content() {
-        const permissions = compute(u => u?.permissions, currentUser);
-
         return create("div")
             .classes("panes-v", "full-width", "full-height")
             .children(
@@ -50,7 +49,7 @@ export class SettingsComponent {
                                         .text("Administration")
                                         .build(),
                                     SettingsComponent.yourInfo(),
-                                    SettingsComponent.usersSettings(permissions),
+                                    SettingsComponent.usersSettings(),
                                 ).build()
                         ), "100%", "500px", "100%")
                     ).build()
@@ -58,8 +57,8 @@ export class SettingsComponent {
     }
 
     static yourInfo() {
-        const roles = compute(u => u?.roles, currentUser);
-        const permissions = compute(u => u?.permissions, currentUser);
+        const roles = compute(u => u?.roles ?? [], currentUser);
+        const permissions = compute(u => u?.permissions ?? [], currentUser);
 
         return create("div")
             .classes("flex-v", "card")
@@ -78,7 +77,7 @@ export class SettingsComponent {
             ).build();
     }
 
-    static role(role) {
+    static role(role: Role) {
         return create("span")
             .classes("pill")
             .text(role.name)
@@ -86,7 +85,7 @@ export class SettingsComponent {
             .build();
     }
 
-    static permission(permission) {
+    static permission(permission: Permission) {
         return create("span")
             .classes("pill")
             .text(permission.name)
@@ -94,9 +93,10 @@ export class SettingsComponent {
             .build();
     }
 
-    static usersSettings(permissions) {
+    static usersSettings() {
+        const permissions = compute(u => u?.permissions, currentUser);
         const hasViewPermission = compute(ps => ps && ps.some(p => p.name === "viewUsers"), permissions);
-        const users = signal([]);
+        const users = signal<User[]>([]);
         const loading = signal(hasViewPermission.value);
         if (hasViewPermission.value) {
             Api.getUsers().then(res => {
@@ -118,12 +118,12 @@ export class SettingsComponent {
                 when(hasViewPermission, create("div")
                     .classes("flex-v")
                     .children(
-                        SettingsComponent.userActions(users, permissions),
+                        SettingsComponent.userActions(),
                         when(loading, CommonTemplates.spinner()),
                         signalMap(users,
                             create("div")
                                 .classes("flex-v"),
-                            user => SettingsComponent.user(users, user, permissions)),
+                            user => SettingsComponent.user(users, user)),
                     ).build()),
                 when(hasViewPermission, create("span")
                     .classes("error")
@@ -132,7 +132,7 @@ export class SettingsComponent {
             ).build();
     }
 
-    static userActions(users, permissions) {
+    static userActions() {
         return create("div")
             .classes("flex-v")
             .children(
@@ -144,7 +144,8 @@ export class SettingsComponent {
             ).build();
     }
 
-    static user(users, user, permissions) {
+    static user(users: Signal<User[]>, user: User) {
+        const permissions = compute(u => u?.permissions, currentUser);
         const hasEditPermission = compute(ps => ps && ps.some(p => p.name === "editUser"), permissions);
         const hasDeletePermission = compute(ps => ps && ps.some(p => p.name === "deleteUser"), permissions);
 
@@ -154,7 +155,7 @@ export class SettingsComponent {
                 create("div")
                     .classes("flex", "space-between")
                     .children(
-                        CommonTemplates.userInList(user.avatar ? user.avatar : testImage, user.displayname, user.username, () => {}),
+                        CommonTemplates.userInList(user.avatar ?? testImage, user.displayname, user.username, () => {}),
                         create("div")
                             .classes("flex")
                             .children(
@@ -189,23 +190,23 @@ export class SettingsComponent {
 
     static settings() {
         const notifs_on = signal(localNotificationsEnabled());
-        const notifs_color = compute(on => on ? "var(--green)" : "var(--red)", notifs_on);
+        const notifs_color = compute((on): string => on ? "var(--green)" : "var(--red)", notifs_on);
         notifs_on.subscribe(v => {
             setLocalNotificationsEnabled(v ? "true" : "false");
         });
         const system_notifs_on = signal(systemNotificationsEnabled());
-        const system_notifs_color = compute(on => on ? "var(--green)" : "var(--red)", system_notifs_on);
+        const system_notifs_color = compute((on): string => on ? "var(--green)" : "var(--red)", system_notifs_on);
         system_notifs_on.subscribe(v => {
             setSystemNotificationsEnabled(v);
         });
-        const notifText = compute(on => on ? "Disable local notifications (in-window popups)" : "Enable local notifications (in-window popups)", notifs_on);
-        const systemNotifText = compute(on => on ? "Disable system notifications" : "Enable system notifications", system_notifs_on);
+        const notifText = compute((on): string => on ? "Disable local notifications (in-window popups)" : "Enable local notifications (in-window popups)", notifs_on);
+        const systemNotifText = compute((on): string => on ? "Disable system notifications" : "Enable system notifications", system_notifs_on);
         const sound_on = signal(soundEnabled());
         sound_on.subscribe(v => {
             setSoundEnabled(v);
         });
-        const sound_color = compute(on => on ? "var(--green)" : "var(--red)", sound_on);
-        const soundText = compute(on => on ? "Disable sound" : "Enable sound", sound_on);
+        const sound_color = compute((on): string => on ? "var(--green)" : "var(--red)", sound_on);
+        const soundText = compute((on): string => on ? "Disable sound" : "Enable sound", sound_on);
         const sound = signal(currentSound());
         sound.subscribe(v => {
             setCurrentSound(v);

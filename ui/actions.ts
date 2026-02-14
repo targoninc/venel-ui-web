@@ -130,7 +130,10 @@ export function playSound(name: string | null) {
     audio.play().then();
 }
 
-export function playLoop(name: string) {
+export function playLoop(name: string | null) {
+    if (!name) {
+        return;
+    }
     stopPlayingLoop();
     const audio = new Audio(`/loops/${name}`);
     audio.loop = true;

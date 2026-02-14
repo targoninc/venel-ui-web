@@ -6,7 +6,7 @@ import {target} from "../index";
 import {currentUser} from "../api/Store";
 
 export class CommonTemplates {
-    static icon(icon, classes: StringOrSignal[] = [], tag = "span") {
+    static icon(icon: StringOrSignal, classes: StringOrSignal[] = [], tag = "span") {
         if (!icon) {
             icon = testImage;
         }
@@ -25,7 +25,7 @@ export class CommonTemplates {
             .build();
     }
 
-    static buttonWithIcon(icon, text, onclick, classes: StringOrSignal[] = [], iconClasses: StringOrSignal[] = []) {
+    static buttonWithIcon(icon: StringOrSignal, text: StringOrSignal, onclick: Function, classes: StringOrSignal[] = [], iconClasses: StringOrSignal[] = []) {
         return create("button")
             .classes("flex", ...classes)
             .onclick(onclick)
@@ -37,7 +37,7 @@ export class CommonTemplates {
             ).build();
     }
 
-    static buttonWithSpinner(icon, text, id, onclick, loadingState, classes: StringOrSignal[] = []) {
+    static buttonWithSpinner(icon: StringOrSignal, text: StringOrSignal, id: StringOrSignal, onclick: Function, loadingState: Signal<boolean>, classes: StringOrSignal[] = []) {
         return create("button")
             .classes("flex", ...classes)
             .onclick(onclick)
@@ -54,7 +54,7 @@ export class CommonTemplates {
             ).build();
     }
 
-    static select(label, options, value, onchange) {
+    static select(label: StringOrSignal, options: Array<{ value: any, text: StringOrSignal }>, value: Signal<any>, onchange: Function) {
         return create("div")
             .classes("flex", "align-center")
             .children(
@@ -76,9 +76,7 @@ export class CommonTemplates {
                                         .text(option.text)
                                         .value(option.value)
                                         .selected(selected)
-                                        .onclick(() => {
-                                            onchange(option.value);
-                                        })
+                                        .onclick(() => onchange(option.value))
                                         .build();
                                 })
                             ).build()
@@ -118,7 +116,6 @@ export class CommonTemplates {
                     .children(
                         CommonTemplates.buttonWithIcon("chat", "Chat", () => router.navigate('chat'), [activeIfActive("chat")]),
                         //CommonTemplates.buttonWithIcon("group", "Friends", () => window.router.navigate('friends'), [activeIfActive("friends")]),
-                        //CommonTemplates.buttonWithIcon("explore", "Explore", () => window.router.navigate('explore'), [activeIfActive("explore")]),
                     ).build(),
                 create("div")
                     .classes("actions-footer", "flex", "align-center", "no-gap", "full-width")
@@ -162,7 +159,7 @@ export class CommonTemplates {
             ).build();
     }
 
-    static circleToggle(text, color: StringOrSignal = "var(--blue)", onclick = () => {
+    static circleToggle(text: StringOrSignal, color: StringOrSignal = "var(--blue)", onclick = () => {
     }) {
         return create("div")
             .classes("flex", "align-center", "circle-toggle")
@@ -178,7 +175,7 @@ export class CommonTemplates {
             ).build();
     }
 
-    static userInList(image, name, text, onclick, avatarClass = "channel-avatar") {
+    static userInList(image: string, name: StringOrSignal, text: StringOrSignal, onclick: Function, avatarClass: StringOrSignal = "channel-avatar") {
         return create("button")
             .classes("flex")
             .onclick(onclick)
@@ -403,7 +400,7 @@ export class CommonTemplates {
     static chatUser(avatar: string, name: string, onclick: Function, onlonghover = (e: MouseEvent) => {
     }, onhoverout = (e: MouseEvent) => {
     }) {
-        let timeout = null;
+        let timeout: number | null = null;
 
         return create("div")
             .classes("flex", "align-center", "chat-user")
@@ -428,7 +425,7 @@ export class CommonTemplates {
             ).build();
     }
 
-    static smallIconButton(icon, title, onclick, classes: StringOrSignal[] = []) {
+    static smallIconButton(icon: StringOrSignal, title: StringOrSignal, onclick: Function, classes: StringOrSignal[] = []) {
         return create("div")
             .classes("small-icon-button", "flex", "align-center", ...classes)
             .onclick(onclick)
