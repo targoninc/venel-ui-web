@@ -12,7 +12,7 @@ import {AttachmentTemplates} from "../attachment.ts";
 import {VirtualList} from "../../tooling/VirtualList.ts";
 import {create, signal, compute, signalMap, when, Signal} from "@targoninc/jess";
 import {target} from "../../index";
-import {Message} from "../../models/models";
+import {Id, Message} from "../../models/models";
 
 export class ChatComponent {
     static render(params) {
@@ -65,15 +65,19 @@ export class ChatComponent {
             ).build();
     }
 
-    static chat(activeChannel) {
+    static chat(activeChannel: Signal<Id | null>) {
         const sending = signal(false);
         const messageText = signal("");
-        const displayedMsgs = compute((msgs) => {
-            const out = msgs[activeChannel.value] || [];
+        const displayedMsgs = compute((msgs, a) => {
+            if (!a) {
+                return [];
+            }
+
+            const out = msgs[a] || [];
             return out.sort((a, b) => {
                 return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
             });
-        }, messages);
+        }, messages, activeChannel);
         const menuShownForMessageId = signal(null);
         const toBeSentAttachments = signal([]);
         const hasAttachments = compute(attachments => {

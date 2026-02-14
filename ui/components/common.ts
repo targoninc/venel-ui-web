@@ -4,6 +4,7 @@ import {router} from "../routing/RouterInstance.ts";
 import {User} from "../models/models";
 import {target} from "../index";
 import {currentUser} from "../api/Store";
+import {Popups} from "../api/Popups";
 
 export class CommonTemplates {
     static icon(icon: StringOrSignal, classes: StringOrSignal[] = [], tag = "span") {
@@ -115,6 +116,7 @@ export class CommonTemplates {
                     .classes("flex", "align-center")
                     .children(
                         CommonTemplates.buttonWithIcon("chat", "Chat", () => router.navigate('chat'), [activeIfActive("chat")]),
+                        CommonTemplates.buttonWithIcon("chat_add_on", "New", () => Popups.newDm()),
                         //CommonTemplates.buttonWithIcon("group", "Friends", () => window.router.navigate('friends'), [activeIfActive("friends")]),
                     ).build(),
                 create("div")

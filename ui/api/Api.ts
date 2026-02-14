@@ -1,4 +1,5 @@
 import {ApiBase} from "./ApiBase.ts";
+import {Id} from "../models/models";
 
 export class Api extends ApiBase {
     static async logout() {
@@ -33,7 +34,7 @@ export class Api extends ApiBase {
         return await this.post("/api/auth/updateAvatar", {avatar});
     }
 
-    static async deleteUser(userId: number) {
+    static async deleteUser(userId: Id) {
         return await this.delete("/api/auth/deleteUser", {userId});
     }
 

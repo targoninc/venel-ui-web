@@ -115,7 +115,7 @@ export function addChannel(channel: Channel) {
     ];
 }
 
-export function addReaction(messageId: number, reactionId: number, userId: number) {
+export function addReaction(messageId: Id, reactionId: Id, userId: Id) {
     const ex = messages.value;
     for (const channel in ex) {
         const message = ex[channel].find((m) => m.id === messageId);
@@ -136,7 +136,7 @@ export function addReaction(messageId: number, reactionId: number, userId: numbe
     }
 }
 
-export function removeReaction(messageId: number, reactionId: number, userId: number) {
+export function removeReaction(messageId: Id, reactionId: Id, userId: Id) {
     const ex = messages.value;
     for (const channel in ex) {
         const message = ex[channel].find((m) => m.id === messageId);
