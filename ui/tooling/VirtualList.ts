@@ -91,7 +91,7 @@ export class VirtualList {
         // Update top padding or transform of the listItemsContainer to position it correctly
         const listContainerTransform = compute((data) => {
             const offsetY = data.start * options.itemHeight;
-            listItemsContainer.style.transform = `translateY(${offsetY}px)`;
+            listItemsContainer._node.style.transform = `translateY(${offsetY}px)`;
             return offsetY;
         }, renderData);
 
